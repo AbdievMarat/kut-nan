@@ -9,7 +9,7 @@
                     <div class="col-md-3">
                         <input type="date" name="date" class="form-control" value="{{ $date }}">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-9">
                         <button type="submit" class="btn btn-success">
                             <i class="bi bi-search"></i> Вывести
                         </button>
