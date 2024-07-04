@@ -60,7 +60,7 @@
                 @foreach ($busOrders as $busOrder)
                     @forelse ($busOrder->orders as $order)
                         <tr>
-                            <td>{{ $busOrder->license_plate }}</td>
+                            <td>{{ $busOrder->license_plate . ' ' . $busOrder->serial_number }}</td>
                             <td>{{ $order->product_1 }}</td>
                             <td>{{ $order->product_2 }}</td>
                             <td>{{ $order->product_3 }}</td>
@@ -93,7 +93,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td>{{ $busOrder->license_plate }}</td>
+                            <td>{{ $busOrder->license_plate . ' ' . $busOrder->serial_number }}</td>
                             <td></td>
                             <td></td>
                             <td></td>

@@ -38,7 +38,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/buses') ? 'active' : '' }}" href="{{ route('admin.buses.index') }}">
-                        <i class="bi bi-card-list"></i>
+                        <i class="bi bi-bus-front"></i>
                         Бусы
                     </a>
                 </li>
