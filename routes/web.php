@@ -13,6 +13,7 @@ Route::resource('orders', OrderController::class)->only(['create', 'store']);
 Auth::routes();
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/', [AdminOrderController::class, 'index'])->name('home');
     Route::resource('buses', BusController::class)->except(['destroy']);
     Route::resource('orders', AdminOrderController::class)->only(['index']);
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateBusRequest extends FormRequest
 {
@@ -22,7 +23,14 @@ class UpdateBusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'license_plate' => [
+                'required',
+                'numeric',
+                Rule::unique('buses', 'license_plate')->ignore($this->route('bus')->id)
+            ],
+            'serial_number' => ['required'],
+            'sort' => ['required', 'numeric'],
+            'is_active' => ['required'],
         ];
     }
 }

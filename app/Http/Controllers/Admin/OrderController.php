@@ -26,6 +26,7 @@ class OrderController extends Controller
             ->with(['orders' => function ($query) use ($date) {
                 $query->whereDate('date', $date);
             }])
+            ->where('is_active', '=', Bus::IS_ACTIVE)
             ->orderBy('sort')
             ->get();
 

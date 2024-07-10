@@ -9,6 +9,7 @@ use App\Models\Bus;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 
 class BusController extends Controller
 {
@@ -26,34 +27,46 @@ class BusController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
      */
-    public function create()
+    public function create(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-        //
+        return view('admin.buses.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @param StoreBusRequest $request
+     * @return RedirectResponse
      */
-    public function store(StoreBusRequest $request)
+    public function store(StoreBusRequest $request): RedirectResponse
     {
-        //
+        Bus::query()->create($request->validated());
+
+        return redirect()
+            ->route('admin.buses.index')
+            ->with('success', ['text' => 'Бус успешно создан!']);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * @param Bus $bus
+     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
      */
-    public function edit(Bus $bus)
+    public function edit(Bus $bus): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-        //
+        return view('admin.buses.edit', compact('bus'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * @param UpdateBusRequest $request
+     * @param Bus $bus
+     * @return RedirectResponse
      */
-    public function update(UpdateBusRequest $request, Bus $bus)
+    public function update(UpdateBusRequest $request, Bus $bus): RedirectResponse
     {
-        //
+        $bus->update($request->validated());
+
+        return redirect()
+            ->route('admin.buses.index')
+            ->with('success', ['text' => 'Бус успешно обновлен!']);
     }
 }

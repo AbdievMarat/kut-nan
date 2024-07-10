@@ -23,6 +23,15 @@ class Bus extends Model
 {
     use HasFactory;
 
+    const IS_ACTIVE = 1;
+    const IS_NOT_ACTIVE = 0;
+
+    protected $fillable = [
+        'license_plate',
+        'serial_number',
+        'sort',
+        'is_active',
+    ];
     /**
      * @return HasMany
      */

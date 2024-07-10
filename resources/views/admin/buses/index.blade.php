@@ -29,7 +29,11 @@
                         <td>{{ $bus->license_plate }}</td>
                         <td>{{ $bus->serial_number }}</td>
                         <td>{{ $bus->sort }} </td>
-                        <td>{{ $bus->is_active }}</td>
+                        <td>
+                            <div class="badge bg-{{ $bus->is_active ? 'success' : 'danger' }}">
+                                {{ $bus->is_active ? 'Активен' : 'Не активен' }}
+                            </div>
+                        </td>
                         <td>
                             <div class="d-flex justify-content-end">
                                 <div class="mx-2">

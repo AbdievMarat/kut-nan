@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreBusRequest extends FormRequest
 {
@@ -22,7 +23,13 @@ class StoreBusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'license_plate' => [
+                'required',
+                'numeric',
+                Rule::unique('buses', 'license_plate')
+            ],
+            'serial_number' => ['required'],
+            'sort' => ['required', 'numeric'],
         ];
     }
 }
