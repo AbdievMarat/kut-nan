@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
+ * @property-read Order|null $orders
+ * @property-read Remainder|null $remainders
+ *
  * @mixin Builder
  */
 class Bus extends Model
@@ -32,11 +35,20 @@ class Bus extends Model
         'sort',
         'is_active',
     ];
+
     /**
      * @return HasMany
      */
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function remainders(): HasMany
+    {
+        return $this->hasMany(Remainder::class);
     }
 }

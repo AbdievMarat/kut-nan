@@ -13,53 +13,40 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
 {
     protected $date;
+    protected $products;
+    protected $sumRealizations;
+    protected $sumRemainders;
 
-    public function __construct($date)
+    public function __construct($date, $products, $sumRealizations, $sumRemainders)
     {
         $this->date = $date;
+        $this->products = $products;
+        $this->sumRealizations = $sumRealizations;
+        $this->sumRemainders = $sumRemainders;
     }
 
     public function query()
     {
-        return Bus::with(['orders' => function ($query) {
-            $query->whereDate('date', $this->date);
-        }])->orderBy('sort');
+        return Bus::query()
+            ->with([
+                'orders' => function ($query) {
+                    $query->whereDate('date', $this->date)
+                        ->with(['items']);
+                }
+            ])
+            ->where('is_active', '=', Bus::IS_ACTIVE)
+            ->orderBy('sort');
     }
 
     public function headings(): array
     {
-        return [
-            'Автобус',
-            'Москва',
-            'Москва уп',
-            'Солдат',
-            'Отруб',
-            'Налив',
-            'Тостер',
-            'Тостер кара',
-            'Мини тостер',
-            'Гречневый',
-            'Зерновой',
-            'Багет',
-            'Без дрожж',
-            'Чемпион',
-            'Абсолют',
-            'Кукурузный',
-            'Уп. Бород',
-            'Уп. Батон отруб',
-            'Уп. Батон серый',
-            'Уп. Батон белый',
-            'Баатыр',
-            'Обама отруб',
-            'Обама ржан',
-            'Обама серый',
-            'Уп. Моск',
-            'Гамбургер',
-            'Тартин',
-            'Тартин зерновой',
-            'Тартин ржаной',
-            'Тартин с луком',
-        ];
+        $productNames = $this->products->pluck('name')->toArray();
+
+        return array_merge(
+            ['Автобус'],
+            $productNames,
+            ['Сумма', 'Уценка', 'Реализации', 'Остаток']
+        );
     }
 
     /**
@@ -68,53 +55,32 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
      */
     public function map($row): array
     {
-        $mapped = [];
+        $orderAmounts = [];
 
-        if ($row->orders->isEmpty()) {
-            $mapped[] = [
-                $row->license_plate . ' ' . $row->serial_number,
-                null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null,
-            ];
-        } else {
-            foreach ($row->orders as $order) {
-                $mapped[] = [
-                    $row->license_plate . ' ' . $row->serial_number,
-                    $order->product_1,
-                    $order->product_2,
-                    $order->product_3,
-                    $order->product_4,
-                    $order->product_5,
-                    $order->product_6,
-                    $order->product_7,
-                    $order->product_8,
-                    $order->product_9,
-                    $order->product_10,
-                    $order->product_11,
-                    $order->product_12,
-                    $order->product_13,
-                    $order->product_14,
-                    $order->product_15,
-                    $order->product_16,
-                    $order->product_17,
-                    $order->product_18,
-                    $order->product_19,
-                    $order->product_20,
-                    $order->product_21,
-                    $order->product_22,
-                    $order->product_23,
-                    $order->product_24,
-                    $order->product_25,
-                    $order->product_26,
-                    $order->product_27,
-                    $order->product_28,
-                    $order->product_29,
-                ];
+        // Подсчет количества продуктов в заказах
+        foreach ($row->orders as $order) {
+            foreach ($order->items as $item) {
+                $orderAmounts[$item->product_id] = $item->amount;
             }
         }
 
-        return $mapped;
+        // Формирование строки данных
+        $mappedRow = [
+            $row->license_plate . ' ' . $row->serial_number,
+        ];
+
+        // Добавляем количество для каждого продукта
+        foreach ($this->products as $product) {
+            $mappedRow[] = $orderAmounts[$product->id] ?? '';
+        }
+
+        // Добавляем сумму реализаций и остатков
+        $mappedRow[] = ''; // Сумма
+        $mappedRow[] = ''; // Уценка
+        $mappedRow[] = $this->sumRealizations[$row->id] ?? '';
+        $mappedRow[] = $this->sumRemainders[$row->id] ?? '';
+
+        return $mappedRow;
     }
 
     public function registerEvents(): array
@@ -123,7 +89,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                $sheet->getStyle('A1:AD1')->applyFromArray([
+                $sheet->getStyle('A1:AH1')->applyFromArray([
                     'alignment' => [
                         'textRotation' => 90,
                         'vertical' => Alignment::VERTICAL_CENTER,
@@ -165,6 +131,8 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                 $sheet->getColumnDimension('AB')->setWidth(5);
                 $sheet->getColumnDimension('AC')->setWidth(5);
                 $sheet->getColumnDimension('AD')->setWidth(5);
+                $sheet->getColumnDimension('AE')->setWidth(5);
+                $sheet->getColumnDimension('AF')->setWidth(5);
             },
         ];
     }

@@ -2,10 +2,10 @@
 
 @section('content')
     <div class="container-sm">
-        <a href="{{ route('admin.buses.index') }}" class="btn btn-outline-primary mb-3">&lang; Назад</a>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-outline-primary mb-3">&lang; Назад</a>
         <div class="row">
             <form
-                    action="{{ route('admin.buses.update', ['bus' => $bus]) }}"
+                    action="{{ route('admin.products.update', ['product' => $product]) }}"
                     method="post"
             >
                 @csrf
@@ -15,22 +15,22 @@
                 <hr>
                 <div class="mb-3">
                     <x-admin-forms-input
-                            type="number"
-                            id="license_plate"
-                            name="license_plate"
-                            label="Гос. номер"
-                            placeholder="Введите гос. номер"
-                            value="{{ old('license_plate') ?? $bus->license_plate }}"
+                            type="text"
+                            id="name"
+                            name="name"
+                            label="Название"
+                            placeholder="Введите название"
+                            value="{{ old('name') ?? $product->name }}"
                     />
                 </div>
                 <div class="mb-3">
                     <x-admin-forms-input
-                            type="text"
-                            id="serial_number"
-                            name="serial_number"
-                            label="Порядковый номер"
-                            placeholder="Введите порядковый номер"
-                            value="{{ old('serial_number') ?? $bus->serial_number }}"
+                            type="number"
+                            id="price"
+                            name="price"
+                            label="Цена"
+                            placeholder="Введите цену"
+                            value="{{ old('price') ?? $product->price }}"
                     />
                 </div>
                 <div class="mb-3">
@@ -40,7 +40,7 @@
                             name="sort"
                             label="Сортировка"
                             placeholder="Введите сортировку"
-                            value="{{ old('sort') ?? $bus->sort }}"
+                            value="{{ old('sort') ?? $product->sort }}"
                     />
                 </div>
 
@@ -52,7 +52,7 @@
                                 name="is_active"
                                 id="flexRadioDefault1"
                                 value="1"
-                                @checked($bus->is_active == \App\Models\Bus::IS_ACTIVE)
+                                @checked($product->is_active == \App\Models\Product::IS_ACTIVE)
                         />
                         <label class="form-check-label" for="flexRadioDefault1">
                             Активный
@@ -65,7 +65,7 @@
                                 name="is_active"
                                 id="flexRadioDefault2"
                                 value="0"
-                                @checked($bus->is_active == \App\Models\Bus::IS_NOT_ACTIVE)
+                                @checked($product->is_active == \App\Models\Product::IS_NOT_ACTIVE)
                         />
                         <label class="form-check-label" for="flexRadioDefault2">
                             Не активный

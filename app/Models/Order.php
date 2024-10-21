@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -44,10 +45,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
+ * @property-read Bus $bus
+ * @property-read OrderItem|null $items
+ *
  * @mixin Builder
  */
 class Order extends Model
 {
+    const TYPE_OPERATION_ORDER = 1;
+    const TYPE_OPERATION_REALIZATION = 2;
+    const TYPE_OPERATION_REMAINDER = 3;
+
     use HasFactory;
 
     protected $fillable = [
@@ -88,5 +96,13 @@ class Order extends Model
     public function bus(): BelongsTo
     {
         return $this->belongsTo(Bus::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

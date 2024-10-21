@@ -3,48 +3,19 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Client\LicensePlateRequest;
-use App\Http\Requests\Client\StoreOrderRequest;
+use App\Http\Requests\Client\StoreRemainderRequest;
 use App\Models\Bus;
-use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Remainder;
+use App\Models\RemainderItem;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class RemainderController extends Controller
 {
-    /**
-     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
-     */
-    public function showEnterLicensePlateForm(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
-    {
-        return view('client.orders.enter_license_plate');
-    }
-
-    /**
-     * @param LicensePlateRequest $request
-     * @return RedirectResponse
-     */
-    public function processLicensePlate(LicensePlateRequest $request): RedirectResponse
-    {
-        $data = $request->validated();
-        $licensePlate = $data['license_plate'];
-
-        $request->session()->put('license_plate', $licensePlate);
-
-        if ($data['type_operation'] == Order::TYPE_OPERATION_REALIZATION) {
-            return redirect()->route('realizations.create');
-        } else if ($data['type_operation'] == Order::TYPE_OPERATION_REMAINDER) {
-            return redirect()->route('remainders.create');
-        } else {
-            return redirect()->route('orders.create');
-        }
-    }
-
     /**
      * @param Request $request
      * @return View|Application|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -63,29 +34,28 @@ class OrderController extends Controller
 
         $date = date('Y-m-d', strtotime('+1 day'));
 
-        $order = Order::query()
+        $remainder = Remainder::query()
             ->where('bus_id', '=', $busId)
             ->whereDate('date', $date)
             ->first();
 
-        if (!$order) {
-            $order = new Order();
-            $order->bus_id = $busId;
-            $order->date = $date;
-            $order->save();
+        if (!$remainder) {
+            $remainder = new Remainder();
+            $remainder->bus_id = $busId;
+            $remainder->date = $date;
+            $remainder->save();
 
             $products = Product::query()
                 ->where('is_active', '=', Product::IS_ACTIVE)
-                ->orderBy('sort')
                 ->get();
 
             if ($products) {
-                $orderItems = [];
+                $remainderItems = [];
 
                 /** @var Product $product */
                 foreach ($products as $product) {
-                    $orderItems[] = [
-                        'order_id' => $order->id,
+                    $remainderItems[] = [
+                        'remainder_id' => $remainder->id,
                         'product_id' => $product->id,
                         'price' => $product->price,
                         'created_at' => now(),
@@ -93,29 +63,29 @@ class OrderController extends Controller
                     ];
                 }
 
-                OrderItem::query()->insert($orderItems);
+                RemainderItem::query()->insert($remainderItems);
             }
         }
 
-        $order->load('items.product');
+        $remainder->load('items.product');
 
-        return view('client.orders.create', compact('licensePlate', 'order'));
+        return view('client.remainders.create', compact('licensePlate', 'remainder'));
     }
 
     /**
-     * @param StoreOrderRequest $request
+     * @param StoreRemainderRequest $request
      * @return RedirectResponse
      */
-    public function store(StoreOrderRequest $request): RedirectResponse
+    public function store(StoreRemainderRequest $request): RedirectResponse
     {
         $validatedData = $request->validated();
 
         foreach ($validatedData['item_ids'] as $itemId) {
             $amount = $validatedData['item_amounts'][$itemId];
 
-            $orderItem = OrderItem::find($itemId);
-            $orderItem->amount = $amount;
-            $orderItem->save();
+            $remainderItem = RemainderItem::find($itemId);
+            $remainderItem->amount = $amount;
+            $remainderItem->save();
         }
 
         $request->session()->forget('license_plate');

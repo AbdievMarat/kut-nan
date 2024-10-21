@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class UpdateOrderRequest extends FormRequest
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,10 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required', Rule::unique('products', 'name')->ignore($this->route('product')->id)],
+            'price' => ['required', 'numeric', 'min:0'],
+            'sort' => ['required', 'numeric'],
+            'is_active' => ['required'],
         ];
     }
 }

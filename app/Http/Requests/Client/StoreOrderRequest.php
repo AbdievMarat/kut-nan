@@ -23,11 +23,11 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => [
-                'required',
-                'numeric',
-                Rule::exists('orders', 'id')
-            ],
+            'id' => ['required', 'numeric', Rule::exists('orders', 'id')],
+            'item_ids' => ['required', 'array'],
+            'item_ids.*' => ['required', 'integer', Rule::exists('order_items', 'id')],
+            'item_amounts' => ['required', 'array'],
+            'item_amounts.*' => ['nullable', 'numeric', 'min:0'],
             'product_1' => ['nullable', 'numeric'],
             'product_2' => ['nullable', 'numeric'],
             'product_3' => ['nullable', 'numeric'],
@@ -57,6 +57,17 @@ class StoreOrderRequest extends FormRequest
             'product_27' => ['nullable', 'numeric'],
             'product_28' => ['nullable', 'numeric'],
             'product_29' => ['nullable', 'numeric'],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public function messages(): array
+    {
+        return [
+            'item_amounts.*.numeric' => 'Сумма должна быть числовой',
+            'item_amounts.*.min' => 'Сумма должна быть не меньше 0',
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Client;
 
 use App\Models\Bus;
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,6 +29,11 @@ class LicensePlateRequest extends FormRequest
                 'required',
                 'numeric',
                 Rule::exists('buses', 'license_plate')->where('is_active', Bus::IS_ACTIVE)
+            ],
+            'type_operation' => [
+                'required',
+                'numeric',
+                Rule::in([Order::TYPE_OPERATION_ORDER, Order::TYPE_OPERATION_REALIZATION, Order::TYPE_OPERATION_REMAINDER])
             ],
         ];
     }
