@@ -44,7 +44,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/products') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
-                        <i class="bi bi-bus-front"></i>
+                        <i class="bi bi-basket"></i>
                         Продукты
                     </a>
                 </li>
