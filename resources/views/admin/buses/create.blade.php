@@ -34,7 +34,7 @@
                 </div>
                 <div class="mb-3">
                     <x-admin-forms-input
-                            type="text"
+                            type="number"
                             id="sort"
                             name="sort"
                             label="Сортировка"
