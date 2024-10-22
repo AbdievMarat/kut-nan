@@ -40,7 +40,9 @@ $(() => {
             }
         });
 
-        $('#total-amount').text(total);
+        let formattedTotal = total.toLocaleString('ru-RU');
+
+        $('#total-amount').text(formattedTotal);
     }
 
     $(document).on('input', 'input[name="amount[]"]', function () {

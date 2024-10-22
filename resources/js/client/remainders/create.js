@@ -11,7 +11,9 @@ $(() => {
             }
         });
 
-        $('#total-price').text(total);
+        let formattedTotal = total.toLocaleString('ru-RU');
+
+        $('#total-price').text(formattedTotal);
     }
 
     $(document).on('input', 'input[data-product-price]', function () {
