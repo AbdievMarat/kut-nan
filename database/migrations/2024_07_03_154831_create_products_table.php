@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('price');
             $table->integer('sort');
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_in_report')->default(true);
             $table->timestamps();
         });
     }

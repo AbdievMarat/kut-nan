@@ -144,6 +144,7 @@ class OrderController extends Controller
     {
         return Product::query()
             ->where('is_active', '=', Product::IS_ACTIVE)
+            ->where('is_in_report', '=', Product::IS_IN_REPORT)
             ->orderBy('sort')
             ->get();
     }

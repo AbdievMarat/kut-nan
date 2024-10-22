@@ -43,6 +43,35 @@
                     />
                 </div>
 
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input
+                                class="form-check-input"
+                                type="radio"
+                                name="is_in_report"
+                                id="isInReportRadio"
+                                value="1"
+                                @checked(old('is_in_report') == \App\Models\Product::IS_IN_REPORT)
+                        />
+                        <label class="form-check-label" for="isInReportRadio">
+                            Отображать в отчёте
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input
+                                class="form-check-input"
+                                type="radio"
+                                name="is_in_report"
+                                id="isNotInReportRadio"
+                                value="0"
+                                @checked(old('is_in_report') == \App\Models\Product::IS_NOT_IN_REPORT)
+                        />
+                        <label class="form-check-label" for="isNotInReportRadio">
+                            Не отображать в отчёте
+                        </label>
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-success float-end">Создать</button>
             </form>
         </div>

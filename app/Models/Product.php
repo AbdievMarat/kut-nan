@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $price
  * @property int $sort
  * @property boolean $is_active
+ * @property boolean $is_in_report
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
@@ -25,10 +26,14 @@ class Product extends Model
     const IS_ACTIVE = 1;
     const IS_NOT_ACTIVE = 0;
 
+    const IS_IN_REPORT = 1;
+    const IS_NOT_IN_REPORT = 0;
+
     protected $fillable = [
         'name',
         'price',
         'sort',
         'is_active',
+        'is_in_report',
     ];
 }

@@ -19,6 +19,7 @@
                     <th>Цена</th>
                     <th>Сортировка</th>
                     <th>Статус</th>
+                    <th>Отображение в отчёте</th>
                     <th style="width: 160px"></th>
                 </tr>
                 </thead>
@@ -32,6 +33,11 @@
                         <td>
                             <div class="badge bg-{{ $product->is_active ? 'success' : 'danger' }}">
                                 {{ $product->is_active ? 'Активен' : 'Не активен' }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="badge bg-{{ $product->is_in_report ? 'success' : 'danger' }}">
+                                {{ $product->is_in_report ? 'Отображать' : 'Не отображать' }}
                             </div>
                         </td>
                         <td>
