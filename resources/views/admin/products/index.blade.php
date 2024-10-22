@@ -53,7 +53,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="6">
+                    <th colspan="7">
                         {{ $products->links() }}
                     </th>
                 </tr>
