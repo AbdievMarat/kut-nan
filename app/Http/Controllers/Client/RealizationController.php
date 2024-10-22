@@ -44,6 +44,27 @@ class RealizationController extends Controller
             $realizationShops = RealizationShop::query()
                 ->where('realization_id', '=', $realization->id)
                 ->get();
+
+            $realizationShopsCount = $realizationShops->count();
+
+            if ($realizationShopsCount === 0) {
+                $latestRealizationId = Realization::query()
+                    ->where('bus_id', '=', $busId)
+                    ->where('id', '!=', $realization->id)
+                    ->orderBy('date', 'desc')
+                    ->value('id');
+
+                if ($latestRealizationId) {
+                    $realizationShops = RealizationShop::query()
+                        ->where('realization_id', '=', $latestRealizationId)
+                        ->get();
+
+                    // Пробегаем по коллекции и заменяем id на 0
+                    $realizationShops->each(function ($shop) {
+                        $shop->id = 0;
+                    });
+                }
+            }
         } else {
             // берем прошлую реализацию данного буса
             $latestRealizationId = Realization::query()
