@@ -28,4 +28,24 @@ $(() => {
             }
         });
     });
+
+    function calculateTotal() {
+        let total = 0;
+
+        $('input[name="amount[]"]').each(function () {
+            let amount = parseInt($(this).val());
+
+            if (amount > 0) {
+                total += amount;
+            }
+        });
+
+        $('#total-amount').text(total);
+    }
+
+    $(document).on('input', 'input[name="amount[]"]', function () {
+        calculateTotal();
+    });
+
+    calculateTotal();
 });

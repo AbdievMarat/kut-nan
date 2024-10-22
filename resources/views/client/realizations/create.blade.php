@@ -31,6 +31,11 @@
 
         <button type="button" class="btn btn-primary w-100 mb-3" id="add_shop">Добавить магазин</button>
 
+        <div id="price-label" class="alert alert-success" role="alert">
+            <i class="bi bi-calculator-fill me-2"></i>
+            <strong>Итого: <span id="total-amount">0</span></strong>
+        </div>
+
         <button type="submit" class="btn btn-success w-100 mb-3">Сохранить</button>
     </form>
 
