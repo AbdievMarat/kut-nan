@@ -4,8 +4,8 @@
         <th scope="col" colspan="4" class="text-center">
             Список остатков на {{ date('d.m.Y', strtotime($remainder->date)) }} от буса № {{ $remainder->bus->license_plate }} <br>
             Создано: {{ date('d.m.Y H:i', strtotime($remainder->created_at)) }} <br>
-            @if($realization->created_at != $realization->updated_at)
-                Обновлено: {{ date('d.m.Y H:i', strtotime($realization->updated_at)) }}
+            @if($remainder->created_at != $remainder->updated_at)
+                Обновлено: {{ date('d.m.Y H:i', strtotime($remainder->updated_at)) }}
             @endif
         </th>
     </tr>
