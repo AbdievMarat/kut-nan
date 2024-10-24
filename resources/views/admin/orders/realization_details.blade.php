@@ -2,10 +2,9 @@
     <thead>
     <tr>
         <th scope="col" colspan="3" class="text-center">
-            Список реализаций на {{ date('d.m.Y', strtotime($realization->date)) }} от буса № {{ $realization->bus->license_plate }} <br>
-            Создано: {{ date('d.m.Y H:i', strtotime($realization->created_at)) }} <br>
+            Список реализаций буса № {{ $realization->bus->license_plate }}, добавлено {{ date('d.m.Y H:i', strtotime($realization->created_at)) }}
             @if($realization->created_at != $realization->updated_at)
-                Обновлено: {{ date('d.m.Y H:i', strtotime($realization->updated_at)) }}
+                <br> Обновлено: {{ date('d.m.Y H:i', strtotime($realization->updated_at)) }}
             @endif
         </th>
     </tr>
