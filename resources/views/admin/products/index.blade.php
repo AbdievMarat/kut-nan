@@ -16,7 +16,6 @@
                 <tr>
                     <th>#</th>
                     <th>Название</th>
-                    <th>Цена</th>
                     <th>Сортировка</th>
                     <th>Статус</th>
                     <th>Отображение в отчёте</th>
@@ -28,7 +27,6 @@
                     <tr>
                         <td>{{ $product->id }}</td>
                         <td>{{ $product->name }}</td>
-                        <td>{{ $product->price }}</td>
                         <td>{{ $product->sort }} </td>
                         <td>
                             <div class="badge bg-{{ $product->is_active ? 'success' : 'danger' }}">
@@ -53,7 +51,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="7">
+                    <th colspan="6">
                         {{ $products->links() }}
                     </th>
                 </tr>

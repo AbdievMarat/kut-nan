@@ -25,16 +25,6 @@
                 <div class="mb-3">
                     <x-admin-forms-input
                             type="number"
-                            id="price"
-                            name="price"
-                            label="Цена"
-                            placeholder="Введите цену"
-                            value="{{ old('price') }}"
-                    />
-                </div>
-                <div class="mb-3">
-                    <x-admin-forms-input
-                            type="number"
                             id="sort"
                             name="sort"
                             label="Сортировка"
@@ -42,7 +32,6 @@
                             value="{{ old('sort') }}"
                     />
                 </div>
-
                 <div class="mb-3">
                     <div class="form-check">
                         <input
