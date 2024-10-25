@@ -24,7 +24,6 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'name' => ['required', Rule::unique('products', 'name')],
-            'price' => ['required', 'numeric', 'min:0'],
             'sort' => ['required', 'numeric'],
             'is_in_report' => ['required'],
         ];

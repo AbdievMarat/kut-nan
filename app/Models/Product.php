@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * @property int $id
  * @property string $name
- * @property int $price
  * @property int $sort
  * @property boolean $is_active
  * @property boolean $is_in_report
@@ -34,7 +33,6 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'price',
         'sort',
         'is_active',
         'is_in_report',
