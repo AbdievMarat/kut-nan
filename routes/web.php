@@ -21,6 +21,8 @@ Auth::routes();
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/', [AdminOrderController::class, 'index'])->name('home');
     Route::resource('buses', BusController::class)->except(['destroy']);
+    Route::get('/buses/{bus}/product_prices/edit', [BusController::class, 'editProductPrices'])->name('buses.product_prices_edit');
+    Route::put('/buses/{bus}/product_prices', [BusController::class, 'updateProductPrices'])->name('buses.product_prices_update');
     Route::resource('products', ProductController::class)->except(['destroy']);
     Route::resource('orders', AdminOrderController::class)->only(['index']);
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');

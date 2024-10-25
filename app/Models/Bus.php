@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property-read Order|null $orders
  * @property-read Remainder|null $remainders
+ * @property-read BusProductPrice|null $prices
  *
  * @mixin Builder
  */
@@ -50,5 +51,13 @@ class Bus extends Model
     public function remainders(): HasMany
     {
         return $this->hasMany(Remainder::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(BusProductPrice::class);
     }
 }

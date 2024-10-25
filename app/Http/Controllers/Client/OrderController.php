@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\LicensePlateRequest;
 use App\Http\Requests\Client\StoreOrderRequest;
 use App\Models\Bus;
+use App\Models\BusProductPrice;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -85,10 +86,17 @@ class OrderController extends Controller
 
                 /** @var Product $product */
                 foreach ($products as $product) {
+                    $busProductPrice = $product->prices()
+                        ->where('bus_id', '=', $busId)
+                        ->first();
+
+                    /** @var BusProductPrice $busProductPrice */
+                    $price = $busProductPrice ? $busProductPrice->price : 0;
+
                     $orderItems[] = [
                         'order_id' => $order->id,
                         'product_id' => $product->id,
-                        'price' => $product->price,
+                        'price' => $price,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

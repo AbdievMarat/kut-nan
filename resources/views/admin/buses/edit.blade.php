@@ -73,7 +73,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success float-end">Создать</button>
+                <button type="submit" class="btn btn-success float-end">Обновить</button>
             </form>
         </div>
     </div>

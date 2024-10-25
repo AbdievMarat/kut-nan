@@ -17,7 +17,7 @@
                     label="{{ $item->product->name }}"
                     placeholder=""
                     value="{{ old('item_amounts.'.$item->id) ?? $item->amount }}"
-                    data-product-price="{{ $item->product->price }}"
+                    data-product-price="{{ $item->price }}"
             >
             </x-client-forms-input>
         @endforeach

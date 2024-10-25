@@ -20,6 +20,7 @@
                             label="Гос. номер"
                             placeholder="Введите гос. номер"
                             value="{{ old('license_plate') }}"
+                            step="1"
                     />
                 </div>
                 <div class="mb-3">

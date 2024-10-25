@@ -37,8 +37,12 @@
                         <td>
                             <div class="d-flex justify-content-end">
                                 <div class="mx-2">
+                                    <a href="{{ route('admin.buses.product_prices_edit', ['bus' => $bus]) }}" type="button"
+                                       class="btn btn-info" title="Установка цен на продукты"><i class="bi-currency-dollar"></i></a>
+                                </div>
+                                <div class="mx-2">
                                     <a href="{{ route('admin.buses.edit', ['bus' => $bus]) }}" type="button"
-                                       class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                       class="btn btn-warning" title="Редактирование"><i class="bi bi-pencil-square"></i></a>
                                 </div>
                             </div>
                         </td>

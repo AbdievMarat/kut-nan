@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreRemainderRequest;
 use App\Models\Bus;
+use App\Models\BusProductPrice;
 use App\Models\Product;
 use App\Models\Remainder;
 use App\Models\RemainderItem;
@@ -54,10 +55,17 @@ class RemainderController extends Controller
 
                 /** @var Product $product */
                 foreach ($products as $product) {
+                    $busProductPrice = $product->prices()
+                        ->where('bus_id', '=', $busId)
+                        ->first();
+
+                    /** @var BusProductPrice $busProductPrice */
+                    $price = $busProductPrice ? $busProductPrice->price : 0;
+
                     $remainderItems[] = [
                         'remainder_id' => $remainder->id,
                         'product_id' => $product->id,
-                        'price' => $product->price,
+                        'price' => $price,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];

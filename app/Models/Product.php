@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property boolean $is_in_report
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ *
+ * @property-read BusProductPrice|null $prices
  *
  * @mixin Builder
  */
@@ -36,4 +39,12 @@ class Product extends Model
         'is_active',
         'is_in_report',
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(BusProductPrice::class);
+    }
 }
