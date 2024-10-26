@@ -46,38 +46,52 @@ class RemainderController extends Controller
             $remainder->date = $date;
             $remainder->save();
 
-            $products = Product::query()
-                ->where('is_active', '=', Product::IS_ACTIVE)
-                ->get();
-
-            if ($products) {
-                $remainderItems = [];
-
-                /** @var Product $product */
-                foreach ($products as $product) {
-                    $busProductPrice = $product->prices()
-                        ->where('bus_id', '=', $busId)
-                        ->first();
-
-                    /** @var BusProductPrice $busProductPrice */
-                    $price = $busProductPrice ? $busProductPrice->price : 0;
-
-                    $remainderItems[] = [
-                        'remainder_id' => $remainder->id,
-                        'product_id' => $product->id,
-                        'price' => $price,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                RemainderItem::query()->insert($remainderItems);
-            }
+//            $products = Product::query()
+//                ->where('is_active', '=', Product::IS_ACTIVE)
+//                ->get();
+//
+//            if ($products) {
+//                $remainderItems = [];
+//
+//                /** @var Product $product */
+//                foreach ($products as $product) {
+//                    $busProductPrice = $product->prices()
+//                        ->where('bus_id', '=', $busId)
+//                        ->first();
+//
+//                    /** @var BusProductPrice $busProductPrice */
+//                    $price = $busProductPrice ? $busProductPrice->price : 0;
+//
+//                    $remainderItems[] = [
+//                        'remainder_id' => $remainder->id,
+//                        'product_id' => $product->id,
+//                        'price' => $price,
+//                        'created_at' => now(),
+//                        'updated_at' => now(),
+//                    ];
+//                }
+//
+//                RemainderItem::query()->insert($remainderItems);
+//            }
         }
 
-        $remainder->load('items.product');
+        $products = BusProductPrice::query()
+            ->select([
+                'bus_product_prices.product_id as id',
+                'products.name as name',
+                'bus_product_prices.price'
+            ])
+            ->from('bus_product_prices')
+            ->where('bus_product_prices.bus_id', '=', $busId)
+            ->where('products.is_active', '=', Product::IS_ACTIVE)
+            ->join('products', 'bus_product_prices.product_id', '=', 'products.id')
+            ->orderBy('products.sort')
+            ->with('product')
+            ->get();
 
-        return view('client.remainders.create', compact('licensePlate', 'remainder'));
+        $itemAmounts = $remainder->items->keyBy('product_id');
+
+        return view('client.remainders.create', compact('licensePlate', 'remainder', 'products', 'itemAmounts'));
     }
 
     /**
@@ -88,12 +102,17 @@ class RemainderController extends Controller
     {
         $validatedData = $request->validated();
 
-        foreach ($validatedData['item_ids'] as $itemId) {
-            $amount = $validatedData['item_amounts'][$itemId];
+        $remainderId = $validatedData['id'];
 
-            $remainderItem = RemainderItem::find($itemId);
-            $remainderItem->amount = $amount;
-            $remainderItem->save();
+        foreach ($validatedData['item_amounts'] as $productId => $amount) {
+            if ($amount !== null) {
+                $price = $validatedData['item_price'][$productId] ?? 0;
+
+                RemainderItem::query()->updateOrCreate(
+                    ['remainder_id' => $remainderId, 'product_id' => $productId],
+                    ['amount' => $amount, 'price' => $price]
+                );
+            }
         }
 
         $request->session()->forget('license_plate');

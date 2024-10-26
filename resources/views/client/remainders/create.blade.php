@@ -7,19 +7,19 @@
 
         <input type="hidden" name="id" value="{{ $remainder->id }}">
 
-        @foreach ($remainder->items as $item)
-            <input type="hidden" name="item_ids[{{ $item->id }}]" value="{{ $item->id }}">
-
+        @foreach ($products as $product)
             <x-client-forms-input
                     type="number"
-                    name="item_amounts[{{ $item->id }}]"
-                    id="item_{{ $item->id }}"
-                    label="{{ $item->product->name }}"
+                    name="item_amounts[{{ $product->id }}]"
+                    id="item_{{ $product->id }}"
+                    label="{{ $product->name }}"
                     placeholder=""
-                    value="{{ old('item_amounts.'.$item->id) ?? $item->amount }}"
-                    data-product-price="{{ $item->price }}"
+                    value="{{ $itemAmounts->has($product->id) ? $itemAmounts[$product->id]->amount : old('item_amounts.'.$product->id) }}"
+                    data-product-price="{{ $product->price }}"
             >
             </x-client-forms-input>
+
+            <input type="hidden" name="item_price[{{ $product->id }}]" value="{{ $product->price }}">
         @endforeach
 
         <div id="price-label" class="alert alert-success" role="alert">

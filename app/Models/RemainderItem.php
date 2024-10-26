@@ -27,7 +27,10 @@ class RemainderItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_id'
+        'remainder_id',
+        'product_id',
+        'price',
+        'amount',
     ];
 
     /**

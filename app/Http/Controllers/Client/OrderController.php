@@ -74,41 +74,26 @@ class OrderController extends Controller
             $order->bus_id = $busId;
             $order->date = $date;
             $order->save();
-
-            $products = Product::query()
-                ->where('is_active', '=', Product::IS_ACTIVE)
-                ->where('is_in_report', '=', Product::IS_IN_REPORT)
-                ->orderBy('sort')
-                ->get();
-
-            if ($products) {
-                $orderItems = [];
-
-                /** @var Product $product */
-                foreach ($products as $product) {
-                    $busProductPrice = $product->prices()
-                        ->where('bus_id', '=', $busId)
-                        ->first();
-
-                    /** @var BusProductPrice $busProductPrice */
-                    $price = $busProductPrice ? $busProductPrice->price : 0;
-
-                    $orderItems[] = [
-                        'order_id' => $order->id,
-                        'product_id' => $product->id,
-                        'price' => $price,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-
-                OrderItem::query()->insert($orderItems);
-            }
         }
 
-        $order->load('items.product');
+        $products = BusProductPrice::query()
+            ->select([
+                'bus_product_prices.product_id as id',
+                'products.name as name',
+                'bus_product_prices.price'
+            ])
+            ->from('bus_product_prices')
+            ->where('bus_product_prices.bus_id', '=', $busId)
+            ->where('products.is_active', '=', Product::IS_ACTIVE)
+            ->where('products.is_in_report', '=', Product::IS_IN_REPORT)
+            ->join('products', 'bus_product_prices.product_id', '=', 'products.id')
+            ->orderBy('products.sort')
+            ->with('product')
+            ->get();
 
-        return view('client.orders.create', compact('licensePlate', 'order'));
+        $itemAmounts = $order->items->keyBy('product_id');
+
+        return view('client.orders.create', compact('licensePlate', 'order', 'products', 'itemAmounts'));
     }
 
     /**
@@ -119,12 +104,17 @@ class OrderController extends Controller
     {
         $validatedData = $request->validated();
 
-        foreach ($validatedData['item_ids'] as $itemId) {
-            $amount = $validatedData['item_amounts'][$itemId];
+        $orderId = $validatedData['id'];
 
-            $orderItem = OrderItem::find($itemId);
-            $orderItem->amount = $amount;
-            $orderItem->save();
+        foreach ($validatedData['item_amounts'] as $productId => $amount) {
+            if ($amount !== null) {
+                $price = $validatedData['item_price'][$productId] ?? 0;
+
+                OrderItem::query()->updateOrCreate(
+                    ['order_id' => $orderId, 'product_id' => $productId],
+                    ['amount' => $amount, 'price' => $price]
+                );
+            }
         }
 
         $request->session()->forget('license_plate');

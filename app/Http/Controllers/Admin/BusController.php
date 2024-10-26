@@ -84,7 +84,7 @@ class BusController extends Controller
             ->orderBy('sort')
             ->get();
 
-        $prices = $bus->prices->keyBy('product_id');;
+        $prices = $bus->prices->keyBy('product_id');
 
         return view('admin.buses.edit_product_prices', compact('bus', 'products', 'prices'));
     }

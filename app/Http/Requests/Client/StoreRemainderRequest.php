@@ -24,10 +24,10 @@ class StoreRemainderRequest extends FormRequest
     {
         return [
             'id' => ['required', 'numeric', Rule::exists('remainders', 'id')],
-            'item_ids' => ['required', 'array'],
-            'item_ids.*' => ['required', 'integer', Rule::exists('remainder_items', 'id')],
             'item_amounts' => ['required', 'array'],
-            'item_amounts.*' => ['nullable', 'numeric', 'min:0']
+            'item_amounts.*' => ['nullable', 'numeric', 'min:0'],
+            'item_price' => ['required', 'array'],
+            'item_price.*' => ['nullable', 'numeric', 'min:0']
         ];
     }
 
