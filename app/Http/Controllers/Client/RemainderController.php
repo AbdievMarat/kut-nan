@@ -45,34 +45,6 @@ class RemainderController extends Controller
             $remainder->bus_id = $busId;
             $remainder->date = $date;
             $remainder->save();
-
-//            $products = Product::query()
-//                ->where('is_active', '=', Product::IS_ACTIVE)
-//                ->get();
-//
-//            if ($products) {
-//                $remainderItems = [];
-//
-//                /** @var Product $product */
-//                foreach ($products as $product) {
-//                    $busProductPrice = $product->prices()
-//                        ->where('bus_id', '=', $busId)
-//                        ->first();
-//
-//                    /** @var BusProductPrice $busProductPrice */
-//                    $price = $busProductPrice ? $busProductPrice->price : 0;
-//
-//                    $remainderItems[] = [
-//                        'remainder_id' => $remainder->id,
-//                        'product_id' => $product->id,
-//                        'price' => $price,
-//                        'created_at' => now(),
-//                        'updated_at' => now(),
-//                    ];
-//                }
-//
-//                RemainderItem::query()->insert($remainderItems);
-//            }
         }
 
         $products = BusProductPrice::query()

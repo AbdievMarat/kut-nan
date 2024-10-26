@@ -33,7 +33,7 @@ class LicensePlateRequest extends FormRequest
             'type_operation' => [
                 'required',
                 'numeric',
-                Rule::in([Order::TYPE_OPERATION_ORDER, Order::TYPE_OPERATION_REALIZATION, Order::TYPE_OPERATION_REMAINDER])
+                Rule::in([Order::TYPE_OPERATION_ORDER, Order::TYPE_OPERATION_REALIZATION, Order::TYPE_OPERATION_REMAINDER, Order::TYPE_OPERATION_MARKDOWN])
             ],
         ];
     }

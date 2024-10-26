@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('markdowns', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bus_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->date('date');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('markdowns');
     }
 };

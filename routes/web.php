@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BusController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Client\MarkdownController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\RealizationController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
@@ -14,6 +15,7 @@ Route::post('/process-license-plate', [OrderController::class, 'processLicensePl
 Route::resource('orders', OrderController::class)->only(['create', 'store']);
 Route::resource('realizations', RealizationController::class)->only(['create', 'store']);
 Route::resource('remainders', RemainderController::class)->only(['create', 'store']);
+Route::resource('markdowns', MarkdownController::class)->only(['create', 'store']);
 Route::post('/realizations/add-shop', [RealizationController::class, 'addShop'])->name('realizations.add_shop');
 
 Auth::routes();

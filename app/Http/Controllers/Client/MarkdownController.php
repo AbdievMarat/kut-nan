@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Client\LicensePlateRequest;
-use App\Http\Requests\Client\StoreOrderRequest;
+use App\Http\Requests\Client\StoreMarkdownRequest;
 use App\Models\Bus;
 use App\Models\BusProductPrice;
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Models\Markdown;
+use App\Models\MarkdownItem;
 use App\Models\Product;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -16,38 +15,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
+class MarkdownController extends Controller
 {
-    /**
-     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
-     */
-    public function showEnterLicensePlateForm(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
-    {
-        return view('client.orders.enter_license_plate');
-    }
-
-    /**
-     * @param LicensePlateRequest $request
-     * @return RedirectResponse
-     */
-    public function processLicensePlate(LicensePlateRequest $request): RedirectResponse
-    {
-        $data = $request->validated();
-        $licensePlate = $data['license_plate'];
-
-        $request->session()->put('license_plate', $licensePlate);
-
-        if ($data['type_operation'] == Order::TYPE_OPERATION_REALIZATION) {
-            return redirect()->route('realizations.create');
-        } else if ($data['type_operation'] == Order::TYPE_OPERATION_REMAINDER) {
-            return redirect()->route('remainders.create');
-        } else if ($data['type_operation'] == Order::TYPE_OPERATION_MARKDOWN) {
-            return redirect()->route('markdowns.create');
-        } else {
-            return redirect()->route('orders.create');
-        }
-    }
-
     /**
      * @param Request $request
      * @return View|Application|Factory|RedirectResponse|\Illuminate\Contracts\Foundation\Application
@@ -66,54 +35,52 @@ class OrderController extends Controller
 
         $date = date('Y-m-d', strtotime('+1 day'));
 
-        $order = Order::query()
+        $markdown = Markdown::query()
             ->where('bus_id', '=', $busId)
             ->whereDate('date', $date)
             ->first();
 
-        if (!$order) {
-            $order = new Order();
-            $order->bus_id = $busId;
-            $order->date = $date;
-            $order->save();
+        if (!$markdown) {
+            $markdown = new Markdown();
+            $markdown->bus_id = $busId;
+            $markdown->date = $date;
+            $markdown->save();
         }
 
         $products = BusProductPrice::query()
             ->select([
                 'bus_product_prices.product_id as id',
                 'products.name as name',
-                'bus_product_prices.price'
             ])
             ->from('bus_product_prices')
             ->where('bus_product_prices.bus_id', '=', $busId)
             ->where('products.is_active', '=', Product::IS_ACTIVE)
-            ->where('products.is_in_report', '=', Product::IS_IN_REPORT)
             ->join('products', 'bus_product_prices.product_id', '=', 'products.id')
             ->orderBy('products.sort')
             ->with('product')
             ->get();
 
-        $itemAmounts = $order->items->keyBy('product_id');
+        $itemAmounts = $markdown->items->keyBy('product_id');
 
-        return view('client.orders.create', compact('licensePlate', 'order', 'products', 'itemAmounts'));
+        return view('client.markdowns.create', compact('licensePlate', 'markdown', 'products', 'itemAmounts'));
     }
 
     /**
-     * @param StoreOrderRequest $request
+     * @param StoreMarkdownRequest $request
      * @return RedirectResponse
      */
-    public function store(StoreOrderRequest $request): RedirectResponse
+    public function store(StoreMarkdownRequest $request): RedirectResponse
     {
         $validatedData = $request->validated();
 
-        $orderId = $validatedData['id'];
+        $markdownId = $validatedData['id'];
 
         foreach ($validatedData['item_amounts'] as $productId => $amount) {
             if ($amount !== null) {
                 $price = $validatedData['item_price'][$productId] ?? 0;
 
-                OrderItem::query()->updateOrCreate(
-                    ['order_id' => $orderId, 'product_id' => $productId],
+                MarkdownItem::query()->updateOrCreate(
+                    ['markdown_id' => $markdownId, 'product_id' => $productId],
                     ['amount' => $amount, 'price' => $price]
                 );
             }

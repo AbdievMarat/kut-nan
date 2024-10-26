@@ -42,6 +42,10 @@
             <button class="btn btn-info w-100 mt-4" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_REMAINDER }})">
                 Ввести остатки
             </button>
+
+            <button class="btn btn-dark w-100 mt-4" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_MARKDOWN }})">
+                Ввести уценку
+            </button>
         </form>
     </div>
 @endsection

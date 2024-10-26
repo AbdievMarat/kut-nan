@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Bus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Order>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MarkdownItem>
  */
-class OrderFactory extends Factory
+class MarkdownItemFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -18,8 +17,7 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         return [
-            'bus_id' => Bus::all()->random(),
-            'date' => $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d')
+            //
         ];
     }
 }

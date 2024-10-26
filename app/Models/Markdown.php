@@ -17,17 +17,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $updated_at
  *
  * @property-read Bus $bus
- * @property-read OrderItem|null $items
+ * @property-read MarkdownItem|null $items
  *
  * @mixin Builder
  */
-class Order extends Model
+class Markdown extends Model
 {
-    const TYPE_OPERATION_ORDER = 1;
-    const TYPE_OPERATION_REALIZATION = 2;
-    const TYPE_OPERATION_REMAINDER = 3;
-    const TYPE_OPERATION_MARKDOWN = 4;
-
     use HasFactory;
 
     /**
@@ -43,6 +38,6 @@ class Order extends Model
      */
     public function items(): HasMany
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(MarkdownItem::class);
     }
 }

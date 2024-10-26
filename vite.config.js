@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/css/admin.css',
                 'resources/js/client/realizations/create.js',
                 'resources/js/client/remainders/create.js',
+                'resources/js/client/markdowns/create.js',
                 'resources/js/admin/orders/index.js'
             ],
             refresh: true,
