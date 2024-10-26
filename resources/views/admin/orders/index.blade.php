@@ -28,6 +28,7 @@
                     @foreach ($products as $product)
                         <th class="vertical-text">{{ $product->name }}</th>
                     @endforeach
+                    <th class="vertical-text">Уценка</th>
                     <th class="vertical-text">Реализации</th>
                     <th class="vertical-text">Остаток</th>
                 </tr>
@@ -39,6 +40,11 @@
                         @foreach ($bus['products'] as $productData)
                             <td>{{ $productData['order_amount'] }}</td>
                         @endforeach
+                        <td>
+                            @if($bus['total_markdown_sum'])
+                                <a href="#" class="get-markdown-items" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
+                            @endif
+                        </td>
                         <td>
                             @if($bus['total_realization_sum'])
                                 <a href="#" class="get-realization-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_realization_sum'] }}</a>

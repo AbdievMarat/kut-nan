@@ -14,13 +14,15 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
 {
     protected $date;
     protected $products;
+    protected $sumMarkdowns;
     protected $sumRealizations;
     protected $sumRemainders;
 
-    public function __construct($date, $products, $sumRealizations, $sumRemainders)
+    public function __construct($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders)
     {
         $this->date = $date;
         $this->products = $products;
+        $this->sumMarkdowns = $sumMarkdowns;
         $this->sumRealizations = $sumRealizations;
         $this->sumRemainders = $sumRemainders;
     }
@@ -76,7 +78,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
 
         // Добавляем сумму реализаций и остатков
         $mappedRow[] = ''; // Сумма
-        $mappedRow[] = ''; // Уценка
+        $mappedRow[] = $this->sumMarkdowns[$row->id] ?? '';
         $mappedRow[] = $this->sumRealizations[$row->id] ?? '';
         $mappedRow[] = $this->sumRemainders[$row->id] ?? '';
 

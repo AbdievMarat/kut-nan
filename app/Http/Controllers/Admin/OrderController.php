@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\OrderExport;
 use App\Http\Controllers\Controller;
 use App\Models\Bus;
+use App\Models\Markdown;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
@@ -43,10 +44,11 @@ class OrderController extends Controller
             ->get();
 
         $products = $this->getProducts();
+        $sumMarkdowns = $this->getSumMarkdowns($date);
         $sumRealizations = $this->getSumRealizations($date);
         $sumRemainders = $this->getSumRemainders($date);
 
-        $busesData = $buses->map(function ($bus) use ($products, $sumRealizations, $sumRemainders) {
+        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders) {
             $orderAmounts = [];
 
             /** @var Order $order */
@@ -66,6 +68,7 @@ class OrderController extends Controller
                         'order_amount' => $orderAmounts[$product->id] ?? '',
                     ];
                 }),
+                'total_markdown_sum' => $sumMarkdowns[$bus->id] ?? '',
                 'total_realization_sum' => $sumRealizations[$bus->id] ?? '',
                 'total_remainder_sum' => $sumRemainders[$bus->id] ?? ''
             ];
@@ -82,10 +85,33 @@ class OrderController extends Controller
     {
         $date = $request->input('date', date('Y-m-d', strtotime('+1 day')));
         $products = $this->getProducts();
+        $sumMarkdowns = $this->getSumMarkdowns($date);
         $sumRealizations = $this->getSumRealizations($date);
         $sumRemainders = $this->getSumRemainders($date);
 
-        return Excel::download(new OrderExport($date, $products, $sumRealizations, $sumRemainders), 'orders_' . date('d.m.Y', strtotime($date)) . '.xlsx');
+        return Excel::download(new OrderExport($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders), 'orders_' . date('d.m.Y', strtotime($date)) . '.xlsx');
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getMarkdownItems(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $busId = $request->input('bus_id');
+
+        $markdown = Markdown::query()
+            ->with('items.product')
+            ->whereDate('date', $date)
+            ->where('bus_id', '=', $busId)
+            ->first();
+
+        return response()->json([
+            'markdownDetails' => view('admin.orders.markdown_details', [
+                'markdown' => $markdown
+            ])->render()
+        ]);
     }
 
     /**
@@ -147,6 +173,22 @@ class OrderController extends Controller
             ->where('is_in_report', '=', Product::IS_IN_REPORT)
             ->orderBy('sort')
             ->get();
+    }
+
+    /**
+     * @param $date
+     * @return Collection
+     */
+    private function getSumMarkdowns($date): Collection
+    {
+        return Markdown::query()
+            ->select('markdowns.bus_id')
+            ->selectRaw('SUM(markdown_items.amount) as total')
+            ->leftJoin('markdown_items', 'markdown_items.markdown_id', '=', 'markdowns.id')
+            ->whereDate('markdowns.date', $date)
+            ->whereNotNull('markdown_items.amount')
+            ->groupBy('markdowns.bus_id')
+            ->pluck('total', 'bus_id');
     }
 
     /**

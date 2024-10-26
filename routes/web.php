@@ -27,6 +27,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::put('/buses/{bus}/product_prices', [BusController::class, 'updateProductPrices'])->name('buses.product_prices_update');
     Route::resource('products', ProductController::class)->except(['destroy']);
     Route::resource('orders', AdminOrderController::class)->only(['index']);
+    Route::get('get-markdown-items', [AdminOrderController::class, 'getMarkdownItems'])->name('orders.get_markdown_items');
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');

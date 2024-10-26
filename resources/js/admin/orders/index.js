@@ -44,4 +44,27 @@ $(() => {
             alert('Ошибка при загрузке данных по остаткам!');
         });
     });
+
+    $(document).on('click', '.get-markdown-items', function (event) {
+        event.preventDefault();
+
+        const csrf_token = $('meta[name="csrf-token"]').attr('content');
+        const date = $(this).data('date');
+        const busId = $(this).data('bus_id');
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/get-markdown-items',
+            headers: {'X-CSRF-TOKEN': csrf_token},
+            data: {
+                date: date,
+                bus_id: busId
+            },
+        }).done(successResponse => {
+            $('#orderContent').html(successResponse.markdownDetails);
+            $('#orderModal').modal('show');
+        }).fail(errorResponse => {
+            alert('Ошибка при загрузке данных по уценке!');
+        });
+    });
 });
