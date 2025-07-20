@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BusController;
+use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Client\MarkdownController;
@@ -27,7 +28,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('buses', BusController::class)->except(['destroy']);
     Route::get('/buses/{bus}/product_prices/edit', [BusController::class, 'editProductPrices'])->name('buses.product_prices_edit');
     Route::put('/buses/{bus}/product_prices', [BusController::class, 'updateProductPrices'])->name('buses.product_prices_update');
-    Route::resource('products', ProductController::class)->except(['destroy']);
+    Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+    Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
     Route::resource('orders', AdminOrderController::class)->only(['index']);
     Route::get('get-markdown-items', [AdminOrderController::class, 'getMarkdownItems'])->name('orders.get_markdown_items');
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');

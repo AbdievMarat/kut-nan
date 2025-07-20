@@ -48,6 +48,12 @@
                         Продукты
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('admin/ingredients') ? 'active' : '' }}" href="{{ route('admin.ingredients.index') }}">
+                        <i class="bi bi-egg-fried"></i>
+                        Ингредиенты
+                    </a>
+                </li>
             </ul>
 
             <!-- Right Side Of Navbar -->
