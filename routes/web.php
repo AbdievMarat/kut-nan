@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\Admin\BusController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Client\MarkdownController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\RealizationController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Client\RemainderController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [OrderController::class, 'showEnterLicensePlateForm'])->name('orders.enter_license_plate');
@@ -18,7 +18,9 @@ Route::resource('remainders', RemainderController::class)->only(['create', 'stor
 Route::resource('markdowns', MarkdownController::class)->only(['create', 'store']);
 Route::post('/realizations/add-shop', [RealizationController::class, 'addShop'])->name('realizations.add_shop');
 
-Auth::routes();
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login']);
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/', [AdminOrderController::class, 'index'])->name('home');

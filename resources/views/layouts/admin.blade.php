@@ -67,22 +67,21 @@
                     @endif
                 @else
                     <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                        <span class="navbar-text me-3" id="username-toggle" style="cursor: pointer;">
                             {{ auth()->user()->name }}
-                        </a>
-
-                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                               onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                {{ __('Logout') }}
-                            </a>
-
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
-                        </div>
+                        </span>
+                        <ul class="dropdown-menu dropdown-menu-end" id="user-menu" style="display: none;">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault();
+                                            document.getElementById('logout-form').submit();">
+                                    Выйти
+                                </a>
+                            </li>
+                        </ul>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
                     </li>
                 @endguest
             </ul>
@@ -94,5 +93,34 @@
     @include('notifications.notifications')
     @yield('content')
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameToggle = document.getElementById('username-toggle');
+    const userMenu = document.getElementById('user-menu');
+
+    if (usernameToggle && userMenu) {
+        // Показать/скрыть меню при клике на имя пользователя
+        usernameToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (userMenu.style.display === 'none' || userMenu.style.display === '') {
+                userMenu.style.display = 'block';
+            } else {
+                userMenu.style.display = 'none';
+            }
+        });
+
+        // Скрыть меню при клике в любом другом месте
+        document.addEventListener('click', function() {
+            userMenu.style.display = 'none';
+        });
+
+        // Предотвратить скрытие при клике на само меню
+        userMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
+</script>
 </body>
 </html>
