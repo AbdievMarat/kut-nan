@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $id
  * @property string $name
  * @property int $sort
+ * @property int $pieces_per_cart Количество штук на одну тележку
  * @property boolean $is_active
  * @property boolean $is_in_report
  * @property Carbon $created_at
@@ -36,6 +37,7 @@ class Product extends Model
         'sort',
         'is_active',
         'is_in_report',
+        'pieces_per_cart',
     ];
 
     /**

@@ -34,6 +34,16 @@
                     />
                 </div>
                 <div class="mb-3">
+                    <x-admin-forms-input
+                            type="number"
+                            id="pieces_per_cart"
+                            name="pieces_per_cart"
+                            label="Количество штук на одну тележку"
+                            placeholder="Введите количество"
+                            value="{{ old('pieces_per_cart') ?? $product->pieces_per_cart }}"
+                    />
+                </div>
+                <div class="mb-3">
                     <div class="form-check">
                         <input
                                 class="form-check-input"
@@ -90,7 +100,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success float-end">Создать</button>
+                <button type="submit" class="btn btn-success float-end">Обновить</button>
             </form>
         </div>
     </div>

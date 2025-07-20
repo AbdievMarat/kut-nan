@@ -17,6 +17,7 @@
                     <th>#</th>
                     <th>Название</th>
                     <th>Сортировка</th>
+                    <th>Количество штук на одну тележку</th>
                     <th>Статус</th>
                     <th>Отображение в отчёте</th>
                     <th style="width: 160px"></th>
@@ -28,6 +29,7 @@
                         <td>{{ $product->id }}</td>
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->sort }} </td>
+                        <td>{{ $product->pieces_per_cart }}</td>
                         <td>
                             <div class="badge bg-{{ $product->is_active ? 'success' : 'danger' }}">
                                 {{ $product->is_active ? 'Активен' : 'Не активен' }}
@@ -51,7 +53,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="6">
+                    <th colspan="7">
                         {{ $products->links() }}
                     </th>
                 </tr>
