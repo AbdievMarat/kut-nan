@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
+use App\Http\Requests\Admin\StoreProductIngredientsRequest;
 use App\Models\Product;
+use App\Models\Ingredient;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -68,5 +71,47 @@ class ProductController extends Controller
         return redirect()
             ->route('admin.products.index')
             ->with('success', ['text' => 'Продукт успешно обновлен!']);
+    }
+
+    /**
+     * @param Product $product
+     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+     */
+    public function ingredients(Product $product): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        $ingredients = Ingredient::query()
+            ->where('is_active', Ingredient::IS_ACTIVE)
+            ->orderBy('sort')
+            ->get();
+
+        $productIngredients = $product->ingredients()
+            ->withPivot('amount')
+            ->get()
+            ->keyBy('id');
+
+        return view('admin.products.ingredients', compact('product', 'ingredients', 'productIngredients'));
+    }
+
+    /**
+     * @param StoreProductIngredientsRequest $request
+     * @param Product $product
+     * @return RedirectResponse
+     */
+    public function storeIngredients(StoreProductIngredientsRequest $request, Product $product): RedirectResponse
+    {
+        $ingredientAmounts = $request->validated()['ingredient_amounts'] ?? [];
+
+        $syncData = [];
+        foreach ($ingredientAmounts as $ingredientId => $amount) {
+            if ($amount > 0) {
+                $syncData[$ingredientId] = ['amount' => $amount];
+            }
+        }
+
+        $product->ingredients()->sync($syncData);
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', ['text' => 'Ингредиенты продукта успешно обновлены!']);
     }
 }

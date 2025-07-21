@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $updated_at
  *
  * @property-read BusProductPrice|null $prices
+ * @property-read BelongsToMany $ingredients
  *
  * @mixin Builder
  */
@@ -46,5 +48,15 @@ class Product extends Model
     public function prices(): HasMany
     {
         return $this->hasMany(BusProductPrice::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function ingredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredient::class, 'product_ingredients', 'product_id', 'ingredient_id')
+            ->withPivot('amount')
+            ->withTimestamps();
     }
 }

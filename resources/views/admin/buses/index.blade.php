@@ -19,7 +19,7 @@
                     <th>Порядковый номер</th>
                     <th>Сортировка</th>
                     <th>Статус</th>
-                    <th style="width: 160px"></th>
+                    <th style="width: 300px"></th>
                 </tr>
                 </thead>
                 <tbody class="table-group-divider">
@@ -35,14 +35,24 @@
                             </div>
                         </td>
                         <td>
-                            <div class="d-flex justify-content-end">
-                                <div class="mx-2">
-                                    <a href="{{ route('admin.buses.product_prices_edit', ['bus' => $bus]) }}" type="button"
-                                       class="btn btn-info" title="Установка цен на продукты"><i class="bi-currency-dollar"></i></a>
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="mx-1">
+                                    <a href="{{ route('admin.buses.product_prices_edit', ['bus' => $bus]) }}"
+                                       type="button"
+                                       class="btn btn-info btn-sm d-flex align-items-center"
+                                       title="Установка цен на продукты">
+                                       <i class="bi-currency-dollar me-1"></i>
+                                       <span>Цены на продукты</span>
+                                    </a>
                                 </div>
-                                <div class="mx-2">
-                                    <a href="{{ route('admin.buses.edit', ['bus' => $bus]) }}" type="button"
-                                       class="btn btn-warning" title="Редактирование"><i class="bi bi-pencil-square"></i></a>
+                                <div class="mx-1">
+                                    <a href="{{ route('admin.buses.edit', ['bus' => $bus]) }}"
+                                       type="button"
+                                       class="btn btn-warning btn-sm d-flex align-items-center"
+                                       title="Редактировать">
+                                       <i class="bi bi-pencil-square me-1"></i>
+                                       <span>Редактировать</span>
+                                    </a>
                                 </div>
                             </div>
                         </td>

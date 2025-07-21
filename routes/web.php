@@ -29,6 +29,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('/buses/{bus}/product_prices/edit', [BusController::class, 'editProductPrices'])->name('buses.product_prices_edit');
     Route::put('/buses/{bus}/product_prices', [BusController::class, 'updateProductPrices'])->name('buses.product_prices_update');
     Route::resource('products', ProductController::class)->except(['show', 'destroy']);
+    Route::get('/products/{product}/ingredients', [ProductController::class, 'ingredients'])->name('products.ingredients');
+    Route::post('/products/{product}/ingredients', [ProductController::class, 'storeIngredients'])->name('products.ingredients.store');
     Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
     Route::resource('orders', AdminOrderController::class)->only(['index']);
     Route::get('get-markdown-items', [AdminOrderController::class, 'getMarkdownItems'])->name('orders.get_markdown_items');

@@ -20,12 +20,12 @@ class IngredientSeeder extends Seeder
             ['name' => 'Соль', 'unit' => 'кг', 'sort' => 5],
             ['name' => 'Масло растительное', 'unit' => 'л', 'sort' => 6],
             ['name' => 'Колер', 'unit' => 'л', 'sort' => 7],
-            ['name' => 'Кукурузная мука', 'unit' => 'кг', 'sort' => 8],
-            ['name' => 'Гречневая мука', 'unit' => 'кг', 'sort' => 9],
-            ['name' => 'Зерновая мука', 'unit' => 'кг', 'sort' => 10],
-            ['name' => 'Чемпион мука', 'unit' => 'кг', 'sort' => 11],
-            ['name' => 'Бездрожжевая смесь', 'unit' => 'кг', 'sort' => 12],
-            ['name' => 'Жир', 'unit' => 'мл', 'sort' => 13],
+            ['name' => 'Жир', 'unit' => 'мл', 'sort' => 8],
+            ['name' => 'Кукурузная мука', 'unit' => 'кг', 'sort' => 9],
+            ['name' => 'Гречневая мука', 'unit' => 'кг', 'sort' => 10],
+            ['name' => 'Зерновая мука', 'unit' => 'кг', 'sort' => 11],
+            ['name' => 'Чемпион мука', 'unit' => 'кг', 'sort' => 12],
+            ['name' => 'Бездрожжевая смесь', 'unit' => 'кг', 'sort' => 13],
         ];
 
         foreach ($ingredients as $ingredient) {

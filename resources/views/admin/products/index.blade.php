@@ -41,10 +41,23 @@
                             </div>
                         </td>
                         <td>
-                            <div class="d-flex justify-content-end">
-                                <div class="mx-2">
-                                    <a href="{{ route('admin.products.edit', ['product' => $product]) }}" type="button"
-                                       class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                            <div class="d-flex justify-content-end align-items-center">
+                                <div class="mx-1">
+                                    <a href="{{ route('admin.products.ingredients', ['product' => $product]) }}"
+                                       class="btn btn-info btn-sm d-flex align-items-center"
+                                       title="Калькуляция ингредиентов">
+                                       <i class="bi bi-calculator me-1"></i>
+                                       <span>Калькуляция</span>
+                                    </a>
+                                </div>
+                                <div class="mx-1">
+                                    <a href="{{ route('admin.products.edit', ['product' => $product]) }}"
+                                       type="button"
+                                       class="btn btn-warning btn-sm d-flex align-items-center"
+                                       title="Редактировать">
+                                       <i class="bi bi-pencil-square me-1"></i>
+                                       <span>Редактировать</span>
+                                    </a>
                                 </div>
                             </div>
                         </td>

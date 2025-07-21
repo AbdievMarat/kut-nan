@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -14,6 +15,8 @@ use Illuminate\Support\Carbon;
  * @property bool $is_active
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ *
+ * @property-read BelongsToMany $products
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -30,4 +33,14 @@ class Ingredient extends Model
         'sort',
         'is_active',
     ];
+
+    /**
+     * @return BelongsToMany
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'product_ingredients', 'ingredient_id', 'product_id')
+            ->withPivot('quantity')
+            ->withTimestamps();
+    }
 }

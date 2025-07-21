@@ -37,8 +37,13 @@
                         <td>
                             <div class="d-flex justify-content-end">
                                 <div class="mx-2">
-                                    <a href="{{ route('admin.ingredients.edit', ['ingredient' => $ingredient]) }}" type="button"
-                                       class="btn btn-warning"><i class="bi bi-pencil-square"></i></a>
+                                    <a href="{{ route('admin.ingredients.edit', ['ingredient' => $ingredient]) }}"
+                                       type="button"
+                                       class="btn btn-warning btn-sm d-flex align-items-center"
+                                       title="Редактировать">
+                                        <i class="bi bi-pencil-square me-1"></i>
+                                        <span>Редактировать</span>
+                                    </a>
                                 </div>
                             </div>
                         </td>
