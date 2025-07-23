@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->decimal('amount', 10, 2);
+            $table->string('formula');
             $table->timestamps();
 
             $table->unique(['product_id', 'ingredient_id']);

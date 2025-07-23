@@ -22,8 +22,35 @@ class StoreProductIngredientsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ingredient_amounts' => ['array'],
-            'ingredient_amounts.*' => ['nullable', 'numeric', 'min:0'],
+            'ingredient_formula' => ['array'],
+            'ingredient_formula.*' => [
+                'nullable',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // 1. Только разрешённые символы и переменные
+                    if (!preg_match('/^\s*[\d\.\+\-\*\/\(\)\s\$quantity\$portion]+\s*$/', $value)) {
+                        $fail('Формула содержит недопустимые символы. Разрешены только цифры, операторы и переменные: $quantity, $portion.');
+                        return;
+                    }
+
+                    // 2. Пробное выполнение
+                    $quantity = 1000;
+                    $portion = 216;
+
+                    $formulaStr = str_replace('$quantity', $quantity, $value);
+                    $formulaStr = str_replace('$portion', $portion, $formulaStr);
+
+                    try {
+                        $result = eval('return ' . $formulaStr . ';');
+                        if (!is_numeric($result)) {
+                            $fail('Формула не возвращает числовое значение.');
+                        }
+                    } catch (\Throwable $e) {
+                        $fail('Ошибка при вычислении формулы: ' . $e->getMessage());
+                    }
+                },
+            ],
         ];
     }
 }

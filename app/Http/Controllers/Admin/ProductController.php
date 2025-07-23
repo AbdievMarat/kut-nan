@@ -85,7 +85,7 @@ class ProductController extends Controller
             ->get();
 
         $productIngredients = $product->ingredients()
-            ->withPivot('amount')
+            ->withPivot('formula')
             ->get()
             ->keyBy('id');
 
@@ -99,12 +99,12 @@ class ProductController extends Controller
      */
     public function storeIngredients(StoreProductIngredientsRequest $request, Product $product): RedirectResponse
     {
-        $ingredientAmounts = $request->validated()['ingredient_amounts'] ?? [];
+        $ingredient_formula = $request->validated()['ingredient_formula'] ?? [];
 
         $syncData = [];
-        foreach ($ingredientAmounts as $ingredientId => $amount) {
-            if ($amount > 0) {
-                $syncData[$ingredientId] = ['amount' => $amount];
+        foreach ($ingredient_formula as $ingredientId => $formula) {
+            if (!empty($formula)) {
+                $syncData[$ingredientId] = ['formula' => $formula];
             }
         }
 
