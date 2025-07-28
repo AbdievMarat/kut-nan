@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property string $name
+ * @property string $short_name
  * @property string $unit
  * @property int $sort
  * @property bool $is_active
@@ -29,6 +31,7 @@ class Ingredient extends Model
 
     protected $fillable = [
         'name',
+        'short_name',
         'unit',
         'sort',
         'is_active',
@@ -40,7 +43,15 @@ class Ingredient extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_ingredients', 'ingredient_id', 'product_id')
-            ->withPivot('quantity')
+            ->withPivot('formula')
             ->withTimestamps();
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function usages(): HasMany
+    {
+        return $this->hasMany(IngredientUsage::class);
     }
 }

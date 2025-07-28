@@ -16,6 +16,7 @@
                 <tr>
                     <th>#</th>
                     <th>Название</th>
+                    <th>Сокращенное название</th>
                     <th>Единица измерения</th>
                     <th>Сортировка</th>
                     <th>Статус</th>
@@ -27,6 +28,7 @@
                     <tr>
                         <td>{{ $ingredient->id }}</td>
                         <td>{{ $ingredient->name }}</td>
+                        <td>{{ $ingredient->short_name }}</td>
                         <td>{{ $ingredient->unit }}</td>
                         <td>{{ $ingredient->sort }} </td>
                         <td>
@@ -52,7 +54,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="6">
+                    <th colspan="7">
                         {{ $ingredients->links() }}
                     </th>
                 </tr>

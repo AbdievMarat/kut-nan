@@ -12,7 +12,8 @@ export default defineConfig({
                 'resources/js/client/realizations/create.js',
                 'resources/js/client/remainders/create.js',
                 'resources/js/client/markdowns/create.js',
-                'resources/js/admin/orders/index.js'
+                'resources/js/admin/orders/index.js',
+                'resources/js/admin/ingredient_movements/create.js'
             ],
             refresh: true,
         }),

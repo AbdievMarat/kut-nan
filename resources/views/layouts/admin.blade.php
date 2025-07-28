@@ -37,6 +37,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ Request::is('admin/ingredient-movements') ? 'active' : '' }}" href="{{ route('admin.ingredient-movements.index') }}">
+                        <i class="bi bi-card-list"></i>
+                        Движение сырья
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/buses') ? 'active' : '' }}" href="{{ route('admin.buses.index') }}">
                         <i class="bi bi-bus-front"></i>
                         Бусы

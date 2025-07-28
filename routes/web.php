@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BusController;
 use App\Http\Controllers\Admin\IngredientController;
+use App\Http\Controllers\Admin\IngredientMovementController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Client\MarkdownController;
@@ -37,4 +38,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');
+    Route::get('ingredient-movements/edit/{date?}', [IngredientMovementController::class, 'edit'])
+        ->name('ingredient-movements.edit-by-date')
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    Route::get('ingredient-movements/show/{date}', [IngredientMovementController::class, 'show'])
+        ->name('ingredient-movements.show-by-date')
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    Route::get('ingredient-movements/show/{date}/export', [IngredientMovementController::class, 'exportShowToExcel'])
+        ->name('ingredient-movements.show-export')
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    Route::put('ingredient-movements/{date}', [IngredientMovementController::class, 'update'])
+        ->name('ingredient-movements.update-by-date')
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    Route::get('ingredient-movements-export', [IngredientMovementController::class, 'exportToExcel'])->name('ingredient-movements.export_to_excel');
+    Route::resource('ingredient-movements', IngredientMovementController::class)->only('index', 'create', 'store');
 });

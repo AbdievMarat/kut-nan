@@ -31,6 +31,11 @@ class UpdateIngredientRequest extends FormRequest
                 'max:255',
                 Rule::unique('ingredients', 'name')->ignore($ingredientId)
             ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'unit' => [
                 'required',
                 'string',

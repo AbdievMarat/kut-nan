@@ -25,6 +25,16 @@
                 <div class="mb-3">
                     <x-admin-forms-input
                             type="text"
+                            id="short_name"
+                            name="short_name"
+                            label="Сокращенное название"
+                            placeholder="Введите сокращенное название"
+                            value="{{ old('short_name') }}"
+                    />
+                </div>
+                <div class="mb-3">
+                    <x-admin-forms-input
+                            type="text"
                             id="unit"
                             name="unit"
                             label="Единица измерения"

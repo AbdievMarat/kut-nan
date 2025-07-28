@@ -29,6 +29,11 @@ class StoreIngredientRequest extends FormRequest
                 'max:255',
                 Rule::unique('ingredients', 'name')
             ],
+            'short_name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
             'unit' => [
                 'required',
                 'string',
