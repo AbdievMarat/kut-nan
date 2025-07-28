@@ -1,7 +1,7 @@
 @if (session('success'))
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-        const message = "{{ session('success')['text'] }}";
+        const message = "{{ is_array(session('success')) ? session('success')['text'] : session('success') }}";
             Swal.fire({
                 icon: 'success',
                 title: message,
@@ -14,7 +14,7 @@
 
 @if (session('error'))
     <script type="text/javascript">
-        const message = "{{ session('error')['text'] }}";
+        const message = "{{ is_array(session('error')) ? session('error')['text'] : session('error') }}";
         document.addEventListener("DOMContentLoaded", () => {
             Swal.fire({
                 icon: 'error',

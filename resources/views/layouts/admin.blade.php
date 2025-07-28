@@ -30,36 +30,42 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
+                @if(auth()->user()->hasRole('admin'))
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/orders') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                            <i class="bi bi-card-list"></i>
+                            Заказы
+                        </a>
+                    </li>
+                @endif
+
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/orders') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
-                        <i class="bi bi-card-list"></i>
-                        Заказы
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/ingredient-movements') ? 'active' : '' }}" href="{{ route('admin.ingredient-movements.index') }}">
+                    <a class="nav-link {{ Request::is('admin/ingredient-movements*') ? 'active' : '' }}" href="{{ route('admin.ingredient-movements.index') }}">
                         <i class="bi bi-card-list"></i>
                         Движение сырья
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/buses') ? 'active' : '' }}" href="{{ route('admin.buses.index') }}">
-                        <i class="bi bi-bus-front"></i>
-                        Бусы
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/products') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
-                        <i class="bi bi-basket"></i>
-                        Продукты
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/ingredients') ? 'active' : '' }}" href="{{ route('admin.ingredients.index') }}">
-                        <i class="bi bi-egg-fried"></i>
-                        Ингредиенты
-                    </a>
-                </li>
+
+                @if(auth()->user()->hasRole('admin'))
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/buses') ? 'active' : '' }}" href="{{ route('admin.buses.index') }}">
+                            <i class="bi bi-bus-front"></i>
+                            Бусы
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/products') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">
+                            <i class="bi bi-basket"></i>
+                            Продукты
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/ingredients') ? 'active' : '' }}" href="{{ route('admin.ingredients.index') }}">
+                            <i class="bi bi-egg-fried"></i>
+                            Ингредиенты
+                        </a>
+                    </li>
+                @endif
             </ul>
 
             <!-- Right Side Of Navbar -->

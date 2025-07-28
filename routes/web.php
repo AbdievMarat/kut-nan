@@ -24,7 +24,7 @@ Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminOrderController::class, 'index'])->name('home');
     Route::resource('buses', BusController::class)->except(['destroy']);
     Route::get('/buses/{bus}/product_prices/edit', [BusController::class, 'editProductPrices'])->name('buses.product_prices_edit');
@@ -38,6 +38,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');
+});
+
+Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [IngredientMovementController::class, 'index']);
     Route::get('ingredient-movements/edit/{date?}', [IngredientMovementController::class, 'edit'])
         ->name('ingredient-movements.edit-by-date')
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
