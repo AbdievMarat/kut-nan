@@ -49,7 +49,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @if(count($tableData) > 0)
+                        @if(count($tableData) > 0 || count($ingredientUsages) > 0)
                             <div class="table-responsive">
                                 <table class="table table-bordered table-striped compact-table">
                                     <thead>

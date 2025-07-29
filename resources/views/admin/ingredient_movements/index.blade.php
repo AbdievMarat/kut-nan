@@ -4,15 +4,9 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <span>Движение ингредиентов</span>
-            @if($hasTodayRecords)
-                <a href="{{ route('admin.ingredient-movements.edit-by-date') }}" class="btn btn-warning">
-                    <i class="bi bi-pencil"></i> Редактировать сегодня
-                </a>
-            @else
-                <a href="{{ route('admin.ingredient-movements.create') }}" class="btn btn-success">
-                    <i class="bi bi-plus"></i> Добавить запись
-                </a>
-            @endif
+            <a href="{{ route('admin.ingredient-movements.create') }}" class="btn btn-success">
+                <i class="bi bi-plus"></i> Добавить запись
+            </a>
         </div>
 
         <!-- Форма фильтрации по датам -->
@@ -54,6 +48,7 @@
                 <table class="table table-bordered table-hover table-sm">
                     <thead>
                         <tr>
+                            <th rowspan="2" class="align-middle text-center">*</th>
                             <th rowspan="2" class="align-middle text-center">Дата</th>
                             @foreach ($ingredients as $ingredient)
                                 <th colspan="3" class="text-center" title="{{ $ingredient->name }}">{{ $ingredient->short_name }} ({{ $ingredient->unit }})</th>
@@ -70,6 +65,15 @@
                     <tbody>
                         @foreach ($tableData as $date => $ingredientsData)
                             <tr>
+                                <td class="text-center">
+                                    @if($editableDates[$date] ?? false)
+                                        <a href="{{ route('admin.ingredient-movements.edit-by-date', $date) }}"
+                                           class="btn btn-sm btn-outline-primary"
+                                           title="Редактировать запись за {{ date('d.m.Y', strtotime($date)) }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    @endif
+                                </td>
                                 <td class="fw-bold">
                                     <a href="{{ route('admin.ingredient-movements.show-by-date', $date) }}"
                                        class="text-decoration-none fw-bold"

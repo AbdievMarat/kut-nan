@@ -47,6 +47,45 @@ class IngredientMovementRequest extends FormRequest
     }
 
     /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $hasProductData = false;
+            $hasIngredientData = false;
+
+            // Проверяем есть ли данные в products
+            if ($this->has('products')) {
+                foreach ($this->input('products', []) as $product) {
+                    if (!empty($product['quantity_cart'])) {
+                        $hasProductData = true;
+                        break;
+                    }
+                }
+            }
+
+            // Проверяем есть ли данные в ingredients
+            if ($this->has('ingredients')) {
+                foreach ($this->input('ingredients', []) as $ingredient) {
+                    if (!empty($ingredient['income']) ||
+                        !empty($ingredient['usage_missing']) ||
+                        !empty($ingredient['usage_taken_from_stock']) ||
+                        !empty($ingredient['usage_kitchen'])) {
+                        $hasIngredientData = true;
+                        break;
+                    }
+                }
+            }
+
+            // Если нет данных ни в одном массиве, добавляем ошибку
+            if (!$hasProductData && !$hasIngredientData) {
+                $validator->errors()->add('general', 'Необходимо заполнить хотя бы одно поле в разделе "Произведенная продукция" или "Приход и расход сырья"');
+            }
+        });
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array

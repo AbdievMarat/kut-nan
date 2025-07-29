@@ -13,12 +13,18 @@
                 <form action="{{ route('admin.ingredient-movements.store') }}" method="POST">
                     @csrf
                     <div class="card-body">
+                        @if($errors->has('general'))
+                            <div class="alert alert-danger">
+                                {{ $errors->first('general') }}
+                            </div>
+                        @endif
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="date">Дата</label>
                                     <input type="date" class="form-control @error('date') is-invalid @enderror"
-                                           id="date" name="date" value="{{ old('date', date('Y-m-d')) }}">
+                                           id="date" name="date" value="{{ old('date', date('Y-m-d')) }}"
+                                           @if(!auth()->user()->hasRole('admin')) readonly @endif>
                                     @error('date')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

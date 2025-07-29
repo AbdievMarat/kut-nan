@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductBatch;
 use App\Exports\IngredientMovementExport;
 use App\Exports\IngredientMovementDetailExport;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -76,6 +77,12 @@ class IngredientMovementController extends Controller
             }
         }
 
+        // Добавляем информацию о возможности редактирования для каждой даты
+        $editableDates = [];
+        foreach ($tableData as $date => $data) {
+            $editableDates[$date] = $this->isDateEditable($date);
+        }
+
         // Проверяем, есть ли записи за сегодняшний день
         $today = date('Y-m-d');
         $hasTodayRecords = IngredientUsage::query()
@@ -88,6 +95,7 @@ class IngredientMovementController extends Controller
             'dateFrom' => $dateFrom,
             'dateTo' => $dateTo,
             'hasTodayRecords' => $hasTodayRecords,
+            'editableDates' => $editableDates,
         ]);
     }
 
@@ -98,18 +106,6 @@ class IngredientMovementController extends Controller
      */
     public function create(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
-        // Проверяем, есть ли уже запись за сегодняшний день
-        $today = date('Y-m-d');
-        $hasTodayRecords = IngredientUsage::query()
-            ->where('date', '=', $today)
-            ->exists();
-
-        if ($hasTodayRecords) {
-            return redirect()
-                ->route('admin.ingredient-movements.index')
-                ->with('error', ['text' => 'Запись за сегодняшний день уже существует']);
-        }
-
         $products = Product::query()
             ->where('is_active', '=', Product::IS_ACTIVE)
             ->where('pieces_per_cart', '>', '1')
@@ -135,6 +131,21 @@ class IngredientMovementController extends Controller
      */
     public function store(IngredientMovementRequest $request): RedirectResponse
     {
+        // Валидация на уровне контроллера
+        $request->validate([
+            'date' => [
+                function ($attribute, $value, $fail) {
+                    $hasRecords = IngredientUsage::query()
+                        ->where('date', '=', $value)
+                        ->exists();
+
+                    if ($hasRecords) {
+                        $fail('Запись за ' . date('d.m.Y', strtotime($value)) . ' уже существует.');
+                    }
+                }
+            ]
+        ]);
+
         DB::transaction(function () use ($request) {
             $date = $request->input('date');
 
@@ -143,6 +154,9 @@ class IngredientMovementController extends Controller
 
             // Расчет и сохранение движения ингредиентов
             $this->processIngredientMovements($request, $date, $productBatches);
+
+            // Пересчитываем остатки для всех последующих дат
+            $this->recalculateStocksAfterDate($date);
         });
 
         return redirect()
@@ -210,13 +224,31 @@ class IngredientMovementController extends Controller
      * Редактирование записи движения ингредиентов по дате
      *
      * @param string|null $date
-     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application|RedirectResponse
      */
-    public function edit(?string $date = null): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    public function edit(?string $date = null): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|RedirectResponse
     {
         // Если дата не передана, используем сегодняшнюю дату
         if (!$date) {
             $date = date('Y-m-d');
+        }
+
+        // Проверяем, есть ли записи за указанную дату
+        $hasRecords = IngredientUsage::query()
+            ->where('date', '=', $date)
+            ->exists();
+
+        if (!$hasRecords) {
+            return redirect()
+                ->route('admin.ingredient-movements.index')
+                ->with('error', ['text' => 'Записи за ' . date('d.m.Y', strtotime($date)) . ' не найдены']);
+        }
+
+        // Проверяем, доступна ли дата для редактирования
+        if (!$this->isDateEditable($date)) {
+            return redirect()
+                ->route('admin.ingredient-movements.index')
+                ->with('error', ['text' => 'Редактирование записи за ' . date('d.m.Y', strtotime($date)) . ' недоступно. Можно редактировать только записи за последние 10 дней.']);
         }
 
         $products = Product::query()
@@ -324,11 +356,11 @@ class IngredientMovementController extends Controller
      */
     private function processIngredientMovements(IngredientMovementRequest $request, string $date, array $productBatches): void
     {
-        $ingredients = Ingredient::with(['products' => function ($query) {
-            $query->whereNotNull('product_ingredients.formula');
-        }])->whereHas('products', function ($query) {
-            $query->whereNotNull('product_ingredients.formula');
-        })->get();
+        $ingredients = Ingredient::query()
+            ->with(['products'])
+            ->where('is_active', Ingredient::IS_ACTIVE)
+            ->orderBy('sort')
+            ->get();
 
         /** @var Ingredient $ingredient */
         foreach ($ingredients as $ingredient) {
@@ -338,18 +370,15 @@ class IngredientMovementController extends Controller
             $usageTakenFromStock = (float) ($request->input("ingredients.{$ingredient->id}.usage_taken_from_stock") ?? 0);
             $usageKitchen = (float) ($request->input("ingredients.{$ingredient->id}.usage_kitchen") ?? 0);
 
-            // Сохраняем запись только если есть приход или любой тип расхода
-            if ($income > 0 || $calculatedUsage > 0 || $usageMissing > 0 || $usageTakenFromStock > 0 || $usageKitchen > 0) {
-                $this->saveIngredientUsage(
-                    $ingredient,
-                    $date,
-                    $calculatedUsage,
-                    $income,
-                    $usageMissing,
-                    $usageTakenFromStock,
-                    $usageKitchen
-                );
-            }
+            $this->saveIngredientUsage(
+                $ingredient,
+                $date,
+                $calculatedUsage,
+                $income,
+                $usageMissing,
+                $usageTakenFromStock,
+                $usageKitchen
+            );
         }
     }
 
@@ -522,5 +551,25 @@ class IngredientMovementController extends Controller
             new IngredientMovementDetailExport($date),
             'production_details_' . date('d.m.Y', strtotime($date)) . '.xlsx'
         );
+    }
+
+    /**
+     * Проверка, доступна ли дата для редактирования
+     *
+     * @param string $date
+     * @return bool
+     */
+    private function isDateEditable(string $date): bool
+    {
+        $today = now();
+        $recordDate = Carbon::parse($date);
+
+        // Для неадминистраторов - только сегодняшний день
+        if (!auth()->user()->hasRole('admin')) {
+            return $recordDate->format('Y-m-d') === $today->format('Y-m-d');
+        }
+
+        // Для администраторов - последние 10 дней
+        return $recordDate->diffInDays($today) <= 10;
     }
 }
