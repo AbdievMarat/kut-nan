@@ -30,14 +30,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side Of Navbar -->
             <ul class="navbar-nav me-auto">
-                @if(auth()->user()->hasRole('admin'))
-                    <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/orders') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
-                            <i class="bi bi-card-list"></i>
-                            Заказы
-                        </a>
-                    </li>
-                @endif
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('admin/orders') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}">
+                        <i class="bi bi-card-list"></i>
+                        Заказы
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/ingredient-movements*') ? 'active' : '' }}" href="{{ route('admin.ingredient-movements.index') }}">

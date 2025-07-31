@@ -33,14 +33,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/products/{product}/ingredients', [ProductController::class, 'ingredients'])->name('products.ingredients');
     Route::post('/products/{product}/ingredients', [ProductController::class, 'storeIngredients'])->name('products.ingredients.store');
     Route::resource('ingredients', IngredientController::class)->except(['show', 'destroy']);
+});
+
+Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('orders', AdminOrderController::class)->only(['index']);
     Route::get('get-markdown-items', [AdminOrderController::class, 'getMarkdownItems'])->name('orders.get_markdown_items');
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');
-});
 
-Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [IngredientMovementController::class, 'index']);
     Route::get('ingredient-movements/edit/{date?}', [IngredientMovementController::class, 'edit'])
         ->name('ingredient-movements.edit-by-date')
