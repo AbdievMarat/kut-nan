@@ -97,7 +97,7 @@
                                                                 data-bs-target="#costDetailModal"
                                                                 data-product-id="{{ $data['product']->id }}"
                                                                 data-date="{{ $date }}"
-                                                                style="text-decoration: none; color: inherit;">
+                                                                style="text-decoration: underline; color: #0a58ca;">
                                                             <strong>{{ number_format($totalCost, 2) }}</strong>
                                                         </button>
                                                     @endif
