@@ -52,6 +52,8 @@ Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.
     Route::get('ingredient-movements/show/{date}/export', [IngredientMovementController::class, 'exportShowToExcel'])
         ->name('ingredient-movements.show-export')
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');
+    Route::get('ingredient-movements/cost-details', [IngredientMovementController::class, 'getCostDetails'])
+        ->name('ingredient-movements.cost-details');
     Route::put('ingredient-movements/{date}', [IngredientMovementController::class, 'update'])
         ->name('ingredient-movements.update-by-date')
         ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}');

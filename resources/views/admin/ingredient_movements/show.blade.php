@@ -63,6 +63,7 @@
                                                     <small class="text-muted d-block">({{ $ingredient->unit }})</small>
                                                 </th>
                                             @endforeach
+                                            <th>Себестоимость</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -78,13 +79,36 @@
                                                         @endif
                                                     </td>
                                                 @endforeach
+                                                <td class="text-center">
+                                                    @php
+                                                        $ingredientsCost = 0;
+                                                        foreach($ingredients as $ingredient) {
+                                                            if(isset($data['ingredients'][$ingredient->id])) {
+                                                                $ingredientsCost += $data['ingredients'][$ingredient->id] * $ingredient->price;
+                                                            }
+                                                        }
+                                                        $productionCost = $data['product']->production_cost * $data['quantity_total'];
+                                                        $totalCost = $ingredientsCost + $productionCost;
+                                                    @endphp
+                                                    @if($totalCost > 0)
+                                                        <button type="button"
+                                                                class="btn btn-link p-0 cost-detail-btn"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#costDetailModal"
+                                                                data-product-id="{{ $data['product']->id }}"
+                                                                data-date="{{ $date }}"
+                                                                style="text-decoration: none; color: inherit;">
+                                                            <strong>{{ number_format($totalCost, 2) }}</strong>
+                                                        </button>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <!-- Заголовок для расхода на хлеб -->
                                         <tr class="table-light">
-                                            <td colspan="{{ 3 + count($ingredients) }}" class="text-center section-header">
+                                            <td colspan="{{ 4 + count($ingredients) }}" class="text-center section-header">
                                                 <h5><strong>РАСХОД НА ХЛЕБ</strong></h5>
                                             </td>
                                         </tr>
@@ -111,11 +135,29 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td class="text-center">
+                                                @php
+                                                    $totalCostAllProducts = 0;
+                                                    foreach($tableData as $data) {
+                                                        $ingredientsCost = 0;
+                                                        foreach($ingredients as $ingredient) {
+                                                            if(isset($data['ingredients'][$ingredient->id])) {
+                                                                $ingredientsCost += $data['ingredients'][$ingredient->id] * $ingredient->price;
+                                                            }
+                                                        }
+                                                        $productionCost = $data['product']->production_cost * $data['quantity_total'];
+                                                        $totalCostAllProducts += $ingredientsCost + $productionCost;
+                                                    }
+                                                @endphp
+                                                @if($totalCostAllProducts > 0)
+                                                    <strong>{{ number_format($totalCostAllProducts, 2) }}</strong>
+                                                @endif
+                                            </td>
                                         </tr>
 
                                         <!-- Заголовок для прочих расходов -->
                                         <tr class="table-light">
-                                            <td colspan="{{ 3 + count($ingredients) }}" class="text-center section-header">
+                                            <td colspan="{{ 4 + count($ingredients) }}" class="text-center section-header">
                                                 <h5><strong>ПРОЧИЕ РАСХОДЫ</strong></h5>
                                             </td>
                                         </tr>
@@ -130,6 +172,7 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Забрали со склада:</strong></td>
@@ -142,6 +185,7 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Кухня:</strong></td>
@@ -154,11 +198,12 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td></td>
                                         </tr>
 
                                         <!-- Заголовок для итогового расхода -->
                                         <tr class="table-light">
-                                            <td colspan="{{ 3 + count($ingredients) }}" class="text-center section-header">
+                                            <td colspan="{{ 4 + count($ingredients) }}" class="text-center section-header">
                                                 <h5><strong>ИТОГО РАСХОД</strong></h5>
                                             </td>
                                         </tr>
@@ -190,11 +235,12 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td></td>
                                         </tr>
 
                                         <!-- Заголовок для прихода -->
                                         <tr class="table-light">
-                                            <td colspan="{{ 3 + count($ingredients) }}" class="text-center section-header">
+                                            <td colspan="{{ 4 + count($ingredients) }}" class="text-center section-header">
                                                 <h5><strong>ПРИХОД</strong></h5>
                                             </td>
                                         </tr>
@@ -209,6 +255,7 @@
                                                     @endif
                                                 </td>
                                             @endforeach
+                                            <td></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -224,4 +271,42 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="orderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Детализация</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="orderContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="costDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Детализация себестоимости</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="costDetailContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/admin/ingredient_movements/show.js'])
+@endpush

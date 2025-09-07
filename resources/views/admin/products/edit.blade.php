@@ -44,6 +44,16 @@
                     />
                 </div>
                 <div class="mb-3">
+                    <x-admin-forms-input
+                            type="number"
+                            id="production_cost"
+                            name="production_cost"
+                            label="Стоимость расходов на производство (ЗП, коммунальные услуги, амортизация оборудования и прочие расходы)"
+                            placeholder="Введите стоимость производства"
+                            value="{{ old('production_cost') ?? $product->production_cost }}"
+                    />
+                </div>
+                <div class="mb-3">
                     <div class="form-check">
                         <input
                                 class="form-check-input"

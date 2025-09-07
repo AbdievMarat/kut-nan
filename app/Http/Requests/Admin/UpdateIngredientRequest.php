@@ -41,6 +41,12 @@ class UpdateIngredientRequest extends FormRequest
                 'string',
                 'max:255',
             ],
+            'price' => [
+                'required',
+                'integer',
+                'min:0',
+                'max:100000',
+            ],
             'sort' => [
                 'required',
                 'integer',

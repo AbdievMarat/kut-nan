@@ -13,7 +13,8 @@ export default defineConfig({
                 'resources/js/client/remainders/create.js',
                 'resources/js/client/markdowns/create.js',
                 'resources/js/admin/orders/index.js',
-                'resources/js/admin/ingredient_movements/create.js'
+                'resources/js/admin/ingredient_movements/create.js',
+                'resources/js/admin/ingredient_movements/show.js'
             ],
             refresh: true,
         }),

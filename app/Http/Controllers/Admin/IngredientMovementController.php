@@ -14,11 +14,13 @@ use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 
 class IngredientMovementController extends Controller
 {
@@ -289,6 +291,7 @@ class IngredientMovementController extends Controller
      * @param IngredientMovementRequest $request
      * @param string $date
      * @return RedirectResponse
+     * @throws Throwable
      */
     public function update(IngredientMovementRequest $request, string $date): RedirectResponse
     {
@@ -551,6 +554,80 @@ class IngredientMovementController extends Controller
             new IngredientMovementDetailExport($date),
             'production_details_' . date('d.m.Y', strtotime($date)) . '.xlsx'
         );
+    }
+
+    /**
+     * Получение детализации себестоимости для продукта
+     *
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function getCostDetails(Request $request): JsonResponse
+    {
+        $productId = $request->get('product_id');
+        $date = $request->get('date');
+
+        $product = Product::findOrFail($productId);
+
+        // Получаем производственную партию за указанную дату
+        $productBatch = ProductBatch::query()
+            ->with([
+                'product',
+                'productBatchIngredients.ingredient'
+            ])
+            ->where('product_id', '=', $productId)
+            ->where('date', '=', $date)
+            ->first();
+
+        if (!$productBatch) {
+            return response()->json(['error' => 'Партия продукта не найдена'], 404);
+        }
+
+        // Собираем данные по ингредиентам
+        $ingredientsData = [];
+        $totalIngredientsCost = 0;
+
+        foreach ($productBatch->productBatchIngredients as $batchIngredient) {
+            $ingredient = $batchIngredient->ingredient;
+            $cost = $batchIngredient->amount * $ingredient->price;
+
+            $ingredientsData[] = [
+                'name' => $ingredient->name,
+                'amount' => $batchIngredient->amount,
+                'unit' => $ingredient->unit,
+                'price' => $ingredient->price,
+                'cost' => $cost
+            ];
+
+            $totalIngredientsCost += $cost;
+        }
+
+        // Расчет производственных расходов
+        $productionCostPerUnit = $product->production_cost;
+        $totalProductionCost = $productionCostPerUnit * $productBatch->quantity_total;
+
+        // Общая себестоимость
+        $totalCost = $totalIngredientsCost + $totalProductionCost;
+
+        $costData = [
+            'product_name' => $product->name,
+            'quantity_total' => $productBatch->quantity_total,
+            'production_cost_per_unit' => $productionCostPerUnit,
+            'ingredients' => $ingredientsData,
+            'total_ingredients_cost' => $totalIngredientsCost,
+            'total_production_cost' => $totalProductionCost,
+            'total_cost' => $totalCost
+        ];
+
+        $costDetailsHtml = view('admin.ingredient_movements.cost_detail', [
+            'costData' => $costData
+        ])->render();
+
+        return response()->json([
+            'success' => true,
+            'costDetails' => $costDetailsHtml
+        ]);
     }
 
     /**

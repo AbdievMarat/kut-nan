@@ -26,6 +26,7 @@ class UpdateProductRequest extends FormRequest
             'name' => ['required', Rule::unique('products', 'name')->ignore($this->route('product')->id)],
             'sort' => ['required', 'numeric'],
             'pieces_per_cart' => ['required', 'numeric', 'min:1', 'max:2000'],
+            'production_cost' => ['required', 'numeric', 'min:0', 'max:1000000'],
             'is_active' => ['required'],
             'is_in_report' => ['required'],
         ];

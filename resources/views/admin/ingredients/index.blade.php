@@ -18,6 +18,7 @@
                     <th>Название</th>
                     <th>Сокращенное название</th>
                     <th>Единица измерения</th>
+                    <th>Цена</th>
                     <th>Сортировка</th>
                     <th>Статус</th>
                     <th style="width: 160px"></th>
@@ -30,6 +31,7 @@
                         <td>{{ $ingredient->name }}</td>
                         <td>{{ $ingredient->short_name }}</td>
                         <td>{{ $ingredient->unit }}</td>
+                        <td>{{ $ingredient->price }}</td>
                         <td>{{ $ingredient->sort }} </td>
                         <td>
                             <div class="badge bg-{{ $ingredient->is_active ? 'success' : 'danger' }}">
@@ -54,7 +56,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="7">
+                    <th colspan="8">
                         {{ $ingredients->links() }}
                     </th>
                 </tr>

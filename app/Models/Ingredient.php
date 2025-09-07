@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $short_name
  * @property string $unit
+ * @property int $price
  * @property int $sort
  * @property bool $is_active
  * @property Carbon $created_at
@@ -33,6 +34,7 @@ class Ingredient extends Model
         'name',
         'short_name',
         'unit',
+        'price',
         'sort',
         'is_active',
     ];
