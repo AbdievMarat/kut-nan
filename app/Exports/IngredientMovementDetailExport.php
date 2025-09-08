@@ -78,11 +78,23 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
                 $row[] = $ingredientAmount ? number_format($ingredientAmount, 2) : '';
             }
 
+            // Рассчитываем себестоимость продукта
+            $ingredientsCost = 0;
+            foreach ($ingredients as $ingredient) {
+                if (isset($productData['ingredients'][$ingredient->id])) {
+                    $ingredientsCost += $productData['ingredients'][$ingredient->id] * $ingredient->price;
+                }
+            }
+            $productionCost = $productData['product']->production_cost * $productData['quantity_total'];
+            $totalCost = $ingredientsCost + $productionCost;
+
+            $row[] = $totalCost > 0 ? number_format($totalCost, 2) : '';
+
             $data[] = $row;
         }
 
         // Пустая строка для разделения
-        $emptyRow = array_fill(0, 3 + count($ingredients), '');
+        $emptyRow = array_fill(0, 4 + count($ingredients), '');
         $data[] = $emptyRow;
 
         // Расход на хлеб - итого
@@ -101,6 +113,21 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             }
             $totalRow[] = $totalUsage > 0 ? number_format($totalUsage, 2) : '';
         }
+
+        // Рассчитываем общую себестоимость всех продуктов
+        $totalCostAllProducts = 0;
+        foreach ($tableData as $productData) {
+            $ingredientsCost = 0;
+            foreach ($ingredients as $ingredient) {
+                if (isset($productData['ingredients'][$ingredient->id])) {
+                    $ingredientsCost += $productData['ingredients'][$ingredient->id] * $ingredient->price;
+                }
+            }
+            $productionCost = $productData['product']->production_cost * $productData['quantity_total'];
+            $totalCostAllProducts += $ingredientsCost + $productionCost;
+        }
+        $totalRow[] = $totalCostAllProducts > 0 ? number_format($totalCostAllProducts, 2) : '';
+
         $data[] = $totalRow;
 
         // Пустая строка
@@ -109,7 +136,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
         // ПРОЧИЕ РАСХОДЫ
         $otherExpensesHeader = ['ПРОЧИЕ РАСХОДЫ'];
         // Заполняем оставшиеся столбцы пустыми значениями
-        for ($i = 1; $i < 3 + count($ingredients); $i++) {
+        for ($i = 1; $i < 4 + count($ingredients); $i++) {
             $otherExpensesHeader[] = '';
         }
         $data[] = $otherExpensesHeader;
@@ -120,6 +147,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $usage = $ingredientUsages[$ingredient->id] ?? null;
             $missingRow[] = ($usage && $usage->usage_missing > 0) ? number_format($usage->usage_missing, 2) : '';
         }
+        $missingRow[] = ''; // Пустая ячейка для колонки себестоимости
         $data[] = $missingRow;
 
         // Забрали со склада
@@ -128,6 +156,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $usage = $ingredientUsages[$ingredient->id] ?? null;
             $takenRow[] = ($usage && $usage->usage_taken_from_stock > 0) ? number_format($usage->usage_taken_from_stock, 2) : '';
         }
+        $takenRow[] = ''; // Пустая ячейка для колонки себестоимости
         $data[] = $takenRow;
 
         // Кухня
@@ -136,6 +165,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $usage = $ingredientUsages[$ingredient->id] ?? null;
             $kitchenRow[] = ($usage && $usage->usage_kitchen > 0) ? number_format($usage->usage_kitchen, 2) : '';
         }
+        $kitchenRow[] = ''; // Пустая ячейка для колонки себестоимости
         $data[] = $kitchenRow;
 
         // Пустая строка
@@ -144,7 +174,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
         // ИТОГО РАСХОД
         $totalExpensesHeader = ['ИТОГО РАСХОД'];
         // Заполняем оставшиеся столбцы пустыми значениями
-        for ($i = 1; $i < 3 + count($ingredients); $i++) {
+        for ($i = 1; $i < 4 + count($ingredients); $i++) {
             $totalExpensesHeader[] = '';
         }
         $data[] = $totalExpensesHeader;
@@ -167,6 +197,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $grandTotal = $totalUsage + $totalOtherUsage;
             $grandTotalRow[] = $grandTotal > 0 ? number_format($grandTotal, 2) : '';
         }
+        $grandTotalRow[] = ''; // Пустая ячейка для колонки себестоимости
         $data[] = $grandTotalRow;
 
         // Пустая строка
@@ -175,7 +206,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
         // ПРИХОД
         $incomeHeader = ['ПРИХОД'];
         // Заполняем оставшиеся столбцы пустыми значениями
-        for ($i = 1; $i < 3 + count($ingredients); $i++) {
+        for ($i = 1; $i < 4 + count($ingredients); $i++) {
             $incomeHeader[] = '';
         }
         $data[] = $incomeHeader;
@@ -185,6 +216,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $usage = $ingredientUsages[$ingredient->id] ?? null;
             $incomeRow[] = ($usage && $usage->income > 0) ? number_format($usage->income, 2) : '';
         }
+        $incomeRow[] = ''; // Пустая ячейка для колонки себестоимости
         $data[] = $incomeRow;
 
         return $data;
@@ -203,6 +235,8 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
             $headings[] = $ingredient->short_name . ' (' . $ingredient->unit . ')';
         }
 
+        $headings[] = 'Себестоимость';
+
         return $headings;
     }
 
@@ -218,7 +252,7 @@ class IngredientMovementDetailExport implements FromArray, WithHeadings, WithEve
                     ->get();
 
                 $ingredientCount = $ingredients->count();
-                $lastColumnIndex = 3 + $ingredientCount;
+                $lastColumnIndex = 4 + $ingredientCount; // +1 для колонки себестоимости
                 $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColumnIndex);
                 $rowCount = $sheet->getHighestRow();
 
