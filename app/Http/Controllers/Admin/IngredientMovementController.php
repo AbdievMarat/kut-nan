@@ -593,6 +593,7 @@ class IngredientMovementController extends Controller
             $cost = $batchIngredient->amount * $ingredient->price;
 
             $ingredientsData[] = [
+                'id' => $ingredient->id,
                 'name' => $ingredient->name,
                 'amount' => $batchIngredient->amount,
                 'unit' => $ingredient->unit,
@@ -611,6 +612,7 @@ class IngredientMovementController extends Controller
         $totalCost = $totalIngredientsCost + $totalProductionCost;
 
         $costData = [
+            'product_id' => $product->id,
             'product_name' => $product->name,
             'quantity_total' => $productBatch->quantity_total,
             'production_cost_per_unit' => $productionCostPerUnit,
