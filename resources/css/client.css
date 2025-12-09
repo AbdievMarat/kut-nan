@@ -41,7 +41,8 @@ img {
     margin-bottom: 2rem;
 }
 
-form input {
+/* Стили применяются только к формам без Bootstrap классов */
+form:not(#feedback-form) input:not(.form-control) {
     border: 1px solid #8200a6;
     padding: 18px 8px;
     border-radius: 15px;
@@ -50,7 +51,7 @@ form input {
     color: #b16bd5;
 }
 
-form input:focus {
+form:not(#feedback-form) input:not(.form-control):focus {
     outline: none;
 }
 
@@ -71,6 +72,123 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+/* Feedback Form - Smooth animation for contact fields */
+#contact-fields {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+#contact-fields[style*="display: none"] {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+#contact-fields[style*="display: block"] {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Switch стили для формы обратной связи */
+#feedback-form .form-switch-lg {
+    font-size: 1.25rem;
+}
+
+#feedback-form .form-switch-lg .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    cursor: pointer;
+}
+
+/* Валидация в реальном времени */
+#feedback-form .validation-feedback {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+}
+
+#feedback-form .form-control.is-valid {
+    border-color: var(--bs-success);
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+#feedback-form .form-control.is-valid:focus {
+    border-color: var(--bs-success);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-success-rgb), 0.25);
+}
+
+#feedback-form .form-control.is-invalid {
+    border-color: var(--bs-danger);
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+#feedback-form .form-control.is-invalid:focus {
+    border-color: var(--bs-danger);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-danger-rgb), 0.25);
+}
+
+/* Исправляем отображение иконок для floating labels */
+#feedback-form .form-floating > .form-control.is-valid,
+#feedback-form .form-floating > .form-control.is-invalid {
+    padding-right: calc(1.5em + 0.75rem);
+}
+
+/* Для textarea тоже нужны иконки */
+#feedback-form textarea.form-control.is-valid,
+#feedback-form textarea.form-control.is-invalid {
+    padding-right: calc(1.5em + 0.75rem);
+    background-position: right calc(0.375em + 0.1875rem) top calc(0.375em + 0.1875rem);
+}
+
+/* Убеждаемся, что иконки видны для всех типов полей, включая floating labels */
+#feedback-form .form-floating > .form-control.is-valid,
+#feedback-form .form-floating > .form-control.is-invalid {
+    padding-right: calc(1.5em + 0.75rem);
+}
+
+/* Для textarea тоже нужны иконки */
+#feedback-form textarea.form-control.is-valid,
+#feedback-form textarea.form-control.is-invalid {
+    padding-right: calc(1.5em + 0.75rem);
+    background-position: right calc(0.375em + 0.1875rem) top calc(0.375em + 0.1875rem);
+}
+
+#feedback-form .valid-feedback {
+    display: block;
+    color: var(--bs-success);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+#feedback-form .invalid-feedback {
+    display: block;
+    color: var(--bs-danger);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Floating labels стили для формы обратной связи */
+#feedback-form .form-floating {
+    margin-bottom: 1rem;
+}
+
+#feedback-form .form-floating > .form-control:focus ~ label,
+#feedback-form .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+#feedback-form .form-floating > textarea.form-control {
+    min-height: 150px;
+    padding-top: 1.625rem;
 }
 
 @media screen and (max-width: 600px) {

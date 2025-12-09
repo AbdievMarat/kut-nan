@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\IngredientController;
 use App\Http\Controllers\Admin\IngredientMovementController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Client\FeedbackController;
 use App\Http\Controllers\Client\MarkdownController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\RealizationController;
@@ -18,6 +19,7 @@ Route::resource('orders', OrderController::class)->only(['create', 'store']);
 Route::resource('realizations', RealizationController::class)->only(['create', 'store']);
 Route::resource('remainders', RemainderController::class)->only(['create', 'store']);
 Route::resource('markdowns', MarkdownController::class)->only(['create', 'store']);
+Route::resource('feedback', FeedbackController::class)->only(['create', 'store']);
 Route::post('/realizations/add-shop', [RealizationController::class, 'addShop'])->name('realizations.add_shop');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
