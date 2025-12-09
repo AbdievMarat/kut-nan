@@ -18,7 +18,7 @@
                     <th>ФИО</th>
                     <th>Телефон</th>
                     <th>Сообщение</th>
-                    <th>Отправлено</th>
+                    <th>Отправлено на почту</th>
                 </tr>
                 </thead>
                 <tbody class="table-group-divider">

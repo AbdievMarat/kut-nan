@@ -39,7 +39,7 @@ class FeedbackController extends Controller
 
         // Отправляем письмо на почту
         try {
-            Mail::to('abdiev.m.t@gmail.com')->send(new NewFeedbackNotification($feedback));
+            Mail::to('avtendi05@gmail.com')->send(new NewFeedbackNotification($feedback));
             $feedback->update(['is_send' => true]);
         } catch (\Exception $e) {
             // Логируем ошибку, но не прерываем выполнение
