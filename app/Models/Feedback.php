@@ -11,9 +11,11 @@ class Feedback extends Model
         'full_name',
         'phone',
         'message',
+        'is_send',
     ];
 
     protected $casts = [
         'is_anonymous' => 'boolean',
+        'is_send' => 'boolean',
     ];
 }
