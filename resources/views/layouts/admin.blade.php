@@ -63,6 +63,12 @@
                             Ингредиенты
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/feedbacks*') ? 'active' : '' }}" href="{{ route('admin.feedbacks.index') }}">
+                            <i class="bi bi-chat-left-text"></i>
+                            Обратная связь
+                        </a>
+                    </li>
                 @endif
             </ul>
 
