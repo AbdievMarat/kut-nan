@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\OrderExport;
 use App\Http\Controllers\Controller;
 use App\Models\Bus;
+use App\Models\BusProductPrice;
 use App\Models\Markdown;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -179,6 +180,92 @@ class OrderController extends Controller
             'remainderDetails' => view('admin.orders.remainder_details', [
                 'remainder' => $remainder
             ])->render()
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateOrderAmount(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $busId = $request->input('bus_id');
+        $productId = $request->input('product_id');
+        $amount = $request->input('amount');
+
+        // Найти или создать Order
+        $order = Order::query()
+            ->where('bus_id', $busId)
+            ->whereDate('date', $date)
+            ->first();
+
+        if (!$order) {
+            $order = new Order();
+            $order->bus_id = $busId;
+            $order->date = $date;
+            $order->save();
+        }
+
+        // Получить цену продукта для автобуса
+        $busProductPrice = BusProductPrice::query()
+            ->where('bus_id', $busId)
+            ->where('product_id', $productId)
+            ->first();
+
+        $price = $busProductPrice ? $busProductPrice->price : 0;
+
+        // Найти или создать OrderItem
+        $orderItem = OrderItem::query()
+            ->where('order_id', $order->id)
+            ->where('product_id', $productId)
+            ->first();
+
+        if (!$orderItem) {
+            $orderItem = new OrderItem();
+            $orderItem->order_id = $order->id;
+            $orderItem->product_id = $productId;
+            $orderItem->price = $price;
+        }
+
+        $orderItem->amount = $amount ? (int)$amount : null;
+        $orderItem->save();
+
+        // Пересчитать totalCarts
+        $products = $this->getProducts();
+        $buses = Bus::query()
+            ->with([
+                'orders' => function ($query) use ($date) {
+                    $query->whereDate('date', $date)
+                        ->with(['items']);
+                }
+            ])
+            ->where('is_active', '=', Bus::IS_ACTIVE)
+            ->orderBy('sort')
+            ->get();
+
+        $totalOrderAmounts = [];
+        foreach ($buses as $bus) {
+            foreach ($bus->orders as $busOrder) {
+                foreach ($busOrder->items as $item) {
+                    $productIdKey = $item->product_id;
+                    $orderAmount = $item->amount ?: 0;
+                    $totalOrderAmounts[$productIdKey] = ($totalOrderAmounts[$productIdKey] ?? 0) + $orderAmount;
+                }
+            }
+        }
+
+        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
+            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $piecesPerCart = $product->pieces_per_cart ?? 1;
+            return $totalAmount > 0 && $piecesPerCart > 0
+                ? round($totalAmount / $piecesPerCart, 2)
+                : '';
+        });
+
+        return response()->json([
+            'success' => true,
+            'totalCarts' => $totalCarts->values()->toArray()
         ]);
     }
 

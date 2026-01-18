@@ -67,4 +67,46 @@ $(() => {
             alert('Ошибка при загрузке данных по уценке!');
         });
     });
+
+    // Обработчик события input для сохранения order_amount
+    let debounceTimer;
+    $(document).on('input', '.order-amount-input', function () {
+        const $input = $(this);
+        const busId = $input.data('bus-id');
+        const productId = $input.data('product-id');
+        const date = $input.data('date');
+        const amount = $input.val();
+
+        // Очищаем предыдущий таймер
+        clearTimeout(debounceTimer);
+
+        // Устанавливаем новый таймер для debounce (задержка 500мс)
+        debounceTimer = setTimeout(function () {
+            const csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/update-order-amount',
+                headers: {'X-CSRF-TOKEN': csrf_token},
+                data: {
+                    bus_id: busId,
+                    product_id: productId,
+                    date: date,
+                    amount: amount
+                },
+            }).done(successResponse => {
+                if (successResponse.success && successResponse.totalCarts) {
+                    // Обновляем значения в строке "Тележки"
+                    const $totalCartCells = $('#total-carts-row .total-cart-cell');
+                    successResponse.totalCarts.forEach(function (value, index) {
+                        if ($totalCartCells.eq(index).length) {
+                            $totalCartCells.eq(index).text(value);
+                        }
+                    });
+                }
+            }).fail(errorResponse => {
+                alert('Ошибка при сохранении данных!');
+            });
+        }, 500);
+    });
 });

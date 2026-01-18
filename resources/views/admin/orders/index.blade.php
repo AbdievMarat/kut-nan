@@ -34,10 +34,10 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr class="table-info fw-bold">
+                    <tr class="table-info fw-bold" id="total-carts-row">
                         <td>Тележки</td>
                         @foreach ($totalCarts as $cartsCount)
-                            <td>{{ $cartsCount }}</td>
+                            <td class="total-cart-cell">{{ $cartsCount }}</td>
                         @endforeach
                         <td></td>
                         <td></td>
@@ -47,7 +47,19 @@
                     <tr>
                         <td>{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
-                            <td>{{ $productData['order_amount'] }}</td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm order-amount-input" 
+                                    value="{{ $productData['order_amount'] }}" 
+                                    data-bus-id="{{ $bus['id'] }}" 
+                                    data-product-id="{{ $productData['product_id'] }}" 
+                                    data-date="{{ $date }}"
+                                    min="0"
+                                    step="1"
+                                    style="min-width: 60px; width: 60px;"
+                                >
+                            </td>
                         @endforeach
                         <td>
                             @if($bus['total_markdown_sum'])
