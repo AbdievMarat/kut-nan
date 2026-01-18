@@ -74,7 +74,26 @@ class OrderController extends Controller
             ];
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products'));
+        // Рассчитываем итоговые суммы order_amount по всем автобусам для каждого продукта
+        $totalOrderAmounts = [];
+        foreach ($busesData as $bus) {
+            foreach ($bus['products'] as $productData) {
+                $productId = $productData['product_id'];
+                $orderAmount = $productData['order_amount'] ?: 0;
+                $totalOrderAmounts[$productId] = ($totalOrderAmounts[$productId] ?? 0) + $orderAmount;
+            }
+        }
+
+        // Рассчитываем количество тележек для итоговой строки
+        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
+            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $piecesPerCart = $product->pieces_per_cart ?? 1;
+            return $totalAmount > 0 && $piecesPerCart > 0 
+                ? round($totalAmount / $piecesPerCart, 1) 
+                : '';
+        });
+
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts'));
     }
 
     /**
