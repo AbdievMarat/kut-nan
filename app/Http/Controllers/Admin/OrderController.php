@@ -328,4 +328,100 @@ class OrderController extends Controller
             ->groupBy('remainders.bus_id')
             ->pluck('total', 'bus_id');
     }
+
+    /**
+     * Публичная страница для отображения заказов на большом экране
+     * @param Request $request
+     * @return Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
+     */
+    public function publicDisplay(Request $request): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
+    {
+        $date = $request->input('date', date('Y-m-d', strtotime('+1 day')));
+
+        $buses = Bus::query()
+            ->with([
+                'orders' => function ($query) use ($date) {
+                    $query->whereDate('date', $date)
+                        ->with(['items']);
+                }
+            ])
+            ->where('is_active', '=', Bus::IS_ACTIVE)
+            ->orderBy('sort')
+            ->get();
+
+        $products = $this->getProducts();
+
+        $busesData = $buses->map(function ($bus) use ($products) {
+            $orderAmounts = [];
+
+            /** @var Order $order */
+            foreach ($bus->orders as $order) {
+                /** @var OrderItem $item */
+                foreach ($order->items as $item) {
+                    $orderAmounts[$item->product_id] = $item->amount;
+                }
+            }
+
+            // Проверяем, есть ли хотя бы один заказ
+            $hasOrders = false;
+            foreach ($orderAmounts as $amount) {
+                if (!empty($amount) && $amount > 0) {
+                    $hasOrders = true;
+                    break;
+                }
+            }
+
+            // Если нет заказов, возвращаем null (будет отфильтровано)
+            if (!$hasOrders) {
+                return null;
+            }
+
+            return [
+                'id' => $bus->id,
+                'license_plate' => $bus->license_plate . ' ' . $bus->serial_number,
+                'products' => $products->map(function ($product) use ($orderAmounts) {
+                    return [
+                        'product_id' => $product->id,
+                        'order_amount' => $orderAmounts[$product->id] ?? '',
+                    ];
+                }),
+            ];
+        })->filter(); // Убираем автобусы без заказов
+
+        // Рассчитываем итоговые суммы order_amount по всем автобусам для каждого продукта
+        $totalOrderAmounts = [];
+        foreach ($busesData as $bus) {
+            foreach ($bus['products'] as $productData) {
+                $productId = $productData['product_id'];
+                $orderAmount = $productData['order_amount'] ?: 0;
+                $totalOrderAmounts[$productId] = ($totalOrderAmounts[$productId] ?? 0) + $orderAmount;
+            }
+        }
+
+        // Рассчитываем количество тележек для итоговой строки
+        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
+            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $piecesPerCart = $product->pieces_per_cart ?? 1;
+            return $totalAmount > 0 && $piecesPerCart > 0
+                ? round($totalAmount / $piecesPerCart, 2)
+                : '';
+        });
+
+        // Если это AJAX запрос, возвращаем JSON
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'date' => $date,
+                'busesData' => $busesData->values()->toArray(),
+                'products' => $products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                    ];
+                })->toArray(),
+                'totalCarts' => $totalCarts->values()->toArray()
+            ]);
+        }
+
+        return view('public.orders.display', compact('date', 'busesData', 'products', 'totalCarts'));
+    }
 }

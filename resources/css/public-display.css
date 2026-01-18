@@ -1,0 +1,191 @@
+/* Стили для публичного экрана на 65 дюймов */
+.public-display-body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    font-family: 'Nunito', sans-serif;
+}
+
+.public-display-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.public-orders-table-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.public-orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.public-orders-title {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #4c2d10;
+    margin: 0;
+}
+
+.public-orders-date-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.public-orders-date {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #6c757d;
+}
+
+.public-orders-update-time {
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: #868e96;
+}
+
+.public-orders-table {
+    width: 100%;
+    height: calc(100% - 140px);
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 2.5rem;
+    table-layout: fixed;
+    overflow: hidden;
+}
+
+.public-orders-table thead {
+    background-color: #4c2d10;
+    color: white;
+}
+
+.public-table-header {
+    padding: 20px 15px !important;
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem;
+    vertical-align: middle;
+    border: 2px solid #333 !important;
+}
+
+.public-table-header.vertical-text {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    min-width: 80px;
+    max-width: 80px;
+    width: 80px;
+    white-space: nowrap;
+}
+
+.public-table-cell {
+    padding: 25px 15px !important;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 600;
+    vertical-align: middle;
+    border: 2px solid #dee2e6 !important;
+    overflow: hidden;
+}
+
+.public-table-cell-bus {
+    font-weight: bold;
+    background-color: #e9ecef;
+    min-width: 120px;
+    max-width: 120px;
+    width: 120px;
+    font-size: 2rem;
+}
+
+.public-orders-table tbody tr {
+    background-color: white;
+}
+
+.public-orders-table tbody tr.table-info {
+    background-color: #d1ecf1 !important;
+    font-weight: bold;
+}
+
+.public-orders-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Адаптация для очень больших экранов */
+@media (min-width: 3840px) {
+    .public-orders-title {
+        font-size: 5rem;
+    }
+    
+    .public-orders-date {
+        font-size: 4rem;
+    }
+    
+    .public-orders-update-time {
+        font-size: 2.5rem;
+    }
+    
+    .public-table-header {
+        font-size: 2.5rem;
+    }
+    
+    .public-table-cell {
+        font-size: 3rem;
+    }
+    
+    .public-table-cell-bus {
+        font-size: 2.5rem;
+    }
+}
+
+/* Адаптация для средних экранов */
+@media (max-width: 1920px) {
+    .public-orders-title {
+        font-size: 3rem;
+    }
+    
+    .public-orders-date {
+        font-size: 2rem;
+    }
+    
+    .public-orders-update-time {
+        font-size: 1.5rem;
+    }
+    
+    .public-table-header {
+        font-size: 1.5rem;
+    }
+    
+    .public-table-cell {
+        font-size: 2rem;
+    }
+    
+    .public-table-cell-bus {
+        font-size: 1.5rem;
+    }
+    
+    .public-table-header.vertical-text {
+        min-width: 60px;
+        max-width: 60px;
+        width: 60px;
+    }
+    
+    .public-table-cell-bus {
+        min-width: 100px;
+        max-width: 100px;
+        width: 100px;
+    }
+}
