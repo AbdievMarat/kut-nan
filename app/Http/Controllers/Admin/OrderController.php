@@ -88,8 +88,8 @@ class OrderController extends Controller
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
-            return $totalAmount > 0 && $piecesPerCart > 0 
-                ? round($totalAmount / $piecesPerCart, 1) 
+            return $totalAmount > 0 && $piecesPerCart > 0
+                ? round($totalAmount / $piecesPerCart, 2)
                 : '';
         });
 

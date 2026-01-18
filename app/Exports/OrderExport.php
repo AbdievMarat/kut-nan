@@ -91,6 +91,49 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
+                // Сначала получаем все данные для расчета итогов (до вставки строки)
+                $lastRow = $sheet->getHighestRow();
+                $totalOrderAmounts = [];
+                for ($row = 2; $row <= $lastRow; $row++) {
+                    $colIndex = 2; // Начинаем с колонки B (индекс 2, так как A=1)
+                    foreach ($this->products as $product) {
+                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+                        $cellValue = $sheet->getCell($colLetter . $row)->getValue();
+                        $orderAmount = is_numeric($cellValue) ? (float)$cellValue : 0;
+                        $totalOrderAmounts[$product->id] = ($totalOrderAmounts[$product->id] ?? 0) + $orderAmount;
+                        $colIndex++;
+                    }
+                }
+
+                // Вставляем новую строку после заголовков (строка 2)
+                $sheet->insertNewRowBefore(2, 1);
+                
+                // Заполняем строку "Тележки"
+                $sheet->setCellValue('A2', 'Тележки');
+                $colIndex = 2;
+                foreach ($this->products as $product) {
+                    $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+                    $piecesPerCart = $product->pieces_per_cart ?? 1;
+                    $cartsCount = $totalAmount > 0 && $piecesPerCart > 0 
+                        ? round($totalAmount / $piecesPerCart, 1) 
+                        : '';
+                    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+                    $sheet->setCellValue($colLetter . '2', $cartsCount);
+                    $colIndex++;
+                }
+                
+                // Стилизуем строку "Тележки"
+                $lastColIndex = 1 + count($this->products); // A (1) + количество продуктов
+                $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColIndex);
+                $sheet->getStyle('A2:' . $lastCol . '2')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => 'D1ECF1']
+                    ]
+                ]);
+
+                // Стилизуем заголовки (теперь строка 1)
                 $sheet->getStyle('A1:AH1')->applyFromArray([
                     'alignment' => [
                         'textRotation' => 90,
@@ -135,48 +178,6 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                 $sheet->getColumnDimension('AD')->setWidth(5);
                 $sheet->getColumnDimension('AE')->setWidth(5);
                 $sheet->getColumnDimension('AF')->setWidth(5);
-
-                // Добавляем итоговую строку с количеством тележек
-                $lastRow = $sheet->getHighestRow();
-                $totalRow = $lastRow + 1;
-                
-                // Получаем все данные для расчета итогов
-                $totalOrderAmounts = [];
-                for ($row = 2; $row <= $lastRow; $row++) {
-                    $colIndex = 2; // Начинаем с колонки B (индекс 2, так как A=1)
-                    foreach ($this->products as $product) {
-                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-                        $cellValue = $sheet->getCell($colLetter . $row)->getValue();
-                        $orderAmount = is_numeric($cellValue) ? (float)$cellValue : 0;
-                        $totalOrderAmounts[$product->id] = ($totalOrderAmounts[$product->id] ?? 0) + $orderAmount;
-                        $colIndex++;
-                    }
-                }
-                
-                // Заполняем итоговую строку
-                $sheet->setCellValue('A' . $totalRow, 'Итого');
-                $colIndex = 2;
-                foreach ($this->products as $product) {
-                    $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
-                    $piecesPerCart = $product->pieces_per_cart ?? 1;
-                    $cartsCount = $totalAmount > 0 && $piecesPerCart > 0 
-                        ? round($totalAmount / $piecesPerCart, 1) 
-                        : '';
-                    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
-                    $sheet->setCellValue($colLetter . $totalRow, $cartsCount);
-                    $colIndex++;
-                }
-                
-                // Стилизуем итоговую строку
-                $lastColIndex = 1 + count($this->products); // A (1) + количество продуктов
-                $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColIndex);
-                $sheet->getStyle('A' . $totalRow . ':' . $lastCol . $totalRow)->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'D1ECF1']
-                    ]
-                ]);
             },
         ];
     }

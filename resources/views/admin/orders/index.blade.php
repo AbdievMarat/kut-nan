@@ -23,15 +23,6 @@
 
             <table id="orders-table" class="table table-bordered table-hover">
                 <thead>
-                <tr class="table-info fw-bold">
-                    <td>Тележки</td>
-                    @foreach ($totalCarts as $cartsCount)
-                        <td>{{ $cartsCount }}</td>
-                    @endforeach
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
                 <tr>
                     <th>Автобус</th>
                     @foreach ($products as $product)
@@ -43,6 +34,15 @@
                 </tr>
                 </thead>
                 <tbody>
+                    <tr class="table-info fw-bold">
+                        <td>Тележки</td>
+                        @foreach ($totalCarts as $cartsCount)
+                            <td>{{ $cartsCount }}</td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 @foreach ($busesData as $bus)
                     <tr>
                         <td>{{ $bus['license_plate'] }}</td>
