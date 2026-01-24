@@ -110,7 +110,7 @@ $(document).ready(function() {
         
         // Скроллим вниз за 15 секунд
         $('html, body').animate({
-            scrollTop: $(document).height() - $(window).height()
+            scrollTop: 99999
         }, 15000, function() {
             console.log('Скроллинг вниз завершен');
             
