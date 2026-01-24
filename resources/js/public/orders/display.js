@@ -6,7 +6,7 @@ $(document).ready(function() {
      */
     function updateData() {
         let date = $('[data-date]').data('date');
-        
+
         $.ajax({
             type: 'GET',
             url: window.location.pathname,
@@ -20,9 +20,6 @@ $(document).ready(function() {
         .done(function(response) {
             if (response && response.busesData && response.products && response.totalCarts) {
                 updateTable(response);
-                if (response.updateTime) {
-                    $('#update-time').text('Обновлено: ' + response.updateTime);
-                }
             }
         })
         .fail(function(xhr, status, error) {
@@ -42,14 +39,14 @@ $(document).ready(function() {
                 month: '2-digit',
                 year: 'numeric'
             });
-            $('[data-date]').text(formattedDate);
+            $('[data-date]').text(formattedDate + ' | Обновлено: ' + data.updateTime);
             $('[data-date]').data('date', data.date);
         }
 
         // Обновляем строку с тележками
         const $totalCartsRow = $('#total-carts-row');
         const $totalCartCells = $totalCartsRow.find('.total-cart-cell');
-        
+
         // Обновляем существующие ячейки
         if (data.totalCarts && data.totalCarts.length > 0) {
             data.totalCarts.forEach(function(cartsCount, index) {
@@ -61,7 +58,7 @@ $(document).ready(function() {
                     $totalCartsRow.append('<td class="text-center align-middle total-cart-cell">' + (cartsCount || '') + '</td>');
                 }
             });
-            
+
             // Удаляем лишние ячейки, если их стало меньше
             const currentCellsCount = $totalCartsRow.find('.total-cart-cell').length;
             if (currentCellsCount > data.totalCarts.length) {
@@ -78,14 +75,14 @@ $(document).ready(function() {
             data.busesData.forEach(function(bus) {
                 const $row = $('<tr></tr>');
                 $row.append('<td class="text-center align-middle fw-bold bg-light">' + escapeHtml(bus.license_plate) + '</td>');
-                
+
                 if (bus.products && bus.products.length > 0) {
                     bus.products.forEach(function(productData) {
                         const amount = productData.order_amount || '';
                         $row.append('<td class="text-center align-middle">' + amount + '</td>');
                     });
                 }
-                
+
                 $tbody.append($row);
             });
         }
