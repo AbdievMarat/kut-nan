@@ -26,77 +26,33 @@
     -ms-transform: rotate(90deg);
     -o-transform: rotate(90deg);
     transform: rotate(90deg);
-    
+
     /* Для современных браузеров с поддержкой writing-mode */
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     -ms-writing-mode: tb-rl;
-    
+
     /* Дополнительная настройка для совместимости */
     text-orientation: mixed;
     -webkit-text-orientation: mixed;
-    
+
     /* Убираем поворот на 180 градусов для лучшей совместимости */
     /* transform: rotate(180deg); */
-    
+
     /* Настройки для отображения */
     display: inline-block;
     white-space: nowrap;
     vertical-align: middle;
-    
+
     /* Размеры для корректного отображения */
     min-height: 100px;
     max-width: 60px;
     text-align: center;
-    
+
     /*white-space: nowrap;*/
     /*min-width: 60px !important;*/
     /*width: 60px !important;*/
     /*max-width: 60px !important;*/
-}
-
-/* Дополнительная совместимость для старых браузеров Smart TV */
-@supports not (writing-mode: vertical-rl) {
-    .vertical-text {
-        /* Если writing-mode не поддерживается, используем только поворот */
-        writing-mode: inherit;
-        -webkit-transform: rotate(90deg);
-        -moz-transform: rotate(90deg);
-        -ms-transform: rotate(90deg);
-        transform: rotate(90deg);
-        transform-origin: center center;
-        width: 20px;
-        height: 100px;
-        line-height: 1.2;
-        font-size: 14px;
-    }
-}
-
-/* Специальные стили для Webkit браузеров (часто используются в Smart TV) */
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-    .vertical-text {
-        -webkit-transform: rotate(90deg);
-        transform: rotate(90deg);
-        -webkit-transform-origin: center center;
-        transform-origin: center center;
-    }
-}
-
-/* Альтернативный класс для критических случаев */
-.vertical-text-fallback {
-    transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform-origin: center center;
-    display: inline-block;
-    white-space: nowrap;
-    width: 20px;
-    height: auto;
-    min-height: 80px;
-    text-align: center;
-    font-size: 14px;
-    line-height: 1.1;
 }
 
 /*#public-orders-table thead th {*/
