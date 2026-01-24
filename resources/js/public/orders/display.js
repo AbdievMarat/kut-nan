@@ -1,10 +1,5 @@
 $(document).ready(function() {
     const UPDATE_INTERVAL = 1 * 60 * 1000; // 1 минута в миллисекундах
-    const SCROLL_SPEED = 0.5; // Пикселей в миллисекунду (очень медленно)
-    const SCROLL_PAUSE = 3000; // Пауза в начале и конце скроллинга (мс)
-    
-    let isScrolling = false;
-    let scrollDirection = 'down'; // 'down' или 'up'
 
     /**
      * Обновление данных через AJAX
@@ -108,75 +103,29 @@ $(document).ready(function() {
     }
 
     /**
-     * Функция автоскроллинга страницы
+     * Простой автоскроллинг
      */
-    function autoScroll() {
-        if (isScrolling) return; // Предотвращаем множественные запуски
-        
-        isScrolling = true;
-        const startPosition = window.pageYOffset;
-        const documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-        const windowHeight = window.innerHeight;
-        const maxScrollPosition = documentHeight - windowHeight;
-        
-        if (maxScrollPosition <= 0) {
-            isScrolling = false;
-            return; // Страница помещается в окно, скроллинг не нужен
-        }
-
-        function smoothScroll() {
-            const currentPosition = window.pageYOffset;
-            let targetPosition;
-            let newPosition;
-
-            if (scrollDirection === 'down') {
-                targetPosition = maxScrollPosition;
-                newPosition = Math.min(currentPosition + SCROLL_SPEED, targetPosition);
-                
-                if (newPosition >= targetPosition) {
-                    // Достигли низа, переключаемся на скроллинг вверх после паузы
-                    setTimeout(() => {
-                        scrollDirection = 'up';
-                        requestAnimationFrame(smoothScroll);
-                    }, SCROLL_PAUSE);
-                    return;
-                }
-            } else {
-                targetPosition = 0;
-                newPosition = Math.max(currentPosition - SCROLL_SPEED, targetPosition);
-                
-                if (newPosition <= targetPosition) {
-                    // Достигли верха, переключаемся на скроллинг вниз после паузы
-                    setTimeout(() => {
-                        scrollDirection = 'down';
-                        isScrolling = false; // Завершаем цикл
-                    }, SCROLL_PAUSE);
-                    return;
-                }
-            }
-
-            window.scrollTo(0, newPosition);
-            requestAnimationFrame(smoothScroll);
-        }
-
-        // Начинаем скроллинг после небольшой паузы
-        setTimeout(() => {
-            requestAnimationFrame(smoothScroll);
-        }, SCROLL_PAUSE);
-    }
-
-    /**
-     * Запуск автоскроллинга с интервалом
-     */
-    function startAutoScrollCycle() {
-        autoScroll();
-        // Запускаем новый цикл скроллинга каждые 30 секунд
-        setTimeout(startAutoScrollCycle, 30000);
+    function startAutoScroll() {
+        // Скроллим вниз за 15 секунд
+        $('html, body').animate({
+            scrollTop: $(document).height()
+        }, 15000, function() {
+            // После скроллинга вниз, ждем 3 секунды и скроллим вверх
+            setTimeout(function() {
+                // Скроллим вверх за 15 секунд
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 15000, function() {
+                    // После скроллинга вверх, ждем 3 секунды и повторяем
+                    setTimeout(startAutoScroll, 3000);
+                });
+            }, 3000);
+        });
     }
 
     // Запускаем обновление данных каждую минуту
     setInterval(updateData, UPDATE_INTERVAL);
     
-    // Запускаем автоскроллинг через 5 секунд после загрузки страницы
-    setTimeout(startAutoScrollCycle, 5000);
+    // Запускаем автоскроллинг через 3 секунды после загрузки страницы
+    setTimeout(startAutoScroll, 3000);
 });
