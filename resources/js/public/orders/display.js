@@ -39,7 +39,7 @@ $(document).ready(function() {
                 month: '2-digit',
                 year: 'numeric'
             });
-            $('[data-date]').text(formattedDate + ' | Обновлено: ' + data.updateTime);
+            $('[data-date]').text('Обновлено: ' + data.dateFormatted);
             $('[data-date]').data('date', data.date);
         }
 

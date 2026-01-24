@@ -97,7 +97,7 @@ class PublicOrderController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'date' => $date,
-                'updateTime' => date('H:i'),
+                'dateFormatted' => date('d.m.Y H:i', strtotime($date)),
                 'busesData' => $busesData->values()->toArray(),
                 'products' => $products->map(function ($product) {
                     return [
@@ -109,7 +109,7 @@ class PublicOrderController extends Controller
             ]);
         }
 
-        return view('public.orders.display', compact('date', 'busesData', 'products', 'totalCarts'));
+        return view('public.orders.display', compact('date', 'dateFormatted', 'busesData', 'products', 'totalCarts'));
     }
 
     /**
