@@ -9,7 +9,8 @@
         </div>
 
         <div class="row">
-            <table id="public-orders-table" class="table table-bordered table-hover">
+            <div class="table-container">
+                <table id="public-orders-table" class="table table-bordered table-hover">
                 <thead>
                 <tr>
                     <th class="text-center align-middle" style="width: 40px;">Автобус</th>
@@ -37,6 +38,7 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 

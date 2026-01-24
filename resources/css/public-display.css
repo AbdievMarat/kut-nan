@@ -37,9 +37,30 @@
 .table-container {
     width: 100%;
     overflow-x: auto;
+    max-height: calc(100vh - 100px); /* Ограничиваем высоту для включения скролла */
+    overflow-y: auto;
 }
 
-/* Фиксированная шапка - проверяем несколько подходов */
+/* Дополнительные стили для таблицы */
+#public-orders-table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Специальные стили для строки "Тележки" */
+#total-carts-row th {
+    font-weight: bold !important;
+    background-color: #0dcaf0 !important;
+    color: black !important;
+}
+
+/* Обеспечиваем правильное выравнивание в ячейках тележек */
+.total-cart-cell {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Фиксированная шапка - настройка sticky заголовков */
 #public-orders-table thead th {
     position: -webkit-sticky;
     position: sticky;
@@ -47,6 +68,8 @@
     background-color: #212529 !important;
     color: white !important;
     border-top: none;
+    height: 80px; /* Фиксированная высота для строк заголовка */
+    vertical-align: middle;
 }
 
 /* Первая строка заголовка (названия продуктов) */
@@ -56,5 +79,7 @@
 
 /* Вторая строка заголовка (строка "Тележки") */
 #public-orders-table thead tr:nth-child(2) th {
-    top: 60px; /* Примерная высота первой строки */
+    top: 80px; /* Высота первой строки заголовка */
+    background-color: #0dcaf0 !important; /* Цвет для строки "Тележки" как в Bootstrap table-info */
+    color: black !important;
 }
