@@ -33,28 +33,6 @@
     writing-mode: vertical-rl;
     -webkit-writing-mode: vertical-rl;
     -ms-writing-mode: tb-rl;
-
-    /* Дополнительная настройка для совместимости */
-    text-orientation: mixed;
-    -webkit-text-orientation: mixed;
-
-    /* Убираем поворот на 180 градусов для лучшей совместимости */
-    /* transform: rotate(180deg); */
-
-    /* Настройки для отображения */
-    display: inline-block;
-    white-space: nowrap;
-    vertical-align: middle;
-
-    /* Размеры для корректного отображения */
-    min-height: 100px;
-    max-width: 60px;
-    text-align: center;
-
-    /*white-space: nowrap;*/
-    /*min-width: 60px !important;*/
-    /*width: 60px !important;*/
-    /*max-width: 60px !important;*/
 }
 
 /*#public-orders-table thead th {*/
