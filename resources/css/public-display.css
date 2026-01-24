@@ -58,3 +58,8 @@
 #public-orders-table thead tr:nth-child(2) th {
     top: 60px; /* Примерная высота первой строки */
 }
+
+/* Чередование строк - серый фон для четных строк */
+#public-orders-table tbody tr:nth-child(even) td {
+    background-color: #e9ecef !important;
+}
