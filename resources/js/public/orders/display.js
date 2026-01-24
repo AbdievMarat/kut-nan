@@ -101,42 +101,31 @@ $(document).ready(function() {
         };
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
-
+ы
     /**
-     * Простой автоскроллинг
+     * Автоматический скроллинг
      */
-    function startAutoScroll() {
-        console.log('Начинаем автоскроллинг');
+    function autoScroll() {
+        // Плавно скроллим вниз
+        const maxHeight = Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight
+        );
         
-        // Скроллим вниз за 15 секунд
-        $('html, body').animate({
-            scrollTop: 99999
-        }, 15000, function() {
-            console.log('Скроллинг вниз завершен');
-            
-            // После скроллинга вниз, ждем 3 секунды и скроллим вверх
-            setTimeout(function() {
-                console.log('Начинаем скроллинг вверх');
-                
-                // Скроллим вверх за 15 секунд
-                $('html, body').animate({
-                    scrollTop: 0
-                }, 15000, function() {
-                    console.log('Скроллинг вверх завершен');
-                    
-                    // После скроллинга вверх, ждем 3 секунды и повторяем
-                    setTimeout(function() {
-                        console.log('Повторяем цикл');
-                        startAutoScroll();
-                    }, 3000);
-                });
-            }, 3000);
+        window.scrollTo({
+            top: maxHeight,
+            behavior: 'smooth'
         });
-    }
 
-    // Запускаем обновление данных каждую минуту
-    setInterval(updateData, UPDATE_INTERVAL);
-    
-    // Запускаем автоскроллинг через 3 секунды после загрузки страницы
-    setTimeout(startAutoScroll, 3000);
+        // Через 3 секунды быстро возвращаемся наверх
+        setTimeout(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'instant'
+            });
+            
+            // Через полсекунды повторяем цикл
+            setTimeout(autoScroll, 500);
+        }, 3000);
+    }
 });
