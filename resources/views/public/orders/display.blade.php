@@ -12,7 +12,7 @@
             <div class="col-12">
                 <div class="table-responsive">
                     <table id="public-orders-table" class="table table-bordered table-hover">
-                        <thead class="table-dark">
+                        <thead>
                         <tr>
                             <th class="text-center align-middle" style="width: 40px;">Автобус</th>
                             @foreach ($products as $product)
