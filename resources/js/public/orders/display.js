@@ -3,6 +3,40 @@ $(document).ready(function() {
     let updateTimer;
 
     /**
+     * Проверка поддержки CSS writing-mode и применение fallback для совместимости с Smart TV
+     */
+    function checkAndApplyCSSFallback() {
+        // Проверяем поддержку writing-mode
+        const testElement = document.createElement('div');
+        testElement.style.writingMode = 'vertical-rl';
+        
+        // Если writing-mode не поддерживается или мы на Smart TV браузере
+        if (!testElement.style.writingMode || 
+            navigator.userAgent.includes('SmartTV') || 
+            navigator.userAgent.includes('WebKit') && navigator.userAgent.includes('TV')) {
+            
+            console.log('Применяем fallback для vertical-text из-за ограниченной поддержки CSS');
+            
+            // Добавляем дополнительный класс для всех элементов с vertical-text
+            $('.vertical-text').each(function() {
+                $(this).addClass('vertical-text-fallback');
+                // Убираем writing-mode через inline стиль для принудительного fallback
+                $(this).css({
+                    'writing-mode': 'initial',
+                    '-webkit-writing-mode': 'initial',
+                    'transform': 'rotate(90deg)',
+                    'transform-origin': 'center center',
+                    'display': 'inline-block',
+                    'white-space': 'nowrap',
+                    'width': '20px',
+                    'height': 'auto',
+                    'min-height': '80px'
+                });
+            });
+        }
+    }
+
+    /**
      * Обновление данных через AJAX
      */
     function updateData() {
@@ -24,6 +58,8 @@ $(document).ready(function() {
         .done(function(response) {
             if (response && response.busesData && response.products && response.totalCarts) {
                 updateTable(response);
+                // Применяем CSS fallback для новых элементов
+                checkAndApplyCSSFallback();
                 // Обновляем время последнего обновления
                 updateLastUpdateTime();
             }
@@ -150,6 +186,9 @@ $(document).ready(function() {
             updateData();
         }, UPDATE_INTERVAL);
     }
+
+    // Применяем CSS fallback для совместимости с Smart TV браузерами
+    checkAndApplyCSSFallback();
 
     // Сохраняем дату в data-атрибут при загрузке страницы
     const initialDate = getDateFromDisplay();
