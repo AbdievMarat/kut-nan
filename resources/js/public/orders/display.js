@@ -106,18 +106,29 @@ $(document).ready(function() {
      * Автоматический скроллинг
      */
     function autoScroll() {
-        // Плавно скроллим вниз
+        // Получаем высоту заголовка таблицы
+        const $thead = $('#public-orders-table thead');
+        const headerHeight = $thead.length ? $thead.outerHeight() : 120;
+        
+        // Вычисляем максимальную высоту с учетом видимости шапки
         const maxHeight = Math.max(
             document.body.scrollHeight,
             document.documentElement.scrollHeight
         );
+        
+        // Вычисляем высоту окна браузера
+        const windowHeight = window.innerHeight;
+        
+        // Скроллим так, чтобы шапка всегда была видна
+        // Оставляем отступ равный высоте заголовка плюс небольшой буфер
+        const scrollTarget = Math.max(0, maxHeight - windowHeight + headerHeight + 20);
 
         window.scrollTo({
-            top: maxHeight,
+            top: scrollTarget,
             behavior: 'smooth'
         });
 
-        // Через 3 секунды быстро возвращаемся наверх
+        // Через 10 секунд быстро возвращаемся наверх
         setTimeout(() => {
             window.scrollTo({
                 top: 0,
