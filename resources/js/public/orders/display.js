@@ -101,7 +101,7 @@ $(document).ready(function() {
         };
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
-    
+
     /**
      * Автоматический скроллинг
      */
@@ -126,7 +126,7 @@ $(document).ready(function() {
 
             // Через полсекунды повторяем цикл
             setTimeout(autoScroll, 500);
-        }, 3000);
+        }, 10000);
     }
 
 
