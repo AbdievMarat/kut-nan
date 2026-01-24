@@ -101,7 +101,7 @@ $(document).ready(function() {
         };
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
-ы
+    
     /**
      * Автоматический скроллинг
      */
@@ -111,7 +111,7 @@ $(document).ready(function() {
             document.body.scrollHeight,
             document.documentElement.scrollHeight
         );
-        
+
         window.scrollTo({
             top: maxHeight,
             behavior: 'smooth'
@@ -123,9 +123,13 @@ $(document).ready(function() {
                 top: 0,
                 behavior: 'instant'
             });
-            
+
             // Через полсекунды повторяем цикл
             setTimeout(autoScroll, 500);
         }, 3000);
     }
+
+
+    // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
+    setTimeout(autoScroll, 1000);
 });
