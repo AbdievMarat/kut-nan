@@ -20,6 +20,9 @@ $(document).ready(function() {
         .done(function(response) {
             if (response && response.busesData && response.products && response.totalCarts) {
                 updateTable(response);
+                if (response.updateTime) {
+                    $('#update-time').text('Обновлено: ' + response.updateTime);
+                }
             }
         })
         .fail(function(xhr, status, error) {
@@ -66,11 +69,11 @@ $(document).ready(function() {
             }
         }
 
-        // Удаляем старые строки автобусов (кроме строки с тележками)
+        // Удаляем старые строки автобусов из tbody
         const $tbody = $('#public-orders-table tbody');
-        $tbody.find('tr:not(#total-carts-row)').remove();
+        $tbody.empty();
 
-        // Добавляем новые строки автобусов
+        // Добавляем новые строки автобусов в tbody
         if (data.busesData && data.busesData.length > 0) {
             data.busesData.forEach(function(bus) {
                 const $row = $('<tr></tr>');
@@ -83,11 +86,10 @@ $(document).ready(function() {
                     });
                 }
                 
-                $totalCartsRow.after($row);
+                $tbody.append($row);
             });
         }
     }
-
 
     /**
      * Экранирование HTML для безопасности

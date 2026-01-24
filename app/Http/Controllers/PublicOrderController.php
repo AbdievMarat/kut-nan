@@ -97,6 +97,7 @@ class PublicOrderController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'date' => $date,
+                'updateTime' => date('H:i'),
                 'busesData' => $busesData->values()->toArray(),
                 'products' => $products->map(function ($product) {
                     return [
