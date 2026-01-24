@@ -13,6 +13,11 @@
     box-sizing: border-box;
 }
 
+/* Убираем стандартный Bootstrap padding для таблицы */
+#public-orders-table>:not(caption)>*>* {
+    padding: 0 !important;
+}
+
 /* Вертикальный текст для заголовков продуктов */
 .vertical-text {
     writing-mode: vertical-rl;
