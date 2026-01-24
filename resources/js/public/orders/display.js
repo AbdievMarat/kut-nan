@@ -106,20 +106,13 @@ $(document).ready(function() {
      * Автоматический скроллинг
      */
     function autoScroll() {
-        // Фиксированный отступ для гарантированной видимости шапки
-        const HEADER_OFFSET = 200; // 200px - достаточно для двухрядной шапки
-        
         // Вычисляем максимальную высоту страницы
         const maxHeight = Math.max(
             document.body.scrollHeight,
             document.documentElement.scrollHeight
         );
         
-        // Скроллим до низа минус фиксированный отступ
-        const scrollTarget = Math.max(0, maxHeight - window.innerHeight + HEADER_OFFSET);
-
         window.scrollTo({
-            top: scrollTarget,
             behavior: 'smooth'
         });
 
