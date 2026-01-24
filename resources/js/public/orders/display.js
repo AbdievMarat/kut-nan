@@ -121,18 +121,18 @@ $(document).ready(function() {
             behavior: 'smooth'
         });
 
-        // Через 3 секунды быстро возвращаемся наверх
+        // Через 30 секунд быстро возвращаемся наверх
         setTimeout(() => {
             window.scrollTo({
                 top: 0,
                 behavior: 'instant'
             });
             
-            // Через полсекунды повторяем цикл
-            setTimeout(autoScroll, 500);
-        }, 20000);
+            // Через 30 секунд повторяем цикл
+            setTimeout(autoScroll, 30000);
+        }, 30000);
     }
 
-    // Начинаем автоскроллинг через 20 секунд после загрузки
-    setTimeout(autoScroll, 20000);
+    // Начинаем автоскроллинг через 2 секунды после загрузки
+    setTimeout(autoScroll, 2000);
 });
