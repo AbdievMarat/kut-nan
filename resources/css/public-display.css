@@ -43,9 +43,18 @@
 #public-orders-table thead th {
     position: -webkit-sticky;
     position: sticky;
-    top: 0;
     z-index: 100;
     background-color: #212529 !important;
     color: white !important;
     border-top: none;
+}
+
+/* Первая строка заголовка (названия продуктов) */
+#public-orders-table thead tr:first-child th {
+    top: 0;
+}
+
+/* Вторая строка заголовка (строка "Тележки") */
+#public-orders-table thead tr:nth-child(2) th {
+    top: 60px; /* Примерная высота первой строки */
 }
