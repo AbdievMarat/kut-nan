@@ -28,81 +28,81 @@
     max-width: 60px !important;
 }
 
-#public-orders-table thead th {
-    font-size: 24px;
-    font-weight: bold;
-}
+/*#public-orders-table thead th {*/
+/*    font-size: 24px;*/
+/*    font-weight: bold;*/
+/*}*/
 
-/* Строка с тележками */
-#total-carts-row td {
-    font-size: 26px;
-    font-weight: bold;
-}
+/*!* Строка с тележками *!*/
+/*#total-carts-row td {*/
+/*    font-size: 26px;*/
+/*    font-weight: bold;*/
+/*}*/
 
-/* Адаптация для больших экранов (4K+) */
-@media (min-width: 2560px) {
-    .public-display-body {
-        font-size: 32px;
-    }
+/*!* Адаптация для больших экранов (4K+) *!*/
+/*@media (min-width: 2560px) {*/
+/*    .public-display-body {*/
+/*        font-size: 32px;*/
+/*    }*/
 
-    #public-orders-table {
-        font-size: 40px;
-    }
+/*    #public-orders-table {*/
+/*        font-size: 40px;*/
+/*    }*/
 
-    #public-orders-table th,
-    #public-orders-table td {
-        padding: 24px !important;
-    }
+/*    #public-orders-table th,*/
+/*    #public-orders-table td {*/
+/*        padding: 24px !important;*/
+/*    }*/
 
-    #public-orders-table thead th {
-        font-size: 32px;
-    }
+/*    #public-orders-table thead th {*/
+/*        font-size: 32px;*/
+/*    }*/
 
-    #public-orders-table tbody td {
-        font-size: 40px;
-    }
+/*    #public-orders-table tbody td {*/
+/*        font-size: 40px;*/
+/*    }*/
 
-    #total-carts-row td {
-        font-size: 35px;
-    }
+/*    #total-carts-row td {*/
+/*        font-size: 35px;*/
+/*    }*/
 
-    .vertical-text {
-        min-width: 80px !important;
-        width: 80px !important;
-        max-width: 80px !important;
-    }
-}
+/*    .vertical-text {*/
+/*        min-width: 80px !important;*/
+/*        width: 80px !important;*/
+/*        max-width: 80px !important;*/
+/*    }*/
+/*}*/
 
-/* Адаптация для очень больших экранов (8K) */
-@media (min-width: 3840px) {
-    .public-display-body {
-        font-size: 40px;
-    }
+/*!* Адаптация для очень больших экранов (8K) *!*/
+/*@media (min-width: 3840px) {*/
+/*    .public-display-body {*/
+/*        font-size: 40px;*/
+/*    }*/
 
-    #public-orders-table {
-        font-size: 56px;
-    }
+/*    #public-orders-table {*/
+/*        font-size: 56px;*/
+/*    }*/
 
-    #public-orders-table th,
-    #public-orders-table td {
-        padding: 32px !important;
-    }
+/*    #public-orders-table th,*/
+/*    #public-orders-table td {*/
+/*        padding: 32px !important;*/
+/*    }*/
 
-    #public-orders-table thead th {
-        font-size: 40px;
-    }
+/*    #public-orders-table thead th {*/
+/*        font-size: 40px;*/
+/*    }*/
 
-    #public-orders-table tbody td {
-        font-size: 56px;
-    }
+/*    #public-orders-table tbody td {*/
+/*        font-size: 56px;*/
+/*    }*/
 
-    #total-carts-row td {
-        font-size: 48px;
-    }
+/*    #total-carts-row td {*/
+/*        font-size: 48px;*/
+/*    }*/
 
-    .vertical-text {
-        min-width: 100px !important;
-        width: 100px !important;
-        max-width: 100px !important;
-    }
-}
+/*    .vertical-text {*/
+/*        min-width: 100px !important;*/
+/*        width: 100px !important;*/
+/*        max-width: 100px !important;*/
+/*    }*/
+/*}*/
