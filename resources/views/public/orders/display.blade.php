@@ -10,7 +10,7 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="table-responsive">
+                <div class="table-container">
                     <table id="public-orders-table" class="table table-bordered table-hover">
                         <thead>
                         <tr>

@@ -1,6 +1,9 @@
 $(document).ready(function() {
     const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 минут в миллисекундах
     let updateTimer;
+    
+    // Инициализация фиксированного заголовка для смарт ТВ
+    initStickyHeaderForTV();
 
     /**
      * Обновление данных через AJAX
@@ -157,4 +160,108 @@ $(document).ready(function() {
 
     // Запускаем первое обновление через 5 минут
     scheduleNextUpdate();
+    
+    /**
+     * Инициализация фиксированного заголовка для смарт ТВ
+     */
+    function initStickyHeaderForTV() {
+        // Проверяем поддержку CSS sticky
+        const testElement = $('<div style="position: sticky; position: -webkit-sticky;"></div>');
+        const supportsSticky = testElement.css('position').includes('sticky');
+        
+        if (supportsSticky) {
+            console.log('CSS Sticky поддерживается');
+            return; // CSS sticky работает, ничего не делаем
+        }
+        
+        console.log('CSS Sticky НЕ поддерживается, используем JavaScript fallback');
+        
+        // JavaScript fallback для браузеров без sticky
+        const table = $('#public-orders-table');
+        const thead = table.find('thead');
+        const thElements = thead.find('th');
+        
+        // Создаем клон заголовка
+        let stickyHeader = null;
+        
+        function createStickyHeader() {
+            if (stickyHeader) {
+                stickyHeader.remove();
+            }
+            
+            stickyHeader = $('<div class="sticky-header-container"></div>');
+            const headerTable = $('<table class="table table-bordered mb-0"></table>');
+            const headerThead = thead.clone();
+            
+            headerTable.append(headerThead);
+            stickyHeader.append(headerTable);
+            
+            // Стили для фиксированного заголовка
+            stickyHeader.css({
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                right: '0',
+                zIndex: 1000,
+                backgroundColor: '#212529',
+                display: 'none'
+            });
+            
+            // Синхронизируем ширину колонок
+            setTimeout(() => {
+                headerThead.find('th').each(function(index) {
+                    const originalTh = thElements.eq(index);
+                    if (originalTh.length > 0) {
+                        $(this).width(originalTh.outerWidth());
+                    }
+                });
+            }, 100);
+            
+            $('body').append(stickyHeader);
+        }
+        
+        function updateStickyHeader() {
+            if (!stickyHeader) return;
+            
+            const tableOffset = table.offset();
+            if (!tableOffset) return;
+            
+            const scrollTop = $(window).scrollTop();
+            const tableTop = tableOffset.top;
+            const tableHeight = table.outerHeight();
+            const headerHeight = thead.outerHeight();
+            
+            // Показываем/скрываем фиксированный заголовок
+            if (scrollTop > tableTop && scrollTop < (tableTop + tableHeight - headerHeight)) {
+                stickyHeader.show();
+                // Обновляем позицию left для горизонтального скролла
+                stickyHeader.css('left', -$(window).scrollLeft() + 'px');
+            } else {
+                stickyHeader.hide();
+            }
+        }
+        
+        // Создаем фиксированный заголовок
+        createStickyHeader();
+        
+        // Отслеживаем события
+        $(window).on('scroll', updateStickyHeader);
+        $(window).on('resize', () => {
+            createStickyHeader();
+            updateStickyHeader();
+        });
+        
+        // Обновляем при изменении данных таблицы
+        const observer = new MutationObserver(() => {
+            setTimeout(() => {
+                createStickyHeader();
+                updateStickyHeader();
+            }, 100);
+        });
+        
+        observer.observe(table[0], { 
+            childList: true, 
+            subtree: true 
+        });
+    }
 });
