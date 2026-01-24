@@ -336,7 +336,8 @@ class OrderController extends Controller
      */
     public function publicDisplay(Request $request): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
     {
-        $date = $request->input('date', date('Y-m-d', strtotime('+1 day')));
+        //$date = $request->input('date', date('Y-m-d', strtotime('+1 day')));
+        $date = $request->input('date', date('Y-m-d'));
 
         $buses = Bus::query()
             ->with([
