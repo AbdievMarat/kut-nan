@@ -110,29 +110,45 @@ $(document).ready(function() {
      * Автоматический скроллинг
      */
     function autoScroll() {
-        // Плавно скроллим вниз
         const maxHeight = Math.max(
             document.body.scrollHeight,
             document.documentElement.scrollHeight
         );
         
-        window.scrollTo({
-            top: maxHeight,
-            behavior: 'smooth'
-        });
-
-        // Через 30 секунд быстро возвращаемся наверх
+        // 10 секунд ждем наверху, затем начинаем медленный скролл вниз
         setTimeout(() => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'instant'
-            });
+            // Медленный скролл вниз за 10 секунд
+            let startTime = Date.now();
+            let startScroll = window.pageYOffset;
+            let distance = maxHeight - startScroll;
+            let duration = 10000; // 10 секунд
             
-            // Через 30 секунд повторяем цикл
-            setTimeout(autoScroll, 30000);
-        }, 30000);
+            function smoothScroll() {
+                let elapsed = Date.now() - startTime;
+                let progress = Math.min(elapsed / duration, 1);
+                
+                // Плавная анимация
+                let currentScroll = startScroll + (distance * progress);
+                window.scrollTo(0, currentScroll);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(smoothScroll);
+                } else {
+                    // 10 секунд ждем внизу, затем быстро наверх и повторяем
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'instant'
+                        });
+                        setTimeout(autoScroll, 1000);
+                    }, 10000);
+                }
+            }
+            
+            requestAnimationFrame(smoothScroll);
+        }, 10000);
     }
 
-    // Начинаем автоскроллинг через 2 секунды после загрузки
-    setTimeout(autoScroll, 2000);
+    // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
+    setTimeout(autoScroll, 1000);
 });
