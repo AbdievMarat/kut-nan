@@ -33,12 +33,6 @@ $(document).ready(function() {
     function updateTable(data) {
         // Обновляем дату
         if (data.date) {
-            const dateObj = new Date(data.date + 'T00:00:00');
-            const formattedDate = dateObj.toLocaleDateString('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
             $('[data-date]').text('Обновлено: ' + data.dateFormatted);
             $('[data-date]').data('date', data.date);
         }
@@ -113,6 +107,7 @@ $(document).ready(function() {
         );
 
         window.scrollTo({
+            top: maxHeight,
             behavior: 'smooth'
         });
 
@@ -131,7 +126,7 @@ $(document).ready(function() {
 
     // Запускаем первое обновление данных через 5 секунд после загрузки
     setTimeout(updateData, 5000);
-    
+
     // Устанавливаем периодическое обновление данных
     setInterval(updateData, UPDATE_INTERVAL);
 
