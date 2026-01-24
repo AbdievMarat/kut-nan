@@ -33,18 +33,12 @@
     line-height: 1.2;
 }
 
-/* Фиксированная шапка таблицы при скролле */
-/* Настройка контейнера для работы sticky */
-.table-responsive {
-    position: relative;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    overflow-x: auto;
-}
-
-/* Применяем sticky к каждой ячейке заголовка */
+/* Отключаем sticky для совместимости со смарт телевизорами */
+/*
 #public-orders-table thead th {
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 10;
+    background-color: #212529 !important;
 }
+*/
