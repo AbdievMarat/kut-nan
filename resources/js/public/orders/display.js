@@ -125,7 +125,7 @@ $(document).ready(function() {
             });
 
             // Через полсекунды повторяем цикл
-            setTimeout(autoScroll, 500);
+            setTimeout(autoScroll, 10000);
         }, 10000);
     }
 
