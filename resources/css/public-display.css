@@ -33,12 +33,11 @@
     line-height: 1.2;
 }
 
-/* Отключаем sticky для совместимости со смарт телевизорами */
-/*
+/* Фиксированная шапка без блокировки скролла */
 #public-orders-table thead th {
     position: sticky;
     top: 0;
     z-index: 10;
     background-color: #212529 !important;
+    color: white !important;
 }
-*/
