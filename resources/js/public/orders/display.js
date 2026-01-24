@@ -130,5 +130,5 @@ $(document).ready(function() {
 
 
     // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
-    setTimeout(autoScroll, 1000);
+    //setTimeout(autoScroll, 1000);
 });
