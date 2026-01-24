@@ -1,15 +1,11 @@
 $(document).ready(function() {
-    const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 минут в миллисекундах
-    let updateTimer;
+    const UPDATE_INTERVAL = 1 * 60 * 1000; // 5 минут в миллисекундах
 
     /**
      * Обновление данных через AJAX
      */
     function updateData() {
         let date = $('[data-date]').data('date');
-        if (!date) {
-            date = getDateFromDisplay();
-        }
         
         $.ajax({
             type: 'GET',
@@ -24,17 +20,10 @@ $(document).ready(function() {
         .done(function(response) {
             if (response && response.busesData && response.products && response.totalCarts) {
                 updateTable(response);
-                // Обновляем время последнего обновления
-                updateLastUpdateTime();
             }
         })
         .fail(function(xhr, status, error) {
-            // В случае ошибки оставляем старые данные
             console.log('Ошибка обновления данных:', status, error);
-        })
-        .always(function() {
-            // Планируем следующее обновление
-            scheduleNextUpdate();
         });
     }
 
@@ -99,16 +88,6 @@ $(document).ready(function() {
         }
     }
 
-    /**
-     * Обновление времени последнего обновления
-     */
-    function updateLastUpdateTime() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const timeString = hours + ':' + minutes;
-        $('#update-time').text('Обновлено: ' + timeString);
-    }
 
     /**
      * Экранирование HTML для безопасности
@@ -124,37 +103,7 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    /**
-     * Получение даты из отображения
-     */
-    function getDateFromDisplay() {
-        const dateText = $('[data-date]').text();
-        if (dateText) {
-            // Преобразуем формат dd.mm.yyyy в yyyy-mm-dd
-            const parts = dateText.split('.');
-            if (parts.length === 3) {
-                return parts[2] + '-' + parts[1] + '-' + parts[0];
-            }
-        }
-        // По умолчанию текущий день
-        const today = new Date();
-        return today.toISOString().split('T')[0];
-    }
 
-    /**
-     * Планирование следующего обновления
-     */
-    function scheduleNextUpdate() {
-        clearTimeout(updateTimer);
-        updateTimer = setTimeout(function() {
-            updateData();
-        }, UPDATE_INTERVAL);
-    }
-
-    // Сохраняем дату в data-атрибут при загрузке страницы
-    const initialDate = getDateFromDisplay();
-    $('[data-date]').data('date', initialDate);
-
-    // Запускаем первое обновление через 5 минут
-    scheduleNextUpdate();
+    // Запускаем обновление каждые 5 минут
+    setInterval(updateData, UPDATE_INTERVAL);
 });
