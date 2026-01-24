@@ -11,6 +11,7 @@ use App\Http\Controllers\Client\MarkdownController;
 use App\Http\Controllers\Client\OrderController;
 use App\Http\Controllers\Client\RealizationController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\PublicOrderController;
 use App\Http\Controllers\Client\RemainderController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,7 +26,7 @@ Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.st
 Route::post('/realizations/add-shop', [RealizationController::class, 'addShop'])->name('realizations.add_shop');
 
 // Публичная страница для отображения заказов на большом экране (без авторизации)
-Route::get('public/orders/display', [AdminOrderController::class, 'publicDisplay'])->name('public.orders.display');
+Route::get('public/orders/display', [PublicOrderController::class, 'display'])->name('public.orders.display');
 
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);

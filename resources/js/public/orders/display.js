@@ -6,7 +6,7 @@ $(document).ready(function() {
      * Обновление данных через AJAX
      */
     function updateData() {
-        let date = $('.public-orders-date').data('date');
+        let date = $('[data-date]').data('date');
         if (!date) {
             date = getDateFromDisplay();
         }
@@ -50,8 +50,8 @@ $(document).ready(function() {
                 month: '2-digit',
                 year: 'numeric'
             });
-            $('.public-orders-date').text(formattedDate);
-            $('.public-orders-date').data('date', data.date);
+            $('[data-date]').text(formattedDate);
+            $('[data-date]').data('date', data.date);
         }
 
         // Обновляем строку с тележками
@@ -66,7 +66,7 @@ $(document).ready(function() {
                     $cell.text(cartsCount || '');
                 } else {
                     // Если ячейки не хватает, добавляем новую
-                    $totalCartsRow.append('<td class="public-table-cell total-cart-cell">' + (cartsCount || '') + '</td>');
+                    $totalCartsRow.append('<td class="text-center align-middle total-cart-cell">' + (cartsCount || '') + '</td>');
                 }
             });
             
@@ -85,12 +85,12 @@ $(document).ready(function() {
         if (data.busesData && data.busesData.length > 0) {
             data.busesData.forEach(function(bus) {
                 const $row = $('<tr></tr>');
-                $row.append('<td class="public-table-cell public-table-cell-bus">' + escapeHtml(bus.license_plate) + '</td>');
+                $row.append('<td class="text-center align-middle fw-bold bg-light">' + escapeHtml(bus.license_plate) + '</td>');
                 
                 if (bus.products && bus.products.length > 0) {
                     bus.products.forEach(function(productData) {
                         const amount = productData.order_amount || '';
-                        $row.append('<td class="public-table-cell">' + amount + '</td>');
+                        $row.append('<td class="text-center align-middle">' + amount + '</td>');
                     });
                 }
                 
@@ -128,7 +128,7 @@ $(document).ready(function() {
      * Получение даты из отображения
      */
     function getDateFromDisplay() {
-        const dateText = $('.public-orders-date').text();
+        const dateText = $('[data-date]').text();
         if (dateText) {
             // Преобразуем формат dd.mm.yyyy в yyyy-mm-dd
             const parts = dateText.split('.');
@@ -136,10 +136,9 @@ $(document).ready(function() {
                 return parts[2] + '-' + parts[1] + '-' + parts[0];
             }
         }
-        // По умолчанию завтрашний день
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow.toISOString().split('T')[0];
+        // По умолчанию текущий день
+        const today = new Date();
+        return today.toISOString().split('T')[0];
     }
 
     /**
@@ -154,7 +153,7 @@ $(document).ready(function() {
 
     // Сохраняем дату в data-атрибут при загрузке страницы
     const initialDate = getDateFromDisplay();
-    $('.public-orders-date').data('date', initialDate);
+    $('[data-date]').data('date', initialDate);
 
     // Запускаем первое обновление через 5 минут
     scheduleNextUpdate();
