@@ -106,18 +106,29 @@ $(document).ready(function() {
      * Простой автоскроллинг
      */
     function startAutoScroll() {
+        console.log('Начинаем автоскроллинг');
+        
         // Скроллим вниз за 15 секунд
         $('html, body').animate({
-            scrollTop: $(document).height()
+            scrollTop: $(document).height() - $(window).height()
         }, 15000, function() {
+            console.log('Скроллинг вниз завершен');
+            
             // После скроллинга вниз, ждем 3 секунды и скроллим вверх
             setTimeout(function() {
+                console.log('Начинаем скроллинг вверх');
+                
                 // Скроллим вверх за 15 секунд
                 $('html, body').animate({
                     scrollTop: 0
                 }, 15000, function() {
+                    console.log('Скроллинг вверх завершен');
+                    
                     // После скроллинга вверх, ждем 3 секунды и повторяем
-                    setTimeout(startAutoScroll, 3000);
+                    setTimeout(function() {
+                        console.log('Повторяем цикл');
+                        startAutoScroll();
+                    }, 3000);
                 });
             }, 3000);
         });
