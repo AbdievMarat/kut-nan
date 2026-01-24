@@ -17,14 +17,14 @@
                         <th class="vertical-text">{{ $product->name }}</th>
                     @endforeach
                 </tr>
-                </thead>
-                <tbody>
                 <tr class="table-info fw-bold" id="total-carts-row">
                     <td class="text-center align-middle fw-bold">Тележки</td>
                     @foreach ($totalCarts as $cartsCount)
                         <td class="text-center align-middle total-cart-cell">{{ $cartsCount }}</td>
                     @endforeach
                 </tr>
+                </thead>
+                <tbody>
                 @foreach ($busesData as $bus)
                     <tr>
                         <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
