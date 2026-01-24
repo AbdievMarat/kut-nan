@@ -49,24 +49,3 @@
     color: white !important;
     border-top: none;
 }
-
-/* Убеждаемся что thead имеет правильный фон */
-#public-orders-table thead {
-    background-color: #212529;
-}
-
-/* Стили для JavaScript fallback заголовка */
-.sticky-header-container {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.sticky-header-container table {
-    margin-bottom: 0 !important;
-    background-color: #212529;
-}
-
-.sticky-header-container th {
-    background-color: #212529 !important;
-    color: white !important;
-    border-color: #454d55 !important;
-}
