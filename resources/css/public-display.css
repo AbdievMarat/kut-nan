@@ -47,18 +47,4 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background-color: #212529 !important; /* Bootstrap dark color */
-    border-bottom: 2px solid #dee2e6;
-    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
-}
-
-/* Убеждаемся что заголовок не прозрачный */
-#public-orders-table thead {
-    background-color: #212529;
-}
-
-/* Дополнительные стили для поддерживаемого sticky заголовка */
-#public-orders-table thead.sticky-supported th {
-    background-color: #212529 !important;
-    color: white !important;
 }
