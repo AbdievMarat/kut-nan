@@ -24,6 +24,8 @@ class PublicOrderController extends Controller
     {
         $date = $request->input('date', date('Y-m-d'));
 
+        $dateFormatted = date('d.m.Y H:i');
+
         $buses = Bus::query()
             ->with([
                 'orders' => function ($query) use ($date) {
@@ -97,7 +99,7 @@ class PublicOrderController extends Controller
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
                 'date' => $date,
-                'dateFormatted' => date('d.m.Y H:i', strtotime($date)),
+                'dateFormatted' => $dateFormatted,
                 'busesData' => $busesData->values()->toArray(),
                 'products' => $products->map(function ($product) {
                     return [
