@@ -3,12 +3,8 @@
 @section('content')
     <div class="container-fluid h-100">
         <div class="row mb-3">
-            <div class="col-md-8">
-                <h1 class="display-4 text-dark fw-bold">Отчёт по заказам</h1>
-            </div>
             <div class="col-md-4 text-end">
-                <div class="text-muted fs-2 fw-bold" data-date="{{ $date }}">{{ date('d.m.Y', strtotime($date)) }}</div>
-                <div class="text-muted fs-5" id="update-time">Обновлено: {{ date('H:i') }}</div>
+                <div class="text-muted" data-date="{{ $date }}">{{ date('d.m.Y', strtotime($date)) }} | <span id="update-time">Обновлено: {{ date('H:i') }}</span></div>
             </div>
         </div>
 

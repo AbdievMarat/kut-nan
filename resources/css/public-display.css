@@ -4,13 +4,12 @@
     padding: 0;
     background-color: #f8f9fa;
     font-family: 'Nunito', sans-serif;
-    font-size: 1.5rem;
+    font-size: 24px;
 }
 
 .public-display-container {
-    width: 100vw;
-    height: 100vh;
-    padding: 20px;
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
 }
 
@@ -24,60 +23,44 @@
     max-width: 60px !important;
 }
 
-/* Стили для таблицы */
-#public-orders-table {
-    font-size: 1.8rem;
-}
-
-#public-orders-table th,
-#public-orders-table td {
-    padding: 1rem !important;
-    vertical-align: middle !important;
-}
-
 #public-orders-table thead th {
-    font-size: 1.5rem;
+    font-size: 24px;
     font-weight: bold;
-}
-
-#public-orders-table tbody td {
-    font-size: 1.8rem;
-    font-weight: 600;
 }
 
 /* Строка с тележками */
 #total-carts-row td {
-    font-size: 1.6rem;
+    font-size: 26px;
     font-weight: bold;
 }
 
 /* Адаптация для больших экранов (4K+) */
 @media (min-width: 2560px) {
     .public-display-body {
-        font-size: 2rem;
+        font-size: 32px;
     }
-    
+
     #public-orders-table {
-        font-size: 2.5rem;
+        font-size: 40px;
     }
-    
+
     #public-orders-table th,
     #public-orders-table td {
-        padding: 1.5rem !important;
+        padding: 24px !important;
     }
-    
+
     #public-orders-table thead th {
-        font-size: 2rem;
+        font-size: 32px;
     }
-    
+
     #public-orders-table tbody td {
-        font-size: 2.5rem;
+        font-size: 40px;
     }
-    
+
     #total-carts-row td {
-        font-size: 2.2rem;
+        font-size: 35px;
     }
-    
+
     .vertical-text {
         min-width: 80px !important;
         width: 80px !important;
@@ -88,30 +71,30 @@
 /* Адаптация для очень больших экранов (8K) */
 @media (min-width: 3840px) {
     .public-display-body {
-        font-size: 2.5rem;
+        font-size: 40px;
     }
-    
+
     #public-orders-table {
-        font-size: 3.5rem;
+        font-size: 56px;
     }
-    
+
     #public-orders-table th,
     #public-orders-table td {
-        padding: 2rem !important;
+        padding: 32px !important;
     }
-    
+
     #public-orders-table thead th {
-        font-size: 2.5rem;
+        font-size: 40px;
     }
-    
+
     #public-orders-table tbody td {
-        font-size: 3.5rem;
+        font-size: 56px;
     }
-    
+
     #total-carts-row td {
-        font-size: 3rem;
+        font-size: 48px;
     }
-    
+
     .vertical-text {
         min-width: 100px !important;
         width: 100px !important;
