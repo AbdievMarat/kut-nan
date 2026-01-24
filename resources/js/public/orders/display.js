@@ -129,6 +129,12 @@ $(document).ready(function() {
     }
 
 
+    // Запускаем первое обновление данных через 5 секунд после загрузки
+    setTimeout(updateData, 5000);
+    
+    // Устанавливаем периодическое обновление данных
+    setInterval(updateData, UPDATE_INTERVAL);
+
     // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
     setTimeout(autoScroll, 1000);
 });
