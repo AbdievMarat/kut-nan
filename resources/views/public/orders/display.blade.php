@@ -18,9 +18,9 @@
                     @endforeach
                 </tr>
                 <tr class="table-info fw-bold" id="total-carts-row">
-                    <td class="text-center align-middle fw-bold">Тележки</td>
+                    <th class="text-center align-middle fw-bold">Тележки</th>
                     @foreach ($totalCarts as $cartsCount)
-                        <td class="text-center align-middle total-cart-cell">{{ $cartsCount }}</td>
+                        <th class="text-center align-middle total-cart-cell">{{ $cartsCount }}</th>
                     @endforeach
                 </tr>
                 </thead>
