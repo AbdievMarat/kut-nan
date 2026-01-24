@@ -31,7 +31,7 @@
                             <tr>
                                 <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
                                 @foreach ($bus['products'] as $productData)
-                                    <td class="text-center align-middle" style="width: 50px;">
+                                    <td class="text-center align-middle">
                                         {{ $productData['order_amount'] ?: '' }}
                                     </td>
                                 @endforeach
