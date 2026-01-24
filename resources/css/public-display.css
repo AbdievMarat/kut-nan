@@ -4,7 +4,7 @@
     padding: 0;
     background-color: #f8f9fa;
     font-family: 'Nunito', sans-serif;
-    font-size: 24px;
+    /*font-size: 24px;*/
 }
 
 .public-display-container {
@@ -22,10 +22,10 @@
 .vertical-text {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    white-space: nowrap;
-    min-width: 60px !important;
-    width: 60px !important;
-    max-width: 60px !important;
+    /*white-space: nowrap;*/
+    /*min-width: 60px !important;*/
+    /*width: 60px !important;*/
+    /*max-width: 60px !important;*/
 }
 
 /*#public-orders-table thead th {*/
