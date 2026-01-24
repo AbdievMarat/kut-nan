@@ -105,4 +105,34 @@ $(document).ready(function() {
 
     // Запускаем обновление каждые 5 минут
     setInterval(updateData, UPDATE_INTERVAL);
+
+    /**
+     * Автоматический скроллинг
+     */
+    function autoScroll() {
+        // Плавно скроллим вниз
+        const maxHeight = Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight
+        );
+        
+        window.scrollTo({
+            top: maxHeight,
+            behavior: 'smooth'
+        });
+
+        // Через 3 секунды быстро возвращаемся наверх
+        setTimeout(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'instant'
+            });
+            
+            // Через полсекунды повторяем цикл
+            setTimeout(autoScroll, 500);
+        }, 3000);
+    }
+
+    // Начинаем автоскроллинг через 2 секунды после загрузки
+    setTimeout(autoScroll, 2000);
 });
