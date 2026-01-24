@@ -16,7 +16,7 @@
                         <tr>
                             <th class="text-center align-middle">Автобус</th>
                             @foreach ($products as $product)
-                                <th class="text-center align-middle vertical-text">{{ $product->name }}</th>
+                                <th class="vertical-text">{{ $product->name }}</th>
                             @endforeach
                         </tr>
                         </thead>
