@@ -23,7 +23,12 @@
 /* Фиксированная ширина с переносом для заголовков продуктов */
 .vertical-text {
     width: 4ch;
+    max-width: 4ch;
     word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
     white-space: normal;
     text-align: center;
+    hyphens: auto;
+    line-height: 1.2;
 }
