@@ -111,7 +111,7 @@ $(document).ready(function() {
             document.body.scrollHeight,
             document.documentElement.scrollHeight
         );
-        
+
         window.scrollTo({
             behavior: 'smooth'
         });
@@ -130,5 +130,5 @@ $(document).ready(function() {
 
 
     // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
-    //setTimeout(autoScroll, 1000);
+    setTimeout(autoScroll, 1000);
 });
