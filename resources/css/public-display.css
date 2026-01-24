@@ -20,12 +20,10 @@
     color: black;
 }
 
-/* Вертикальный текст для заголовков продуктов */
+/* Фиксированная ширина с переносом для заголовков продуктов */
 .vertical-text {
-    transform: rotate(90deg);
-    min-height: 120px; /* или по длине самого длинного названия */
-    white-space: nowrap;
-    width: 40px;
-    min-width: 40px;
+    width: 4ch;
+    word-wrap: break-word;
+    white-space: normal;
     text-align: center;
 }
