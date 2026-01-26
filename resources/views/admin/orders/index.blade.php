@@ -125,7 +125,7 @@
     <style>
         @media print {
             * {
-                font-size: 9px !important;
+                font-size: 10px !important;
             }
             
             body {
@@ -150,10 +150,10 @@
             }
             
             .card-header {
-                font-size: 11px !important;
-                padding: 2px 0 !important;
+                font-size: 12px !important;
+                padding: 3px 0 !important;
                 margin: 0 !important;
-                margin-bottom: 2px !important;
+                margin-bottom: 3px !important;
             }
             
             .card-body {
@@ -162,7 +162,7 @@
             }
             
             #orders-table {
-                font-size: 8px !important;
+                font-size: 9px !important;
                 width: 100% !important;
                 border-collapse: collapse;
                 margin: 0 !important;
@@ -170,14 +170,14 @@
             
             #orders-table th,
             #orders-table td {
-                padding: 1px 2px !important;
-                font-size: 8px !important;
+                padding: 2px 3px !important;
+                font-size: 9px !important;
                 border: 1px solid #000 !important;
-                line-height: 1.1 !important;
+                line-height: 1.2 !important;
             }
             
             #orders-table th {
-                font-size: 8px !important;
+                font-size: 9px !important;
                 font-weight: bold;
             }
             
@@ -187,7 +187,7 @@
             
             #orders-table .print-value {
                 display: inline-block !important;
-                font-size: 8px !important;
+                font-size: 9px !important;
                 padding: 0 !important;
             }
             
@@ -200,8 +200,8 @@
             .vertical-text {
                 writing-mode: vertical-rl;
                 text-orientation: mixed;
-                height: 40px;
-                width: 15px;
+                height: 50px;
+                width: 18px;
             }
             
             @page {
