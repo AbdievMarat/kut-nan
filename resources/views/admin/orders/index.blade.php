@@ -166,6 +166,12 @@
                 width: 100% !important;
                 border-collapse: collapse;
                 margin: 0 !important;
+                table-layout: fixed !important;
+            }
+            
+            #orders-table th:first-child,
+            #orders-table td:first-child {
+                width: 80px !important;
             }
             
             #orders-table th,
@@ -174,6 +180,11 @@
                 font-size: 10px !important;
                 border: 1px solid #000 !important;
                 line-height: 1.2 !important;
+            }
+            
+            #orders-table th.vertical-text,
+            #orders-table td:not(:first-child):not(:nth-last-child(-n+3)) {
+                width: 25px !important;
             }
             
             #orders-table th {
@@ -200,8 +211,8 @@
             .vertical-text {
                 writing-mode: vertical-rl;
                 text-orientation: mixed;
-                height: 55px;
-                width: 20px;
+                height: 55px !important;
+                width: 25px !important;
             }
             
             @page {
