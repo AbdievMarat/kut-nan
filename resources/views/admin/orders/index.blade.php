@@ -43,6 +43,24 @@
                         <td></td>
                         <td></td>
                     </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td>Штук на тележку</td>
+                        @foreach ($piecesPerCarts as $piecesPerCart)
+                            <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="table-secondary fw-bold">
+                        <td>Итого</td>
+                        @foreach ($multipliedAmounts as $multipliedAmount)
+                            <td class="multiplied-amount-cell">{{ $multipliedAmount }}</td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                 @foreach ($busesData as $bus)
                     <tr>
                         <td>{{ $bus['license_plate'] }}</td>

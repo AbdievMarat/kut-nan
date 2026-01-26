@@ -113,9 +113,11 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                 $colIndex = 2;
                 foreach ($this->products as $product) {
                     $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+                    $orderMultiplier = $product->order_multiplier ?? 1;
                     $piecesPerCart = $product->pieces_per_cart ?? 1;
-                    $cartsCount = $totalAmount > 0 && $piecesPerCart > 0 
-                        ? round($totalAmount / $piecesPerCart, 1) 
+                    $multipliedAmount = $totalAmount * $orderMultiplier;
+                    $cartsCount = $multipliedAmount > 0 && $piecesPerCart > 0 
+                        ? round($multipliedAmount / $piecesPerCart, 1) 
                         : '';
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
                     $sheet->setCellValue($colLetter . '2', $cartsCount);

@@ -104,6 +104,24 @@ $(() => {
                         }
                     });
                 }
+                if (successResponse.multipliedAmounts) {
+                    // Обновляем значения в строке "Итого × Множитель"
+                    const $multipliedAmountCells = $('.multiplied-amount-cell');
+                    successResponse.multipliedAmounts.forEach(function (value, index) {
+                        if ($multipliedAmountCells.eq(index).length) {
+                            $multipliedAmountCells.eq(index).text(value);
+                        }
+                    });
+                }
+                if (successResponse.piecesPerCarts) {
+                    // Обновляем значения в строке "Штук на тележку"
+                    const $piecesPerCartCells = $('.pieces-per-cart-cell');
+                    successResponse.piecesPerCarts.forEach(function (value, index) {
+                        if ($piecesPerCartCells.eq(index).length) {
+                            $piecesPerCartCells.eq(index).text(value);
+                        }
+                    });
+                }
             }).fail(errorResponse => {
                 alert('Ошибка при сохранении данных!');
             });

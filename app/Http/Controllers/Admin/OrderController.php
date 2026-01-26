@@ -88,13 +88,27 @@ class OrderController extends Controller
         // Рассчитываем количество тележек для итоговой строки
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
-            return $totalAmount > 0 && $piecesPerCart > 0
-                ? round($totalAmount / $piecesPerCart, 2)
+            $multipliedAmount = $totalAmount * $orderMultiplier;
+            return $multipliedAmount > 0 && $piecesPerCart > 0
+                ? round($multipliedAmount / $piecesPerCart, 2)
                 : '';
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts'));
+        // Рассчитываем промежуточные значения для отображения
+        $multipliedAmounts = $products->map(function ($product) use ($totalOrderAmounts) {
+            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $orderMultiplier = $product->order_multiplier ?? 1;
+            $multipliedAmount = $totalAmount * $orderMultiplier;
+            return $multipliedAmount > 0 ? $multipliedAmount : '';
+        });
+
+        $piecesPerCarts = $products->map(function ($product) {
+            return $product->pieces_per_cart ?? 1;
+        });
+
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts'));
     }
 
     /**
@@ -257,15 +271,30 @@ class OrderController extends Controller
 
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
-            return $totalAmount > 0 && $piecesPerCart > 0
-                ? round($totalAmount / $piecesPerCart, 2)
+            $multipliedAmount = $totalAmount * $orderMultiplier;
+            return $multipliedAmount > 0 && $piecesPerCart > 0
+                ? round($multipliedAmount / $piecesPerCart, 2)
                 : '';
+        });
+
+        $multipliedAmounts = $products->map(function ($product) use ($totalOrderAmounts) {
+            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $orderMultiplier = $product->order_multiplier ?? 1;
+            $multipliedAmount = $totalAmount * $orderMultiplier;
+            return $multipliedAmount > 0 ? $multipliedAmount : '';
+        });
+
+        $piecesPerCarts = $products->map(function ($product) {
+            return $product->pieces_per_cart ?? 1;
         });
 
         return response()->json([
             'success' => true,
-            'totalCarts' => $totalCarts->values()->toArray()
+            'totalCarts' => $totalCarts->values()->toArray(),
+            'multipliedAmounts' => $multipliedAmounts->values()->toArray(),
+            'piecesPerCarts' => $piecesPerCarts->values()->toArray()
         ]);
     }
 

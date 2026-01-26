@@ -89,9 +89,11 @@ class PublicOrderController extends Controller
         // Рассчитываем количество тележек для итоговой строки
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
+            $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
-            return $totalAmount > 0 && $piecesPerCart > 0
-                ? round($totalAmount / $piecesPerCart, 1)
+            $multipliedAmount = $totalAmount * $orderMultiplier;
+            return $multipliedAmount > 0 && $piecesPerCart > 0
+                ? round($multipliedAmount / $piecesPerCart, 1)
                 : '';
         });
 
