@@ -179,7 +179,7 @@
             #orders-table th,
             #orders-table td {
                 padding: 2px 3px !important;
-                font-size: 10px !important;
+                font-size: 11px !important;
                 border: 1px solid #000 !important;
                 line-height: 1.2 !important;
             }
