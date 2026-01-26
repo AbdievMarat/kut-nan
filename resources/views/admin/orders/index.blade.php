@@ -171,7 +171,9 @@
             
             #orders-table th:first-child,
             #orders-table td:first-child {
-                width: 80px !important;
+                width: 110px !important;
+                min-width: 110px !important;
+                max-width: 110px !important;
             }
             
             #orders-table th,
