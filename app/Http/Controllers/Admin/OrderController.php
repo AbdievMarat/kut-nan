@@ -92,7 +92,7 @@ class OrderController extends Controller
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
             return $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 2)
+                ? round($multipliedAmount / $piecesPerCart, 1)
                 : '';
         });
 

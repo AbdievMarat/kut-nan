@@ -127,4 +127,25 @@ $(() => {
             });
         }, 500);
     });
+
+    // Обработчик кнопки печати
+    $(document).on('click', '#print-btn', function () {
+        // Заменяем input на текст перед печатью
+        $('.order-amount-input').each(function() {
+            const $input = $(this);
+            const value = $input.val() || '0';
+            const $span = $('<span class="print-value">' + value + '</span>');
+            $input.after($span);
+            $input.hide();
+        });
+        
+        // Печать
+        window.print();
+        
+        // Возвращаем input после печати
+        setTimeout(function() {
+            $('.print-value').remove();
+            $('.order-amount-input').show();
+        }, 100);
+    });
 });

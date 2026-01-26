@@ -2,9 +2,9 @@
 
 @section('content')
     <div class="card">
-        <div class="card-header">Отчёт по заказам</div>
+        <div class="card-header">Отчёт по заказам {{ date('d.m.Y', strtotime($date)) }}</div>
         <div class="card-body overflow-auto">
-            <form method="GET" action="{{ route('admin.orders.index') }}" class="mb-4">
+            <form method="GET" action="{{ route('admin.orders.index') }}" class="mb-4 no-print">
                 <div class="row">
                     <div class="col-md-3 mb-3">
                         <input type="date" name="date" class="form-control" value="{{ $date }}">
@@ -16,6 +16,10 @@
 
                         <button type="submit" class="btn btn-primary" formaction="{{ route('admin.orders.export_to_excel') }}">
                             <i class="bi bi-file-earmark-excel"></i> Выгрузить
+                        </button>
+
+                        <button type="button" class="btn btn-info" id="print-btn">
+                            <i class="bi bi-printer"></i> Распечатать
                         </button>
                     </div>
                 </div>
@@ -43,7 +47,7 @@
                         <td></td>
                         <td></td>
                     </tr>
-                    <tr class="table-secondary fw-bold">
+                    <tr class="table-secondary fw-bold pieces-per-cart-row">
                         <td>Штук на тележку</td>
                         @foreach ($piecesPerCarts as $piecesPerCart)
                             <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
@@ -52,7 +56,7 @@
                         <td></td>
                         <td></td>
                     </tr>
-                    <tr class="table-secondary fw-bold">
+                    <tr class="table-secondary fw-bold multiplied-amount-row">
                         <td>Итого</td>
                         @foreach ($multipliedAmounts as $multipliedAmount)
                             <td class="multiplied-amount-cell">{{ $multipliedAmount }}</td>
@@ -117,6 +121,91 @@
             </div>
         </div>
     </div>
+
+    <style>
+        @media print {
+            * {
+                font-size: 9px !important;
+            }
+            
+            body {
+                margin: 0;
+                padding: 5px;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .pieces-per-cart-row,
+            .multiplied-amount-row {
+                display: none !important;
+            }
+            
+            .card {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .card-header {
+                font-size: 11px !important;
+                padding: 5px !important;
+                margin-bottom: 5px;
+            }
+            
+            .card-body {
+                padding: 0 !important;
+            }
+            
+            #orders-table {
+                font-size: 8px !important;
+                width: 100% !important;
+                border-collapse: collapse;
+            }
+            
+            #orders-table th,
+            #orders-table td {
+                padding: 2px 3px !important;
+                font-size: 8px !important;
+                border: 1px solid #000 !important;
+            }
+            
+            #orders-table th {
+                font-size: 8px !important;
+                font-weight: bold;
+            }
+            
+            #orders-table input.order-amount-input {
+                display: none !important;
+            }
+            
+            #orders-table .print-value {
+                display: inline-block !important;
+                font-size: 8px !important;
+                padding: 2px 3px !important;
+            }
+            
+            /* Скрываем последние 3 столбца (Уценка, Реализации, Остаток) */
+            #orders-table th:nth-last-child(-n+3),
+            #orders-table td:nth-last-child(-n+3) {
+                display: none !important;
+            }
+            
+            .vertical-text {
+                writing-mode: vertical-rl;
+                text-orientation: mixed;
+                height: 60px;
+                width: 20px;
+            }
+            
+            @page {
+                size: landscape;
+                margin: 0.5cm;
+            }
+        }
+    </style>
 
     @push('scripts')
         @vite(['resources/js/admin/orders/index.js'])
