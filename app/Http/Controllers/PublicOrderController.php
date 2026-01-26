@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bus;
 use App\Models\Order;
+use App\Models\OrderChangeLog;
 use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Contracts\View\Factory;
@@ -39,7 +40,19 @@ class PublicOrderController extends Controller
 
         $products = $this->getProducts();
 
-        $busesData = $buses->map(function ($bus) use ($products) {
+        // Получаем последние изменения для текущей даты
+        $changeLogs = OrderChangeLog::query()
+            ->whereDate('date', $date)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($log) {
+                return $log->bus_id . '_' . $log->product_id;
+            })
+            ->map(function ($logs) {
+                return $logs->first(); // Берем последнее изменение для каждой комбинации bus_id + product_id
+            });
+
+        $busesData = $buses->map(function ($bus) use ($products, $changeLogs) {
             $orderAmounts = [];
 
             /** @var Order $order */
@@ -67,10 +80,25 @@ class PublicOrderController extends Controller
             return [
                 'id' => $bus->id,
                 'license_plate' => $bus->license_plate . ' ' . $bus->serial_number,
-                'products' => $products->map(function ($product) use ($orderAmounts) {
+                'products' => $products->map(function ($product) use ($orderAmounts, $changeLogs, $bus) {
+                    $logKey = $bus->id . '_' . $product->id;
+                    $changeLog = $changeLogs->get($logKey);
+
+                    $changeType = null;
+                    if ($changeLog) {
+                        $oldAmount = $changeLog->old_amount ?? 0;
+                        $newAmount = $changeLog->new_amount ?? 0;
+                        if ($newAmount > $oldAmount) {
+                            $changeType = 'increase';
+                        } elseif ($newAmount < $oldAmount) {
+                            $changeType = 'decrease';
+                        }
+                    }
+
                     return [
                         'product_id' => $product->id,
                         'order_amount' => $orderAmounts[$product->id] ?? '',
+                        'change_type' => $changeType,
                     ];
                 }),
             ];

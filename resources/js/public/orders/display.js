@@ -1,5 +1,20 @@
 $(document).ready(function() {
-    const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 минут в миллисекундах
+    const UPDATE_INTERVAL = 5 * 2 * 1000; // 5 минут в миллисекундах
+
+    /**
+     * Применение стилей изменения к ячейке
+     * Подсветка остается на весь день
+     */
+    function applyChangeStyle($cell, changeType) {
+        // Удаляем предыдущие классы изменений
+        $cell.removeClass('change-increase change-decrease');
+        
+        if (changeType === 'increase') {
+            $cell.addClass('change-increase');
+        } else if (changeType === 'decrease') {
+            $cell.addClass('change-decrease');
+        }
+    }
 
     /**
      * Обновление данных через AJAX
@@ -23,6 +38,13 @@ $(document).ready(function() {
             console.log('Ошибка обновления данных:', status, error);
         });
     }
+
+    // Применяем стили изменений при первой загрузке страницы
+    $('.order-cell').each(function() {
+        const $cell = $(this);
+        const changeType = $cell.data('change-type');
+        applyChangeStyle($cell, changeType);
+    });
 
     /**
      * Обновление таблицы новыми данными
@@ -53,6 +75,19 @@ $(document).ready(function() {
             }
         }
 
+        // Сохраняем предыдущие значения для сравнения
+        const previousValues = {};
+        $('#public-orders-table tbody .order-cell').each(function() {
+            const $cell = $(this);
+            const busId = $cell.data('bus-id');
+            const productId = $cell.data('product-id');
+            const key = busId + '_' + productId;
+            previousValues[key] = {
+                amount: parseInt($cell.text()) || 0,
+                changeType: $cell.data('change-type') || ''
+            };
+        });
+
         // Удаляем старые строки автобусов из tbody
         const $tbody = $('#public-orders-table tbody');
         $tbody.empty();
@@ -66,7 +101,30 @@ $(document).ready(function() {
                 if (bus.products && bus.products.length > 0) {
                     bus.products.forEach(function(productData) {
                         const amount = productData.order_amount || '';
-                        $row.append('<td class="text-center align-middle">' + amount + '</td>');
+                        const changeType = productData.change_type || '';
+                        const key = bus.id + '_' + productData.product_id;
+                        
+                        // Используем тип изменения из данных сервера (изменения за весь день)
+                        // Если тип не передан, проверяем изменение относительно предыдущего значения
+                        let finalChangeType = changeType;
+                        if (!finalChangeType && previousValues[key]) {
+                            const prevAmount = previousValues[key].amount;
+                            const newAmount = parseInt(amount) || 0;
+                            if (newAmount > prevAmount) {
+                                finalChangeType = 'increase';
+                            } else if (newAmount < prevAmount) {
+                                finalChangeType = 'decrease';
+                            }
+                        }
+
+                        const $cell = $('<td class="text-center align-middle order-cell"></td>')
+                            .attr('data-bus-id', bus.id)
+                            .attr('data-product-id', productData.product_id)
+                            .attr('data-change-type', finalChangeType)
+                            .text(amount);
+                        
+                        applyChangeStyle($cell, finalChangeType);
+                        $row.append($cell);
                     });
                 }
 

@@ -8,6 +8,7 @@ use App\Models\Bus;
 use App\Models\BusProductPrice;
 use App\Models\Markdown;
 use App\Models\Order;
+use App\Models\OrderChangeLog;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Realization;
@@ -235,6 +236,11 @@ class OrderController extends Controller
             ->where('product_id', $productId)
             ->first();
 
+        $oldAmount = null;
+        if ($orderItem) {
+            $oldAmount = $orderItem->amount;
+        }
+
         if (!$orderItem) {
             $orderItem = new OrderItem();
             $orderItem->order_id = $order->id;
@@ -242,8 +248,21 @@ class OrderController extends Controller
             $orderItem->price = $price;
         }
 
-        $orderItem->amount = $amount ? (int)$amount : null;
+        $newAmount = $amount ? (int)$amount : null;
+        $orderItem->amount = $newAmount;
         $orderItem->save();
+
+        // Записать изменение в лог, если значение изменилось
+        if ($oldAmount !== $newAmount) {
+            OrderChangeLog::create([
+                'order_id' => $order->id,
+                'product_id' => $productId,
+                'bus_id' => $busId,
+                'date' => $date,
+                'old_amount' => $oldAmount,
+                'new_amount' => $newAmount,
+            ]);
+        }
 
         // Пересчитать totalCarts
         $products = $this->getProducts();

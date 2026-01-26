@@ -63,3 +63,27 @@
 #public-orders-table tbody tr:nth-child(even) td {
     background-color: #e9ecef !important;
 }
+
+/* Подсветка ячеек при изменении значений */
+.order-cell.change-increase {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.order-cell.change-decrease {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+/* Учитываем чередование строк при подсветке */
+#public-orders-table tbody tr:nth-child(even) td.order-cell.change-increase {
+    background-color: #c3e6cb !important;
+}
+
+#public-orders-table tbody tr:nth-child(even) td.order-cell.change-decrease {
+    background-color: #f5c6cb !important;
+}

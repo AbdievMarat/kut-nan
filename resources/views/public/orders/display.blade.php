@@ -29,7 +29,10 @@
                     <tr>
                         <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
-                            <td class="text-center align-middle">
+                            <td class="text-center align-middle order-cell"
+                                data-bus-id="{{ $bus['id'] }}"
+                                data-product-id="{{ $productData['product_id'] }}"
+                                data-change-type="{{ $productData['change_type'] ?? '' }}">
                                 {{ $productData['order_amount'] ?: '' }}
                             </td>
                         @endforeach
