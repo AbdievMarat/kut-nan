@@ -9,6 +9,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/client.css',
                 'resources/css/admin.css',
+                'resources/css/admin-orders.css',
                 'resources/css/public-display.css',
                 'resources/js/client/realizations/create.js',
                 'resources/js/client/remainders/create.js',
