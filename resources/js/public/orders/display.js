@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const UPDATE_INTERVAL = 5 * 2 * 1000; // 5 минут в миллисекундах
+    const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 минут в миллисекундах
 
     /**
      * Применение стилей изменения к ячейке
