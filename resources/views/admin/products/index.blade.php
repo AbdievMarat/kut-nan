@@ -18,6 +18,7 @@
                     <th>Название</th>
                     <th>Сортировка</th>
                     <th>Количество штук на одну тележку</th>
+                    <th>Множитель заказа</th>
                     <th>Стоимость производства</th>
                     <th>Статус</th>
                     <th>Отображение в отчёте</th>
@@ -31,6 +32,7 @@
                         <td>{{ $product->name }}</td>
                         <td>{{ $product->sort }} </td>
                         <td>{{ $product->pieces_per_cart }}</td>
+                        <td>{{ $product->order_multiplier }}</td>
                         <td>{{ $product->production_cost }}</td>
                         <td>
                             <div class="badge bg-{{ $product->is_active ? 'success' : 'danger' }}">
@@ -68,7 +70,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th colspan="8">
+                    <th colspan="9">
                         {{ $products->links() }}
                     </th>
                 </tr>

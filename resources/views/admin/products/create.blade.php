@@ -45,6 +45,16 @@
                 <div class="mb-3">
                     <x-admin-forms-input
                             type="number"
+                            id="order_multiplier"
+                            name="order_multiplier"
+                            label="Множитель для количества заказанных товаров при формировании общего показателя"
+                            placeholder="Введите множитель"
+                            value="{{ old('order_multiplier') }}"
+                    />
+                </div>
+                <div class="mb-3">
+                    <x-admin-forms-input
+                            type="number"
                             id="production_cost"
                             name="production_cost"
                             label="Стоимость расходов на производство (ЗП, коммунальные услуги, амортизация оборудования и прочие расходы)"

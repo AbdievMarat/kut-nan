@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property int $sort
  * @property int $pieces_per_cart Количество штук на одну тележку
+ * @property int $order_multiplier Множитель для количества заказанных товаров при формировании общего показателя
  * @property int $production_cost Стоимость расходов на производство (ЗП, коммунальные услуги, амортизация оборудования и прочие расходы)
  * @property boolean $is_active
  * @property boolean $is_in_report
@@ -41,6 +42,7 @@ class Product extends Model
         'is_active',
         'is_in_report',
         'pieces_per_cart',
+        'order_multiplier',
         'production_cost',
     ];
 
