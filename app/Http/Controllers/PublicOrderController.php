@@ -22,7 +22,7 @@ class PublicOrderController extends Controller
      */
     public function display(Request $request): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
     {
-        $date = $request->input('date', date('Y-m-d', strtotime('+1 day')));
+        $date = date('Y-m-d', strtotime('+1 day'));
 
         $dateFormatted = date('d.m.Y H:i');
 

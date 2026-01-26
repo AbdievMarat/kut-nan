@@ -4,7 +4,7 @@
     <div class="container-fluid h-100">
         <div class="row">
             <div class="text-end">
-                <div class="text-muted" data-date="{{ $date }}">Обновлено: {{ $dateFormatted }}</div>
+                <div class="text-muted" id="date-formatted">Обновлено: {{ $dateFormatted }}</div>
             </div>
         </div>
 

@@ -1,16 +1,13 @@
 $(document).ready(function() {
-    const UPDATE_INTERVAL = 1 * 60 * 1000; // 1 минута в миллисекундах
+    const UPDATE_INTERVAL = 5 * 60 * 1000; // 5 минут в миллисекундах
 
     /**
      * Обновление данных через AJAX
      */
     function updateData() {
-        let date = $('[data-date]').data('date');
-
         $.ajax({
             type: 'GET',
             url: window.location.pathname,
-            data: { date: date },
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
@@ -31,11 +28,7 @@ $(document).ready(function() {
      * Обновление таблицы новыми данными
      */
     function updateTable(data) {
-        // Обновляем дату
-        if (data.date) {
-            $('[data-date]').text('Обновлено: ' + data.dateFormatted);
-            $('[data-date]').data('date', data.date);
-        }
+        $('#date-formatted').text('Обновлено: ' + data.dateFormatted);
 
         // Обновляем строку с тележками
         const $totalCartsRow = $('#total-carts-row');
