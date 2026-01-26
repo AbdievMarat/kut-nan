@@ -129,8 +129,8 @@
             }
             
             body {
-                margin: 0;
-                padding: 5px;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             .no-print {
@@ -145,31 +145,35 @@
             .card {
                 border: none;
                 box-shadow: none;
-                margin: 0;
-                padding: 0;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             .card-header {
                 font-size: 11px !important;
-                padding: 5px !important;
-                margin-bottom: 5px;
+                padding: 2px 0 !important;
+                margin: 0 !important;
+                margin-bottom: 2px !important;
             }
             
             .card-body {
                 padding: 0 !important;
+                margin: 0 !important;
             }
             
             #orders-table {
                 font-size: 8px !important;
                 width: 100% !important;
                 border-collapse: collapse;
+                margin: 0 !important;
             }
             
             #orders-table th,
             #orders-table td {
-                padding: 2px 3px !important;
+                padding: 1px 2px !important;
                 font-size: 8px !important;
                 border: 1px solid #000 !important;
+                line-height: 1.1 !important;
             }
             
             #orders-table th {
@@ -184,7 +188,7 @@
             #orders-table .print-value {
                 display: inline-block !important;
                 font-size: 8px !important;
-                padding: 2px 3px !important;
+                padding: 0 !important;
             }
             
             /* Скрываем последние 3 столбца (Уценка, Реализации, Остаток) */
@@ -196,13 +200,13 @@
             .vertical-text {
                 writing-mode: vertical-rl;
                 text-orientation: mixed;
-                height: 60px;
-                width: 20px;
+                height: 40px;
+                width: 15px;
             }
             
             @page {
                 size: landscape;
-                margin: 0.5cm;
+                margin: 0.2cm !important;
             }
         }
     </style>
