@@ -21,6 +21,8 @@
             <input type="hidden" name="item_price[{{ $product->id }}]" value="{{ $product->price }}">
         @endforeach
 
-        <button type="submit" class="btn btn-success w-100 mb-3">Сохранить</button>
+        @if(now()->hour < 13)
+            <button type="submit" class="btn btn-success w-100 mb-3">Сохранить</button>
+        @endif
     </form>
 @endsection
