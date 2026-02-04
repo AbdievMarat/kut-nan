@@ -129,7 +129,7 @@ class PublicOrderController extends Controller
             ->keyBy('product_id');
 
         // Рассчитываем итоговое количество тележек (рассчитанное + введенное)
-        // Округляем до целых чисел
+        // Используем точное значение без округления
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedCartCounts) {
             // Рассчитываем количество тележек из заказов
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
@@ -144,9 +144,9 @@ class PublicOrderController extends Controller
             $cartCount = $savedCartCounts->get($product->id);
             $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
             
-            // Итоговое количество тележек (рассчитанное + введенное), округляем до целых
+            // Итоговое количество тележек (рассчитанное + введенное), используем точное значение
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+            return $totalCartsValue > 0 ? $totalCartsValue : '';
         });
 
         // Если это AJAX запрос, возвращаем JSON

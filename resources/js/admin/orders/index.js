@@ -123,17 +123,25 @@ $(() => {
                         }
                     });
                 }
+                if (successResponse.totalCartsValuesExact) {
+                    // Обновляем точные значения в data-атрибуте для использования при печати
+                    const $totalCartsInputs = $('.total-carts-input');
+                    successResponse.totalCartsValuesExact.forEach(function (exactValue, index) {
+                        if ($totalCartsInputs.eq(index).length) {
+                            const $input = $totalCartsInputs.eq(index);
+                            // Сохраняем точное значение в data-атрибуте (без округления)
+                            $input.data('exact-value', exactValue !== '' && exactValue !== null ? exactValue : '');
+                        }
+                    });
+                }
                 if (successResponse.totalCartsValues) {
-                    // Обновляем инпуты итогового количества тележек
+                    // Обновляем инпуты итогового количества тележек (только если пользователь заполнил поле)
                     const $totalCartsInputs = $('.total-carts-input');
                     successResponse.totalCartsValues.forEach(function (value, index) {
                         if ($totalCartsInputs.eq(index).length) {
                             const $input = $totalCartsInputs.eq(index);
-                            // Сохраняем точное значение в data-атрибуте
-                            $input.data('exact-value', value || '');
-                            // Показываем округленное значение в инпуте для удобства
-                            const roundedValue = value ? Math.round(parseFloat(value)) : '';
-                            $input.val(roundedValue);
+                            // Показываем значение только если пользователь заполнил поле
+                            $input.val(value || '');
                         }
                     });
                 }
@@ -229,12 +237,17 @@ $(() => {
                         $cartCountInput.val('');
                     }
                     
-                    // Обновляем точное значение в data-атрибуте и в инпуте из ответа сервера
+                    // Обновляем точное значение в data-атрибуте (без округления) для использования при печати
                     if (successResponse.total_carts_value !== null && successResponse.total_carts_value !== undefined) {
                         $input.data('exact-value', successResponse.total_carts_value);
-                        // Всегда обновляем значение в инпуте полученным с сервера (округляем до целого)
-                        const roundedValue = Math.round(successResponse.total_carts_value);
-                        $input.val(roundedValue);
+                        // Обновляем значение в инпуте только если пользователь заполнил поле (есть carts)
+                        if (successResponse.carts !== null && successResponse.carts !== undefined) {
+                            const roundedValue = Math.round(successResponse.total_carts_value);
+                            $input.val(roundedValue);
+                        } else {
+                            // Если пользователь не заполнил поле, очищаем его
+                            $input.val('');
+                        }
                     }
                     
                     // Обновляем итого в строке "Итого" (округляем до целых)
@@ -282,7 +295,8 @@ $(() => {
             }
             const $printValue = $input.closest('.total-cart-cell').find('.print-total-carts-value');
             if ($printValue.length) {
-                $printValue.text(Math.round(exactValue));
+                // Выводим точное значение без округления
+                $printValue.text(exactValue !== '' && !isNaN(exactValue) ? exactValue : '');
             }
         });
         

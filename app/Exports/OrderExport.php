@@ -133,9 +133,9 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     $cartCount = $savedCartCounts->get($product->id);
                     $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
                     
-                    // Итоговое количество тележек (рассчитанное + введенное), округляем до целых
+                    // Итоговое количество тележек (рассчитанное + введенное), используем точное значение
                     $totalCartsValue = $calculatedCarts + $savedCartsValue;
-                    $cartsCount = $totalCartsValue > 0 ? round($totalCartsValue) : '';
+                    $cartsCount = $totalCartsValue > 0 ? $totalCartsValue : '';
                     
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
                     $sheet->setCellValue($colLetter . '2', $cartsCount);

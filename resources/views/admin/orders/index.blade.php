@@ -64,8 +64,8 @@
                                     <input 
                                         type="number" 
                                         class="form-control form-control-sm text-center total-carts-input" 
-                                        value="{{ $totalCartsValues->values()->get($index) ? round($totalCartsValues->values()->get($index)) : '' }}" 
-                                        data-exact-value="{{ $totalCartsValues->values()->get($index) ?? '' }}"
+                                        value="{{ $totalCartsValues->values()->get($index) ?? '' }}" 
+                                        data-exact-value="{{ $totalCartsValuesExact->values()->get($index) ?? '' }}"
                                         data-product-id="{{ $product->id }}" 
                                         data-date="{{ $date }}"
                                         placeholder="Итого тележек"
@@ -76,7 +76,7 @@
                                     </div>
                                 </div>
                                 <!-- Значение для печати -->
-                                <span class="print-total-carts-value d-none">{{ $totalCartsValues->values()->get($index) ? round($totalCartsValues->values()->get($index)) : '' }}</span>
+                                <span class="print-total-carts-value d-none">{{ $totalCartsValuesExact->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
                         <td></td>

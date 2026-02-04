@@ -123,11 +123,24 @@ class OrderController extends Controller
         });
 
         // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
-        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+        // Точные значения (без округления) для использования в data-exact-value и при печати
+        $totalCartsValuesExact = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
             $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
             $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+            return $totalCartsValue > 0 ? $totalCartsValue : '';
+        });
+        
+        // Округленные значения для отображения в поле (только если пользователь заполнил поле)
+        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            // Показываем значение только если пользователь заполнил поле (есть savedCarts)
+            if ($savedCartsValue > 0) {
+                $totalCartsValue = $calculatedCarts + $savedCartsValue;
+                return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+            }
+            return '';
         });
 
         // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
@@ -140,7 +153,7 @@ class OrderController extends Controller
             return $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : '';
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues'));
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues', 'totalCartsValuesExact'));
     }
 
     /**
@@ -353,11 +366,24 @@ class OrderController extends Controller
         });
 
         // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
-        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+        // Точные значения (без округления) для использования в data-exact-value и при печати
+        $totalCartsValuesExact = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
             $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
             $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+            return $totalCartsValue > 0 ? $totalCartsValue : '';
+        });
+        
+        // Округленные значения для отображения в поле (только если пользователь заполнил поле)
+        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            // Показываем значение только если пользователь заполнил поле (есть savedCarts)
+            if ($savedCartsValue > 0) {
+                $totalCartsValue = $calculatedCarts + $savedCartsValue;
+                return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+            }
+            return '';
         });
 
         // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
@@ -376,7 +402,8 @@ class OrderController extends Controller
             'multipliedAmounts' => $multipliedAmounts->values()->toArray(),
             'piecesPerCarts' => $piecesPerCarts->values()->toArray(),
             'finalTotals' => $finalTotals->values()->toArray(),
-            'totalCartsValues' => $totalCartsValues->values()->toArray()
+            'totalCartsValues' => $totalCartsValues->values()->toArray(),
+            'totalCartsValuesExact' => $totalCartsValuesExact->values()->toArray()
         ]);
     }
 
