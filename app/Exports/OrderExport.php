@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Bus;
+use App\Models\CartCount;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -105,20 +106,37 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     }
                 }
 
+                // Загружаем сохраненные значения тележек из базы данных
+                $savedCartCounts = CartCount::query()
+                    ->whereDate('date', $this->date)
+                    ->whereIn('product_id', $this->products->pluck('id'))
+                    ->get()
+                    ->keyBy('product_id');
+
                 // Вставляем новую строку после заголовков (строка 2)
                 $sheet->insertNewRowBefore(2, 1);
                 
-                // Заполняем строку "Тележки"
+                // Заполняем строку "Тележки" с итоговым количеством (рассчитанное + введенное)
                 $sheet->setCellValue('A2', 'Тележки');
                 $colIndex = 2;
                 foreach ($this->products as $product) {
+                    // Рассчитываем количество тележек из заказов
                     $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
                     $orderMultiplier = $product->order_multiplier ?? 1;
                     $piecesPerCart = $product->pieces_per_cart ?? 1;
                     $multipliedAmount = $totalAmount * $orderMultiplier;
-                    $cartsCount = $multipliedAmount > 0 && $piecesPerCart > 0 
-                        ? round($multipliedAmount / $piecesPerCart, 1) 
-                        : '';
+                    $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0 
+                        ? round($multipliedAmount / $piecesPerCart, 2) 
+                        : 0;
+                    
+                    // Получаем введенное пользователем количество тележек
+                    $cartCount = $savedCartCounts->get($product->id);
+                    $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
+                    
+                    // Итоговое количество тележек (рассчитанное + введенное), округляем до целых
+                    $totalCartsValue = $calculatedCarts + $savedCartsValue;
+                    $cartsCount = $totalCartsValue > 0 ? round($totalCartsValue) : '';
+                    
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
                     $sheet->setCellValue($colLetter . '2', $cartsCount);
                     $colIndex++;

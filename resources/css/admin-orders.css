@@ -79,6 +79,29 @@
         padding: 0 !important;
     }
     
+    /* Скрываем инпуты тележек при печати */
+    #orders-table .cart-count-input,
+    #orders-table .total-carts-input {
+        display: none !important;
+    }
+    
+    /* Показываем только итоговые значения тележек при печати */
+    #orders-table .total-cart-cell {
+        text-align: center !important;
+    }
+    
+    #orders-table .print-total-carts-value {
+        display: inline-block !important;
+        font-size: 11px !important;
+        font-weight: bold !important;
+    }
+    
+    /* Скрываем промежуточные элементы при печати */
+    #orders-table .calculated-carts-value,
+    #orders-table .text-muted {
+        display: none !important;
+    }
+    
     /* Скрываем последние 3 столбца (Уценка, Реализации, Остаток) */
     #orders-table th:nth-last-child(-n+3),
     #orders-table td:nth-last-child(-n+3) {

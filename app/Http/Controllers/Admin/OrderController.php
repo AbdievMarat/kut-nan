@@ -6,6 +6,7 @@ use App\Exports\OrderExport;
 use App\Http\Controllers\Controller;
 use App\Models\Bus;
 use App\Models\BusProductPrice;
+use App\Models\CartCount;
 use App\Models\Markdown;
 use App\Models\Order;
 use App\Models\OrderChangeLog;
@@ -109,7 +110,37 @@ class OrderController extends Controller
             return $product->pieces_per_cart ?? 1;
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts'));
+        // Загружаем сохраненные значения тележек
+        $savedCartCounts = CartCount::query()
+            ->whereDate('date', $date)
+            ->whereIn('product_id', $products->pluck('id'))
+            ->get()
+            ->keyBy('product_id');
+
+        $savedCarts = $products->map(function ($product) use ($savedCartCounts) {
+            $cartCount = $savedCartCounts->get($product->id);
+            return $cartCount ? $cartCount->carts : null;
+        });
+
+        // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
+        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+        });
+
+        // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
+        // Округляем до целых чисел
+        $finalTotals = $products->map(function ($product, $index) use ($totalCarts, $savedCarts, $piecesPerCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
+            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            return $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : '';
+        });
+
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues'));
     }
 
     /**
@@ -309,11 +340,43 @@ class OrderController extends Controller
             return $product->pieces_per_cart ?? 1;
         });
 
+        // Загружаем сохраненные значения тележек для расчета итого
+        $savedCartCounts = CartCount::query()
+            ->whereDate('date', $date)
+            ->whereIn('product_id', $products->pluck('id'))
+            ->get()
+            ->keyBy('product_id');
+
+        $savedCarts = $products->map(function ($product) use ($savedCartCounts) {
+            $cartCount = $savedCartCounts->get($product->id);
+            return $cartCount ? $cartCount->carts : null;
+        });
+
+        // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
+        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+        });
+
+        // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
+        // Округляем до целых чисел
+        $finalTotals = $products->map(function ($product, $index) use ($totalCarts, $savedCarts, $piecesPerCarts) {
+            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
+            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            return $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : '';
+        });
+
         return response()->json([
             'success' => true,
             'totalCarts' => $totalCarts->values()->toArray(),
             'multipliedAmounts' => $multipliedAmounts->values()->toArray(),
-            'piecesPerCarts' => $piecesPerCarts->values()->toArray()
+            'piecesPerCarts' => $piecesPerCarts->values()->toArray(),
+            'finalTotals' => $finalTotals->values()->toArray(),
+            'totalCartsValues' => $totalCartsValues->values()->toArray()
         ]);
     }
 
@@ -375,6 +438,84 @@ class OrderController extends Controller
             ->whereNotNull('remainder_items.amount')
             ->groupBy('remainders.bus_id')
             ->pluck('total', 'bus_id');
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updateCartCount(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $productId = $request->input('product_id');
+        $carts = $request->input('carts');
+
+        $product = Product::find($productId);
+        if (!$product) {
+            return response()->json(['success' => false, 'message' => 'Продукт не найден'], 404);
+        }
+
+        $cartCount = CartCount::query()
+            ->whereDate('date', $date)
+            ->where('product_id', $productId)
+            ->first();
+
+        if (!$cartCount) {
+            $cartCount = new CartCount();
+            $cartCount->date = $date;
+            $cartCount->product_id = $productId;
+        }
+
+        // Сохраняем только carts (введенное пользователем количество тележек)
+        $cartCount->carts = $carts !== null && $carts !== '' ? (float)$carts : null;
+        $cartCount->save();
+
+        // Рассчитываем итого динамически: (рассчитанное из заказов + введенное) * pieces_per_cart
+        // Для этого нужно получить рассчитанное значение из заказов
+        $buses = Bus::query()
+            ->with([
+                'orders' => function ($query) use ($date) {
+                    $query->whereDate('date', $date)
+                        ->with(['items']);
+                }
+            ])
+            ->where('is_active', '=', Bus::IS_ACTIVE)
+            ->orderBy('sort')
+            ->get();
+
+        $totalOrderAmounts = [];
+        foreach ($buses as $bus) {
+            foreach ($bus->orders as $busOrder) {
+                foreach ($busOrder->items as $item) {
+                    if ($item->product_id == $productId) {
+                        $orderAmount = $item->amount ?: 0;
+                        $totalOrderAmounts[$productId] = ($totalOrderAmounts[$productId] ?? 0) + $orderAmount;
+                    }
+                }
+            }
+        }
+
+        $totalAmount = $totalOrderAmounts[$productId] ?? 0;
+        $orderMultiplier = $product->order_multiplier ?? 1;
+        $piecesPerCart = $product->pieces_per_cart ?? 1;
+        $multipliedAmount = $totalAmount * $orderMultiplier;
+        $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
+            ? round($multipliedAmount / $piecesPerCart, 2)
+            : 0;
+
+        // Итого = (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
+        // Округляем до целых чисел
+        $savedCartsValue = $cartCount->carts ?? 0;
+        $totalCartsValue = $calculatedCarts + $savedCartsValue;
+        $calculatedTotal = $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : 0;
+
+        return response()->json([
+            'success' => true,
+            'carts' => $cartCount->carts,
+            'calculated_total' => $calculatedTotal,
+            'calculated_carts' => $calculatedCarts,
+            'total_carts_value' => $totalCartsValue > 0 ? round($totalCartsValue) : 0,
+        ]);
     }
 
 }

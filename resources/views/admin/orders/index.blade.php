@@ -40,8 +40,52 @@
                 <tbody>
                     <tr class="table-info fw-bold" id="total-carts-row">
                         <td>Тележки</td>
-                        @foreach ($totalCarts as $cartsCount)
-                            <td class="total-cart-cell">{{ $cartsCount }}</td>
+                        @foreach ($products as $index => $product)
+                            <td class="total-cart-cell">
+                                <div class="d-flex flex-column gap-1">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="calculated-carts-value">{{ $totalCarts->values()->get($index) ?? '' }}</span>
+                                        <span class="text-muted">+</span>
+                                        <input 
+                                            type="number" 
+                                            class="form-control form-control-sm cart-count-input" 
+                                            value="{{ $savedCarts->values()->get($index) ? number_format($savedCarts->values()->get($index), 2, '.', '') : '' }}" 
+                                            data-product-id="{{ $product->id }}" 
+                                            data-date="{{ $date }}"
+                                            data-pieces-per-cart="{{ $product->pieces_per_cart ?? 1 }}"
+                                            placeholder="Ввод"
+                                            step="0.1"
+                                            style="min-width: 70px; width: 70px;"
+                                        >
+                                    </div>
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        <span class="text-muted">=</span>
+                                    <input 
+                                        type="number" 
+                                        class="form-control form-control-sm text-center total-carts-input" 
+                                        value="{{ $totalCartsValues->values()->get($index) ? round($totalCartsValues->values()->get($index)) : '' }}" 
+                                        data-product-id="{{ $product->id }}" 
+                                        data-date="{{ $date }}"
+                                        placeholder="Итого тележек"
+                                        step="1"
+                                        style="min-width: 70px; width: 70px;"
+                                    >
+                                    </div>
+                                </div>
+                                <!-- Значение для печати -->
+                                <span class="print-total-carts-value d-none">{{ $totalCartsValues->values()->get($index) ? round($totalCartsValues->values()->get($index)) : '' }}</span>
+                            </td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="table-warning fw-bold" id="cart-totals-row">
+                        <td>Итого</td>
+                        @foreach ($products as $index => $product)
+                            <td class="cart-total-cell">
+                                <span class="calculated-total-value">{{ $finalTotals->values()->get($index) ?? '' }}</span>
+                            </td>
                         @endforeach
                         <td></td>
                         <td></td>
@@ -57,7 +101,7 @@
                         <td></td>
                     </tr>
                     <tr class="table-secondary fw-bold multiplied-amount-row">
-                        <td>Итого</td>
+                        <td>Итого из заказов</td>
                         @foreach ($multipliedAmounts as $multipliedAmount)
                             <td class="multiplied-amount-cell">{{ $multipliedAmount }}</td>
                         @endforeach

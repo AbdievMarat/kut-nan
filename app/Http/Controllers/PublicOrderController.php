@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bus;
+use App\Models\CartCount;
 use App\Models\Order;
 use App\Models\OrderChangeLog;
 use App\Models\OrderItem;
@@ -114,15 +115,32 @@ class PublicOrderController extends Controller
             }
         }
 
-        // Рассчитываем количество тележек для итоговой строки
-        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts) {
+        // Загружаем сохраненные значения тележек из базы данных
+        $savedCartCounts = CartCount::query()
+            ->whereDate('date', $date)
+            ->whereIn('product_id', $products->pluck('id'))
+            ->get()
+            ->keyBy('product_id');
+
+        // Рассчитываем итоговое количество тележек (рассчитанное + введенное)
+        // Округляем до целых чисел
+        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedCartCounts) {
+            // Рассчитываем количество тележек из заказов
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
-            return $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 1)
-                : '';
+            $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
+                ? round($multipliedAmount / $piecesPerCart, 2)
+                : 0;
+            
+            // Получаем введенное пользователем количество тележек
+            $cartCount = $savedCartCounts->get($product->id);
+            $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
+            
+            // Итоговое количество тележек (рассчитанное + введенное), округляем до целых
+            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            return $totalCartsValue > 0 ? round($totalCartsValue) : '';
         });
 
         // Если это AJAX запрос, возвращаем JSON
