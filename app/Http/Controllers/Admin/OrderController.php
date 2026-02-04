@@ -130,7 +130,7 @@ class OrderController extends Controller
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
             return $totalCartsValue > 0 ? $totalCartsValue : '';
         });
-        
+
         // Округленные значения для отображения в поле (только если пользователь заполнил поле)
         $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
             $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
@@ -338,7 +338,7 @@ class OrderController extends Controller
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
             return $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 2)
+                ? round($multipliedAmount / $piecesPerCart, 1)
                 : '';
         });
 
@@ -373,7 +373,7 @@ class OrderController extends Controller
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
             return $totalCartsValue > 0 ? $totalCartsValue : '';
         });
-        
+
         // Округленные значения для отображения в поле (только если пользователь заполнил поле)
         $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
             $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
@@ -527,7 +527,7 @@ class OrderController extends Controller
         $piecesPerCart = $product->pieces_per_cart ?? 1;
         $multipliedAmount = $totalAmount * $orderMultiplier;
         $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
-            ? round($multipliedAmount / $piecesPerCart, 2)
+            ? round($multipliedAmount / $piecesPerCart, 1)
             : 0;
 
         // Итого = (рассчитанное из заказов + введенное пользователем) * pieces_per_cart
