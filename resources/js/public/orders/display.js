@@ -20,9 +20,11 @@ $(document).ready(function() {
      * Обновление данных через AJAX
      */
     function updateData() {
+        // Формируем URL с параметром ajax=1 для явного указания AJAX запроса
+        const url = window.location.pathname + (window.location.search ? '&ajax=1' : '?ajax=1');
         $.ajax({
             type: 'GET',
-            url: window.location.pathname,
+            url: url,
             headers: {
                 'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'

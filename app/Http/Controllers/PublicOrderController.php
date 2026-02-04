@@ -150,7 +150,8 @@ class PublicOrderController extends Controller
         });
 
         // Если это AJAX запрос, возвращаем JSON
-        if ($request->wantsJson() || $request->ajax()) {
+        // Проверяем явный параметр ajax=1 для надежности (избегаем проблем при дублировании вкладки)
+        if ($request->ajax() && $request->has('ajax')) {
             return response()->json([
                 'date' => $date,
                 'dateFormatted' => $dateFormatted,
