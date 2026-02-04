@@ -24,7 +24,13 @@ class PublicOrderController extends Controller
      */
     public function display(Request $request): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
     {
-        $date = date('Y-m-d', strtotime('+1 day'));
+        // Переключаемся на следующий день только после 07:00 утра
+        $currentHour = (int)date('H');
+        if ($currentHour >= 7) {
+            $date = date('Y-m-d', strtotime('+1 day'));
+        } else {
+            $date = date('Y-m-d');
+        }
 
         $dateFormatted = date('d.m.Y H:i');
 
