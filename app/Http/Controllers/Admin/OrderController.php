@@ -514,7 +514,7 @@ class OrderController extends Controller
             'carts' => $cartCount->carts,
             'calculated_total' => $calculatedTotal,
             'calculated_carts' => $calculatedCarts,
-            'total_carts_value' => $totalCartsValue > 0 ? round($totalCartsValue) : 0,
+            'total_carts_value' => $totalCartsValue > 0 ? $totalCartsValue : 0, // Возвращаем точное значение, не округленное
         ]);
     }
 

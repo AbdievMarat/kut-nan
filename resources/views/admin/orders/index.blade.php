@@ -55,6 +55,7 @@
                                             data-pieces-per-cart="{{ $product->pieces_per_cart ?? 1 }}"
                                             placeholder="Ввод"
                                             step="0.1"
+                                            readonly
                                             style="min-width: 70px; width: 70px;"
                                         >
                                     </div>
@@ -64,9 +65,11 @@
                                         type="number" 
                                         class="form-control form-control-sm text-center total-carts-input" 
                                         value="{{ $totalCartsValues->values()->get($index) ? round($totalCartsValues->values()->get($index)) : '' }}" 
+                                        data-exact-value="{{ $totalCartsValues->values()->get($index) ?? '' }}"
                                         data-product-id="{{ $product->id }}" 
                                         data-date="{{ $date }}"
                                         placeholder="Итого тележек"
+                                        min="0"
                                         step="1"
                                         style="min-width: 70px; width: 70px;"
                                     >
