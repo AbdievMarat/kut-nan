@@ -100,7 +100,7 @@
     #orders-table #cart-totals-row td,
     #orders-table #cart-totals-row .cart-total-cell,
     #orders-table #cart-totals-row .calculated-total-value {
-        font-size: 9px !important;
+        font-size: 8px !important;
     }
     
     /* Скрываем промежуточные элементы при печати */
