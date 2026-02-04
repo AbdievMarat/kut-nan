@@ -96,6 +96,13 @@
         font-weight: bold !important;
     }
     
+    /* Уменьшаем шрифт в строке "Итого" на 1px для печати */
+    #orders-table #cart-totals-row td,
+    #orders-table #cart-totals-row .cart-total-cell,
+    #orders-table #cart-totals-row .calculated-total-value {
+        font-size: 9px !important;
+    }
+    
     /* Скрываем промежуточные элементы при печати */
     #orders-table .calculated-carts-value,
     #orders-table .text-muted {
