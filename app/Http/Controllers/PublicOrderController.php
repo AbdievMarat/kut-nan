@@ -137,7 +137,7 @@ class PublicOrderController extends Controller
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
             $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 2)
+                ? round($multipliedAmount / $piecesPerCart, 1)
                 : 0;
             
             // Получаем введенное пользователем количество тележек
