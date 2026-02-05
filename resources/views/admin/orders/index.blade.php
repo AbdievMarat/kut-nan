@@ -43,9 +43,8 @@
                         @foreach ($products as $index => $product)
                             <td class="total-cart-cell">
                                 <div class="d-flex flex-column gap-1">
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex justify-content-center align-items-center">
                                         <span class="calculated-carts-value">{{ $totalCarts->values()->get($index) ?? '' }}</span>
-                                        
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center">
                                         <span class="text-muted">+</span>
