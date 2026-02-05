@@ -45,6 +45,9 @@
                                 <div class="d-flex flex-column gap-1">
                                     <div class="d-flex align-items-center gap-2">
                                         <span class="calculated-carts-value">{{ $totalCarts->values()->get($index) ?? '' }}</span>
+                                        
+                                    </div>
+                                    <div class="d-flex justify-content-center align-items-center">
                                         <span class="text-muted">+</span>
                                         <input 
                                             type="number" 
@@ -56,23 +59,23 @@
                                             placeholder="Ввод"
                                             step="0.1"
                                             readonly
-                                            style="min-width: 70px; width: 70px;"
+                                            style="min-width: 55px; width: 55px;"
                                         >
                                     </div>
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <div class="d-flex justify-content-center align-items-center">
                                         <span class="text-muted">=</span>
-                                    <input 
-                                        type="number" 
-                                        class="form-control form-control-sm text-center total-carts-input" 
-                                        value="{{ $totalCartsValues->values()->get($index) ?? '' }}" 
-                                        data-exact-value="{{ $totalCartsValuesExact->values()->get($index) ?? '' }}"
-                                        data-product-id="{{ $product->id }}" 
-                                        data-date="{{ $date }}"
-                                        placeholder="Итого тележек"
-                                        min="0"
-                                        step="1"
-                                        style="min-width: 70px; width: 70px;"
-                                    >
+                                        <input 
+                                            type="number" 
+                                            class="form-control form-control-sm total-carts-input" 
+                                            value="{{ $totalCartsValues->values()->get($index) ?? '' }}" 
+                                            data-exact-value="{{ $totalCartsValuesExact->values()->get($index) ?? '' }}"
+                                            data-product-id="{{ $product->id }}" 
+                                            data-date="{{ $date }}"
+                                            placeholder="Итого"
+                                            min="0"
+                                            step="1"
+                                            style="min-width: 55px; width: 55px;"
+                                        >
                                     </div>
                                 </div>
                                 <!-- Значение для печати -->

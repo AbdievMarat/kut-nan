@@ -1,3 +1,24 @@
+/* Стили для вертикального текста в заголовках таблицы */
+#orders-table th.vertical-text {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Скрытие стрелочек у input[type="number"] */
+.total-carts-input::-webkit-outer-spin-button,
+.total-carts-input::-webkit-inner-spin-button,
+.cart-count-input::-webkit-outer-spin-button,
+.cart-count-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.total-carts-input,
+.cart-count-input {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 @media print {
     * {
         font-size: 11px !important;
