@@ -55,7 +55,7 @@
                                             data-product-id="{{ $product->id }}" 
                                             data-date="{{ $date }}"
                                             data-pieces-per-cart="{{ $product->pieces_per_cart ?? 1 }}"
-                                            placeholder="Ввод"
+                                            placeholder="Запас"
                                             step="0.1"
                                             readonly
                                             style="min-width: 55px; width: 55px;"
