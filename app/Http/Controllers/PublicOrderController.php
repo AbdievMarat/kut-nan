@@ -139,14 +139,14 @@ class PublicOrderController extends Controller
             $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
                 ? round($multipliedAmount / $piecesPerCart, 1)
                 : 0;
-            
+
             // Получаем введенное пользователем количество тележек
             $cartCount = $savedCartCounts->get($product->id);
             $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
-            
+
             // Итоговое количество тележек (рассчитанное + введенное), используем точное значение
             $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? $totalCartsValue : '';
+            return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
         });
 
         // Если это AJAX запрос, возвращаем JSON
