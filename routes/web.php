@@ -51,6 +51,7 @@ Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
     Route::post('update-order-amount', [AdminOrderController::class, 'updateOrderAmount'])->name('orders.update_order_amount');
     Route::post('update-cart-count', [AdminOrderController::class, 'updateCartCount'])->name('orders.update_cart_count');
+    Route::post('update-bread-remain', [AdminOrderController::class, 'updateBreadRemain'])->name('orders.update_bread_remain');
     Route::get('orders_export_to_excel', [AdminOrderController::class, 'exportToExcel'])->name('orders.export_to_excel');
 
     Route::get('/', [IngredientMovementController::class, 'index']);

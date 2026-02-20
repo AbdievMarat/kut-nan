@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\BreadRemain;
 use App\Models\Bus;
 use App\Models\CartCount;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -113,10 +114,17 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     ->get()
                     ->keyBy('product_id');
 
+                // Загружаем сохраненные остатки хлеба для расчета тележек
+                $savedBreadRemains = BreadRemain::query()
+                    ->whereDate('date', $this->date)
+                    ->whereIn('product_id', $this->products->pluck('id'))
+                    ->get()
+                    ->keyBy('product_id');
+
                 // Вставляем новую строку после заголовков (строка 2)
                 $sheet->insertNewRowBefore(2, 1);
                 
-                // Заполняем строку "Тележки" с итоговым количеством (рассчитанное + введенное)
+                // Заполняем строку "Тележки" с итоговым количеством (рассчитанное + введенное + остатки хлеба в тележках)
                 $sheet->setCellValue('A2', 'Тележки');
                 $colIndex = 2;
                 foreach ($this->products as $product) {
@@ -125,7 +133,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     $orderMultiplier = $product->order_multiplier ?? 1;
                     $piecesPerCart = $product->pieces_per_cart ?? 1;
                     $multipliedAmount = $totalAmount * $orderMultiplier;
-                    $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0 
+                    $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0 
                         ? round($multipliedAmount / $piecesPerCart, 2) 
                         : 0;
                     
@@ -133,8 +141,15 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     $cartCount = $savedCartCounts->get($product->id);
                     $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
                     
-                    // Итоговое количество тележек (рассчитанное + введенное), используем точное значение
-                    $totalCartsValue = $calculatedCarts + $savedCartsValue;
+                    // Добавляем остатки хлеба в пересчете на тележки
+                    $breadRemain = $savedBreadRemains->get($product->id);
+                    $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
+                    $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
+                        ? round($breadRemainAmount / $piecesPerCart, 2)
+                        : 0;
+                    
+                    // Итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках), используем точное значение
+                    $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue + $breadRemainCarts;
                     $cartsCount = $totalCartsValue > 0 ? $totalCartsValue : '';
                     
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);

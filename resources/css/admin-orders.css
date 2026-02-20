@@ -8,7 +8,9 @@
 .total-carts-input::-webkit-outer-spin-button,
 .total-carts-input::-webkit-inner-spin-button,
 .cart-count-input::-webkit-outer-spin-button,
-.cart-count-input::-webkit-inner-spin-button {
+.cart-count-input::-webkit-inner-spin-button,
+.bread-remain-input::-webkit-outer-spin-button,
+.bread-remain-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }

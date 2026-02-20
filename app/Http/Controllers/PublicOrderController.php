@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BreadRemain;
 use App\Models\Bus;
 use App\Models\CartCount;
 use App\Models\Order;
@@ -128,15 +129,22 @@ class PublicOrderController extends Controller
             ->get()
             ->keyBy('product_id');
 
-        // Рассчитываем итоговое количество тележек (рассчитанное + введенное)
+        // Загружаем сохраненные остатки хлеба для расчета тележек
+        $savedBreadRemains = BreadRemain::query()
+            ->whereDate('date', $date)
+            ->whereIn('product_id', $products->pluck('id'))
+            ->get()
+            ->keyBy('product_id');
+
+        // Рассчитываем итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках)
         // Используем точное значение без округления
-        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedCartCounts) {
+        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedCartCounts, $savedBreadRemains) {
             // Рассчитываем количество тележек из заказов
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
-            $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
+            $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
                 ? round($multipliedAmount / $piecesPerCart, 1)
                 : 0;
 
@@ -144,8 +152,15 @@ class PublicOrderController extends Controller
             $cartCount = $savedCartCounts->get($product->id);
             $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
 
-            // Итоговое количество тележек (рассчитанное + введенное), используем точное значение
-            $totalCartsValue = $calculatedCarts + $savedCartsValue;
+            // Добавляем остатки хлеба в пересчете на тележки
+            $breadRemain = $savedBreadRemains->get($product->id);
+            $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
+            $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
+                ? round($breadRemainAmount / $piecesPerCart, 1)
+                : 0;
+
+            // Итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках), используем точное значение
+            $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue + $breadRemainCarts;
             return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
         });
 

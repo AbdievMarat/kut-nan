@@ -105,6 +105,26 @@
                         <td></td>
                         <td></td>
                     </tr>
+                    <tr class="table-info fw-bold bread-remain-row">
+                        <td>Остатки</td>
+                        @foreach ($products as $index => $product)
+                            <td class="bread-remain-cell">
+                                <input 
+                                    type="number" 
+                                    class="form-control form-control-sm bread-remain-input" 
+                                    value="{{ $breadRemains->values()->get($index) ?? '' }}" 
+                                    data-product-id="{{ $product->id }}" 
+                                    data-date="{{ $date }}"
+                                    min="0"
+                                    step="1"
+                                    style="min-width: 60px; width: 60px;"
+                                >
+                            </td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                     <tr class="table-secondary fw-bold multiplied-amount-row">
                         <td>Итого из заказов</td>
                         @foreach ($multipliedAmounts as $multipliedAmount)
