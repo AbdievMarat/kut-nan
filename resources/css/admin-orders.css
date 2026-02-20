@@ -4,6 +4,11 @@
     vertical-align: middle;
 }
 
+/* Скрываем столбец "Подпись" на экране */
+.print-only {
+    display: none !important;
+}
+
 /* Скрытие стрелочек у input[type="number"] */
 .total-carts-input::-webkit-outer-spin-button,
 .total-carts-input::-webkit-inner-spin-button,
@@ -83,7 +88,7 @@
     }
     
     #orders-table th.vertical-text,
-    #orders-table td:not(:first-child):not(:nth-last-child(-n+3)) {
+    #orders-table td:not(:first-child):not(:nth-last-child(-n+4)) {
         width: 25px !important;
     }
     
@@ -132,10 +137,22 @@
         display: none !important;
     }
     
-    /* Скрываем последние 3 столбца (Уценка, Реализации, Остаток) */
-    #orders-table th:nth-last-child(-n+3),
-    #orders-table td:nth-last-child(-n+3) {
+    /* Скрываем столбцы Уценка (4-й с конца), Реализации (3-й с конца), Остаток (2-й с конца) */
+    #orders-table th:nth-last-child(4),
+    #orders-table td:nth-last-child(4),
+    #orders-table th:nth-last-child(3),
+    #orders-table td:nth-last-child(3),
+    #orders-table th:nth-last-child(2),
+    #orders-table td:nth-last-child(2) {
         display: none !important;
+    }
+    
+    /* Показываем столбец "Подпись" (последний столбец) при печати */
+    .print-only {
+        display: table-cell !important;
+        width: 60px !important;
+        min-width: 60px !important;
+        max-width: 60px !important;
     }
     
     .vertical-text {

@@ -35,6 +35,7 @@
                     <th class="vertical-text">Уценка</th>
                     <th class="vertical-text">Реализации</th>
                     <th class="vertical-text">Остаток</th>
+                    <th class="vertical-text print-only">Подпись</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -84,6 +85,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="print-only"></td>
                     </tr>
                     <tr class="table-secondary fw-bold pieces-per-cart-row">
                         <td>Штук на тележку</td>
@@ -93,6 +95,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="print-only"></td>
                     </tr>
                     <tr class="table-warning fw-bold" id="cart-totals-row">
                         <td>Итого</td>
@@ -104,6 +107,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="print-only"></td>
                     </tr>
                     <tr class="table-info fw-bold bread-remain-row">
                         <td>Остатки</td>
@@ -124,6 +128,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="print-only"></td>
                     </tr>
                     <tr class="table-secondary fw-bold multiplied-amount-row">
                         <td>Итого из заказов</td>
@@ -133,6 +138,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td class="print-only"></td>
                     </tr>
                 @foreach ($busesData as $bus)
                     <tr>
@@ -167,6 +173,7 @@
                                 <a href="#" class="get-remainder-items" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_remainder_sum'] }}</a>
                             @endif
                         </td>
+                        <td class="print-only"></td>
                     </tr>
                 @endforeach
                 </tbody>
