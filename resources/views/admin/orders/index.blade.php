@@ -85,21 +85,21 @@
                         <td></td>
                         <td></td>
                     </tr>
+                    <tr class="table-secondary fw-bold pieces-per-cart-row">
+                        <td>Штук на тележку</td>
+                        @foreach ($piecesPerCarts as $piecesPerCart)
+                            <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
                     <tr class="table-warning fw-bold" id="cart-totals-row">
                         <td>Итого</td>
                         @foreach ($products as $index => $product)
                             <td class="cart-total-cell">
                                 <span class="calculated-total-value">{{ $finalTotals->values()->get($index) ?? '' }}</span>
                             </td>
-                        @endforeach
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr class="table-secondary fw-bold pieces-per-cart-row">
-                        <td>Штук на тележку</td>
-                        @foreach ($piecesPerCarts as $piecesPerCart)
-                            <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
                         @endforeach
                         <td></td>
                         <td></td>
