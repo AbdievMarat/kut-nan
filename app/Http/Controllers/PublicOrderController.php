@@ -94,12 +94,16 @@ class PublicOrderController extends Controller
 
                     $changeType = null;
                     if ($changeLog) {
-                        $oldAmount = $changeLog->old_amount ?? 0;
-                        $newAmount = $changeLog->new_amount ?? 0;
-                        if ($newAmount > $oldAmount) {
-                            $changeType = 'increase';
-                        } elseif ($newAmount < $oldAmount) {
-                            $changeType = 'decrease';
+                        // Проверяем, что изменение было после 13:00
+                        $changeHour = (int)$changeLog->created_at->format('H');
+                        if ($changeHour >= 13) {
+                            $oldAmount = $changeLog->old_amount ?? 0;
+                            $newAmount = $changeLog->new_amount ?? 0;
+                            if ($newAmount > $oldAmount) {
+                                $changeType = 'increase';
+                            } elseif ($newAmount < $oldAmount) {
+                                $changeType = 'decrease';
+                            }
                         }
                     }
 
