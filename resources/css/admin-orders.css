@@ -12,18 +12,29 @@
 /* Скрытие стрелочек у input[type="number"] */
 .total-carts-input::-webkit-outer-spin-button,
 .total-carts-input::-webkit-inner-spin-button,
-.cart-count-input::-webkit-outer-spin-button,
-.cart-count-input::-webkit-inner-spin-button,
 .bread-remain-input::-webkit-outer-spin-button,
-.bread-remain-input::-webkit-inner-spin-button {
+.bread-remain-input::-webkit-inner-spin-button,
+.order-amount-input::-webkit-outer-spin-button,
+.order-amount-input::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
 .total-carts-input,
-.cart-count-input {
+.order-amount-input {
     -moz-appearance: textfield;
     appearance: textfield;
+}
+
+/* Скрытие сводных строк по умолчанию */
+#orders-table.summary-rows-hidden .carts-calculated-row,
+#orders-table.summary-rows-hidden .carts-reserve-row,
+#orders-table.summary-rows-hidden .carts-total-row,
+#orders-table.summary-rows-hidden .pieces-per-cart-row,
+#orders-table.summary-rows-hidden #cart-totals-row,
+#orders-table.summary-rows-hidden .bread-remain-row,
+#orders-table.summary-rows-hidden .multiplied-amount-row {
+    display: none;
 }
 
 @media print {
@@ -100,21 +111,23 @@
     #orders-table input.order-amount-input {
         display: none !important;
     }
-    
-    #orders-table .print-value {
-        display: inline-block !important;
-        font-size: 10px !important;
-        padding: 0 !important;
+
+    #orders-table .bread-remain-input {
+        display: none !important;
+    }
+
+    #orders-table .cart-count-view,
+    #orders-table .total-carts-view {
+        display: none !important;
     }
     
     /* Скрываем инпуты тележек при печати */
-    #orders-table .cart-count-input,
     #orders-table .total-carts-input {
         display: none !important;
     }
     
     /* Показываем только итоговые значения тележек при печати */
-    #orders-table .total-cart-cell {
+    #orders-table .total-carts-summary-cell {
         text-align: center !important;
     }
     

@@ -1,562 +1,341 @@
 $(() => {
+    const URL_ORDER_ITEMS = '/admin/orders/update-order-items';
+    const URL_BREAD_REMAINS = '/admin/orders/update-bread-remains';
+    const URL_CART_COUNTS = '/admin/orders/update-cart-counts';
+
+    /** @type {'none' | 'orders' | 'bread' | 'carts'} */
+    let activeEditDomain = 'none';
+    let domainDirty = false;
+
+    function csrfToken() {
+        return $('meta[name="csrf-token"]').attr('content');
+    }
+
+    function setFormsDisabled(disabled) {
+        $('.orders-filter-control, #print-btn').prop('disabled', disabled);
+    }
+
+    function markDirty() {
+        if (activeEditDomain !== 'none') {
+            domainDirty = true;
+        }
+    }
+
+    function setEditDomain(domain) {
+        activeEditDomain = domain;
+        const $table = $('#orders-table');
+
+        if (domain === 'none') {
+            $table.removeClass('orders-edit-mode').addClass('orders-view-mode');
+        } else {
+            $table.removeClass('orders-view-mode').addClass('orders-edit-mode');
+        }
+
+        $('tr.bus-data-row, tr.multiplied-amount-row, tr.bread-remain-row, tr.carts-calculated-row, tr.carts-reserve-row, tr.carts-total-row').removeClass(
+            'table-warning',
+        );
+
+        $('.orders-domain-enter-btn, .bread-domain-enter-btn, .carts-domain-enter-btn').removeClass('d-none');
+        $('.orders-domain-save-btn, .orders-domain-cancel-btn').addClass('d-none');
+        $('.bread-domain-save-btn, .bread-domain-cancel-btn').addClass('d-none');
+        $('.carts-domain-save-btn, .carts-domain-cancel-btn').addClass('d-none');
+
+        $('.order-amount-input, .bread-remain-input, .total-carts-input').addClass('d-none');
+        $('.order-amount-view, .bread-remain-view, .total-carts-view').removeClass('d-none');
+
+        if (domain === 'none') {
+            setFormsDisabled(false);
+            domainDirty = false;
+            return;
+        }
+
+        setFormsDisabled(true);
+        domainDirty = false;
+
+        $('.orders-domain-enter-btn, .bread-domain-enter-btn, .carts-domain-enter-btn').addClass('d-none');
+
+        if (domain === 'orders') {
+            $('.orders-domain-save-btn, .orders-domain-cancel-btn').removeClass('d-none');
+            $('.order-amount-view').addClass('d-none');
+            $('.order-amount-input').removeClass('d-none');
+            $('tr.bus-data-row, tr.multiplied-amount-row').addClass('table-warning');
+        } else if (domain === 'bread') {
+            $('.bread-domain-save-btn, .bread-domain-cancel-btn').removeClass('d-none');
+            $('.bread-remain-view').addClass('d-none');
+            $('.bread-remain-input').removeClass('d-none');
+            $('tr.bread-remain-row').addClass('table-warning');
+        } else if (domain === 'carts') {
+            $('.carts-domain-save-btn, .carts-domain-cancel-btn').removeClass('d-none');
+            $('.total-carts-view').addClass('d-none');
+            $('.total-carts-input').removeClass('d-none');
+            $('tr.carts-calculated-row, tr.carts-reserve-row, tr.carts-total-row').addClass('table-warning');
+        }
+    }
+
+    function normalizeTotalCartsInput($input) {
+        let inputValue = $input.val();
+        if (inputValue !== '' && inputValue !== null) {
+            inputValue = String(inputValue).replace(/[^\d-]/g, '');
+            if (inputValue.startsWith('-')) {
+                inputValue = inputValue.replace('-', '');
+            }
+            const intValue = Math.floor(parseFloat(inputValue) || 0);
+            inputValue = intValue < 0 ? '0' : String(intValue);
+            $input.val(inputValue);
+        }
+        const totalCartsValue = inputValue === '' || inputValue === null ? null : parseInt(inputValue, 10);
+        $input.data('exact-value', totalCartsValue !== null && !isNaN(totalCartsValue) ? totalCartsValue : '');
+        return totalCartsValue;
+    }
+
+    function collectOrderItemsPayload() {
+        const $first = $('.order-amount-input').first();
+        const date = $first.data('date');
+        const order_items = [];
+        $('.order-amount-input').each(function () {
+            const $i = $(this);
+            const v = $i.val();
+            order_items.push({
+                bus_id: $i.data('bus-id'),
+                product_id: $i.data('product-id'),
+                amount: v === '' ? null : v,
+            });
+        });
+        return { date, order_items };
+    }
+
+    function collectBreadRemainsPayload() {
+        const $first = $('.bread-remain-input').first();
+        const date = $first.data('date');
+        const bread_remains = [];
+        $('.bread-remain-input').each(function () {
+            const $i = $(this);
+            const v = $i.val();
+            bread_remains.push({
+                product_id: $i.data('product-id'),
+                amount: v === '' ? null : v,
+            });
+        });
+        return { date, bread_remains };
+    }
+
+    function collectCartCountsPayload() {
+        const $first = $('.total-carts-input').first();
+        const date = $first.data('date');
+        const cart_counts = [];
+        $('.total-carts-input').each(function () {
+            const $i = $(this);
+            const productId = $i.data('product-id');
+            normalizeTotalCartsInput($i);
+            const rawExact = $i.data('exact-value');
+            const parsedTotal =
+                rawExact === '' || rawExact === undefined || rawExact === null ? null : parseInt(String(rawExact), 10);
+            const calculatedCarts =
+                parseFloat($(`.calculated-carts-cell[data-product-id="${productId}"]`).find('.calculated-carts-value').text()) || 0;
+            let carts = null;
+            if (parsedTotal !== null && !isNaN(parsedTotal)) {
+                carts = parsedTotal - calculatedCarts;
+            }
+            cart_counts.push({
+                product_id: productId,
+                carts: carts === null || isNaN(carts) ? null : carts.toFixed(2),
+            });
+        });
+        return { date, cart_counts };
+    }
+
+    function ajaxSave(url, payload, $btn) {
+        $btn.prop('disabled', true);
+        $.ajax({
+            type: 'POST',
+            url,
+            contentType: 'application/json; charset=UTF-8',
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
+            data: JSON.stringify(payload),
+        })
+            .done((res) => {
+                if (res.success) {
+                    domainDirty = false;
+                    window.location.reload();
+                } else {
+                    alert('Не удалось сохранить изменения.');
+                    $btn.prop('disabled', false);
+                }
+            })
+            .fail((xhr) => {
+                let msg = 'Ошибка при сохранении данных.';
+                const json = xhr.responseJSON;
+                if (json) {
+                    if (json.message) {
+                        msg = json.message;
+                    }
+                    if (json.errors) {
+                        const first = Object.values(json.errors)[0];
+                        if (Array.isArray(first) && first[0]) {
+                            msg = first[0];
+                        }
+                    }
+                }
+                alert(msg);
+                $btn.prop('disabled', false);
+            });
+    }
+
+    $(window).on('beforeunload', function (e) {
+        if (domainDirty && activeEditDomain !== 'none') {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
     $(document).on('click', '.get-realization-shops', function (event) {
         event.preventDefault();
 
-        const csrf_token = $('meta[name="csrf-token"]').attr('content');
         const date = $(this).data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
             type: 'GET',
             url: '/admin/get-realization-shops',
-            headers: {'X-CSRF-TOKEN': csrf_token},
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
             data: {
                 date: date,
-                bus_id: busId
+                bus_id: busId,
             },
-        }).done(successResponse => {
-            $('#orderContent').html(successResponse.realizationDetails);
-            $('#orderModal').modal('show');
-        }).fail(errorResponse => {
-            alert('Ошибка при загрузке данных реализации!');
-        });
+        })
+            .done((successResponse) => {
+                $('#orderContent').html(successResponse.realizationDetails);
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке данных реализации!');
+            });
     });
 
     $(document).on('click', '.get-remainder-items', function (event) {
         event.preventDefault();
 
-        const csrf_token = $('meta[name="csrf-token"]').attr('content');
         const date = $(this).data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
             type: 'GET',
             url: '/admin/get-remainder-items',
-            headers: {'X-CSRF-TOKEN': csrf_token},
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
             data: {
                 date: date,
-                bus_id: busId
+                bus_id: busId,
             },
-        }).done(successResponse => {
-            $('#orderContent').html(successResponse.remainderDetails);
-            $('#orderModal').modal('show');
-        }).fail(errorResponse => {
-            alert('Ошибка при загрузке данных по остаткам!');
-        });
+        })
+            .done((successResponse) => {
+                $('#orderContent').html(successResponse.remainderDetails);
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке данных по остаткам!');
+            });
     });
 
     $(document).on('click', '.get-markdown-items', function (event) {
         event.preventDefault();
 
-        const csrf_token = $('meta[name="csrf-token"]').attr('content');
         const date = $(this).data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
             type: 'GET',
             url: '/admin/get-markdown-items',
-            headers: {'X-CSRF-TOKEN': csrf_token},
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
             data: {
                 date: date,
-                bus_id: busId
+                bus_id: busId,
             },
-        }).done(successResponse => {
-            $('#orderContent').html(successResponse.markdownDetails);
-            $('#orderModal').modal('show');
-        }).fail(errorResponse => {
-            alert('Ошибка при загрузке данных по уценке!');
-        });
+        })
+            .done((successResponse) => {
+                $('#orderContent').html(successResponse.markdownDetails);
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке данных по уценке!');
+            });
     });
 
-    // Обработчик события input для сохранения order_amount
-    let debounceTimer;
+    $('.orders-domain-enter-btn').on('click', function () {
+        setEditDomain('orders');
+    });
+    $('.bread-domain-enter-btn').on('click', function () {
+        setEditDomain('bread');
+    });
+    $('.carts-domain-enter-btn').on('click', function () {
+        setEditDomain('carts');
+    });
+
+    $('.orders-domain-cancel-btn, .bread-domain-cancel-btn, .carts-domain-cancel-btn').on('click', function () {
+        domainDirty = false;
+        window.location.reload();
+    });
+
+    $('.orders-domain-save-btn').on('click', function () {
+        ajaxSave(URL_ORDER_ITEMS, collectOrderItemsPayload(), $(this));
+    });
+    $('.bread-domain-save-btn').on('click', function () {
+        ajaxSave(URL_BREAD_REMAINS, collectBreadRemainsPayload(), $(this));
+    });
+    $('.carts-domain-save-btn').on('click', function () {
+        ajaxSave(URL_CART_COUNTS, collectCartCountsPayload(), $(this));
+    });
+
     $(document).on('input', '.order-amount-input', function () {
-        const $input = $(this);
-        const busId = $input.data('bus-id');
-        const productId = $input.data('product-id');
-        const date = $input.data('date');
-        const amount = $input.val();
-
-        // Очищаем предыдущий таймер
-        clearTimeout(debounceTimer);
-
-        // Устанавливаем новый таймер для debounce (задержка 500мс)
-        debounceTimer = setTimeout(function () {
-            const csrf_token = $('meta[name="csrf-token"]').attr('content');
-
-            $.ajax({
-                type: 'POST',
-                url: '/admin/update-order-amount',
-                headers: {'X-CSRF-TOKEN': csrf_token},
-                data: {
-                    bus_id: busId,
-                    product_id: productId,
-                    date: date,
-                    amount: amount
-                },
-            }).done(successResponse => {
-                if (successResponse.success && successResponse.totalCarts) {
-                    // Обновляем значения в строке "Тележки" (рассчитанные значения)
-                    const $calculatedCartsValues = $('.calculated-carts-value');
-                    successResponse.totalCarts.forEach(function (value, index) {
-                        if ($calculatedCartsValues.eq(index).length) {
-                            const roundedValue = value !== '' && value !== null && !isNaN(value) 
-                                ? parseFloat(value).toFixed(1) 
-                                : '';
-                            $calculatedCartsValues.eq(index).text(roundedValue);
-                        }
-                    });
-                }
-                if (successResponse.multipliedAmounts) {
-                    // Обновляем значения в строке "Итого × Множитель"
-                    const $multipliedAmountCells = $('.multiplied-amount-cell');
-                    successResponse.multipliedAmounts.forEach(function (value, index) {
-                        if ($multipliedAmountCells.eq(index).length) {
-                            $multipliedAmountCells.eq(index).text(value || '');
-                        }
-                    });
-                }
-                if (successResponse.finalTotals) {
-                    // Обновляем итого в строке "Итого" (с учетом сохраненных carts и остатков хлеба, округляем до целых)
-                    // Если пользователь ввел значение в total-carts-input, используем его для пересчета
-                    const $calculatedTotalValues = $('.calculated-total-value');
-                    const $totalCartsInputs = $('.total-carts-input');
-                    const $piecesPerCartCells = $('.pieces-per-cart-cell');
-                    const $breadRemainInputs = $('.bread-remain-input');
-                    
-                    successResponse.finalTotals.forEach(function (value, index) {
-                        if ($calculatedTotalValues.eq(index).length) {
-                            const $input = $totalCartsInputs.eq(index);
-                            const $piecesPerCartCell = $piecesPerCartCells.eq(index);
-                            const $breadRemainInput = $breadRemainInputs.eq(index);
-                            
-                            // Проверяем, заполнил ли пользователь поле total-carts-input
-                            const userInputValue = $input.val();
-                            let finalTotal = value;
-                            
-                            if (userInputValue && userInputValue !== '') {
-                                // Пользователь ввел значение - пересчитываем итого на основе его ввода
-                                const totalCartsValue = parseFloat(userInputValue) || 0;
-                                const piecesPerCart = parseFloat($piecesPerCartCell.text()) || 1;
-                                const breadRemainValue = parseFloat($breadRemainInput.val()) || 0;
-                                finalTotal = (totalCartsValue * piecesPerCart) + breadRemainValue;
-                            }
-                            
-                            const roundedValue = finalTotal ? Math.round(parseFloat(finalTotal)) : '';
-                            $calculatedTotalValues.eq(index).text(roundedValue);
-                        }
-                    });
-                }
-                if (successResponse.totalCartsValuesExact) {
-                    // Обновляем точные значения в data-атрибуте для использования при печати
-                    const $totalCartsInputs = $('.total-carts-input');
-                    successResponse.totalCartsValuesExact.forEach(function (exactValue, index) {
-                        if ($totalCartsInputs.eq(index).length) {
-                            const $input = $totalCartsInputs.eq(index);
-                            // Обновляем data-exact-value только если поле пустое (пользователь не вводил значение)
-                            // Если поле заполнено, сохраняем текущее значение
-                            const currentValue = $input.val();
-                            if (!currentValue || currentValue === '') {
-                                // Поле пустое - обновляем data-exact-value новым рассчитанным значением
-                                $input.data('exact-value', exactValue !== '' && exactValue !== null ? exactValue : '');
-                            } else {
-                                // Поле заполнено пользователем - пересчитываем data-exact-value на основе текущего значения
-                                const $cell = $input.closest('.total-cart-cell');
-                                const $calculatedCartsValue = $cell.find('.calculated-carts-value');
-                                const calculatedCarts = parseFloat($calculatedCartsValue.text()) || 0;
-                                const $cartCountInput = $cell.find('.cart-count-input');
-                                const savedCarts = parseFloat($cartCountInput.val()) || 0;
-                                const newExactValue = calculatedCarts + savedCarts;
-                                $input.data('exact-value', newExactValue > 0 ? newExactValue : '');
-                            }
-                        }
-                    });
-                }
-                if (successResponse.totalCartsValues) {
-                    // Обновляем инпуты итогового количества тележек ТОЛЬКО если поле пустое
-                    // Если пользователь уже ввел значение, не трогаем его, но пересчитываем запас
-                    const $totalCartsInputs = $('.total-carts-input');
-                    successResponse.totalCartsValues.forEach(function (value, index) {
-                        if ($totalCartsInputs.eq(index).length) {
-                            const $input = $totalCartsInputs.eq(index);
-                            const currentValue = $input.val();
-                            // Обновляем значение только если поле пустое
-                            if (!currentValue || currentValue === '') {
-                                $input.val(value || '');
-                            } else {
-                                // Поле заполнено пользователем - пересчитываем запас тележек
-                                const $cell = $input.closest('.total-cart-cell');
-                                const $calculatedCartsValue = $cell.find('.calculated-carts-value');
-                                const calculatedCarts = parseFloat($calculatedCartsValue.text()) || 0;
-                                const totalCartsValue = parseFloat(currentValue) || 0;
-                                const carts = totalCartsValue - calculatedCarts;
-                                
-                                const $cartCountInput = $cell.find('.cart-count-input');
-                                if ($cartCountInput.length) {
-                                    const productId = $input.data('product-id');
-                                    const date = $input.data('date');
-                                    const cartsValue = carts !== null && !isNaN(carts) ? carts : null;
-                                    
-                                    // Обновляем значение в поле
-                                    $cartCountInput.val(cartsValue !== null ? cartsValue.toFixed(2) : '');
-                                    
-                                    // Сохраняем в базу данных
-                                    const csrf_token = $('meta[name="csrf-token"]').attr('content');
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: '/admin/update-cart-count',
-                                        headers: {'X-CSRF-TOKEN': csrf_token},
-                                        data: {
-                                            product_id: productId,
-                                            date: date,
-                                            carts: cartsValue
-                                        },
-                                    }).done(saveResponse => {
-                                        if (saveResponse.success) {
-                                            // Обновляем значение в инпуте carts после сохранения
-                                            if (saveResponse.carts !== null && saveResponse.carts !== undefined) {
-                                                $cartCountInput.val(parseFloat(saveResponse.carts).toFixed(2));
-                                            } else {
-                                                $cartCountInput.val('');
-                                            }
-                                            
-                                            // Обновляем точное значение в data-атрибуте
-                                            if (saveResponse.total_carts_value !== null && saveResponse.total_carts_value !== undefined) {
-                                                $input.data('exact-value', saveResponse.total_carts_value);
-                                                // Обновляем значение в инпуте только если пользователь заполнил поле (есть carts)
-                                                if (saveResponse.carts !== null && saveResponse.carts !== undefined) {
-                                                    const roundedValue = Math.round(saveResponse.total_carts_value);
-                                                    $input.val(roundedValue);
-                                                }
-                                            }
-                                            
-                                            // Обновляем итого в строке "Итого" (округляем до целых)
-                                            const $totalCells = $('#cart-totals-row .cart-total-cell');
-                                            const $allTotalCartsInputs = $('.total-carts-input');
-                                            const productIndex = $allTotalCartsInputs.index($input);
-                                            
-                                            if (productIndex >= 0 && saveResponse.calculated_total !== null && saveResponse.calculated_total !== undefined) {
-                                                const $totalCell = $totalCells.eq(productIndex);
-                                                if ($totalCell.length) {
-                                                    $totalCell.find('.calculated-total-value').text(Math.round(saveResponse.calculated_total));
-                                                }
-                                            }
-                                        }
-                                    }).fail(errorResponse => {
-                                        console.error('Ошибка при сохранении запаса тележек:', errorResponse);
-                                    });
-                                }
-                            }
-                        }
-                    });
-                }
-                if (successResponse.piecesPerCarts) {
-                    // Обновляем значения в строке "Штук на тележку"
-                    const $piecesPerCartCells = $('.pieces-per-cart-cell');
-                    successResponse.piecesPerCarts.forEach(function (value, index) {
-                        if ($piecesPerCartCells.eq(index).length) {
-                            $piecesPerCartCells.eq(index).text(value);
-                        }
-                    });
-                }
-            }).fail(errorResponse => {
-                alert('Ошибка при сохранении данных!');
-            });
-        }, 500);
+        if (activeEditDomain === 'orders') {
+            markDirty();
+        }
     });
 
-    // Обработчик события input для остатков хлеба
-    let breadRemainDebounceTimer;
     $(document).on('input', '.bread-remain-input', function () {
-        const $input = $(this);
-        const productId = $input.data('product-id');
-        const date = $input.data('date');
-        const amount = $input.val();
-
-        // Очищаем предыдущий таймер
-        clearTimeout(breadRemainDebounceTimer);
-
-        // Устанавливаем новый таймер для debounce (задержка 500мс)
-        breadRemainDebounceTimer = setTimeout(function () {
-            const csrf_token = $('meta[name="csrf-token"]').attr('content');
-
-            $.ajax({
-                type: 'POST',
-                url: '/admin/update-bread-remain',
-                headers: {'X-CSRF-TOKEN': csrf_token},
-                data: {
-                    product_id: productId,
-                    date: date,
-                    amount: amount
-                },
-            }).done(successResponse => {
-                if (successResponse.success) {
-                    // Обновляем значение тележек (calculated-carts-value) с учетом остатков хлеба
-                    const $allBreadRemainInputs = $('.bread-remain-input');
-                    const productIndex = $allBreadRemainInputs.index($input);
-                    
-                    if (productIndex >= 0 && successResponse.calculated_carts !== null && successResponse.calculated_carts !== undefined) {
-                        const $calculatedCartsValues = $('.calculated-carts-value');
-                        if ($calculatedCartsValues.eq(productIndex).length) {
-                            const calculatedCarts = successResponse.calculated_carts;
-                            const roundedValue = calculatedCarts !== '' && calculatedCarts !== null && !isNaN(calculatedCarts) 
-                                ? parseFloat(calculatedCarts).toFixed(1) 
-                                : '';
-                            $calculatedCartsValues.eq(productIndex).text(roundedValue);
-                        }
-                        
-                        // Пересчитываем итоговое значение тележек (total-carts-input)
-                        const $totalCartsInputs = $('.total-carts-input');
-                        const $totalCartsInput = $totalCartsInputs.eq(productIndex);
-                        if ($totalCartsInput.length) {
-                            const $cell = $totalCartsInput.closest('.total-cart-cell');
-                            const $calculatedCartsValue = $cell.find('.calculated-carts-value');
-                            const $cartCountInput = $cell.find('.cart-count-input');
-                            const calculatedCarts = parseFloat($calculatedCartsValue.text()) || 0;
-                            const savedCarts = parseFloat($cartCountInput.val()) || 0;
-                            
-                            const currentValue = $totalCartsInput.val();
-                            
-                            if (!currentValue || currentValue === '') {
-                                // Если поле пустое, обновляем его значение
-                                const totalCartsValue = calculatedCarts + savedCarts;
-                                $totalCartsInput.val(totalCartsValue > 0 ? Math.round(totalCartsValue) : '');
-                                $totalCartsInput.data('exact-value', totalCartsValue > 0 ? totalCartsValue : '');
-                            } else {
-                                // Если поле заполнено пользователем, пересчитываем запас (cart-count-input)
-                                const totalCartsValue = parseFloat(currentValue) || 0;
-                                const newSavedCarts = totalCartsValue - calculatedCarts;
-                                
-                                // Обновляем значение запаса
-                                if (newSavedCarts !== null && !isNaN(newSavedCarts)) {
-                                    $cartCountInput.val(newSavedCarts.toFixed(2));
-                                    
-                                    // Сохраняем запас в базу данных
-                                    const csrf_token = $('meta[name="csrf-token"]').attr('content');
-                                    $.ajax({
-                                        type: 'POST',
-                                        url: '/admin/update-cart-count',
-                                        headers: {'X-CSRF-TOKEN': csrf_token},
-                                        data: {
-                                            product_id: productId,
-                                            date: date,
-                                            carts: newSavedCarts
-                                        },
-                                    }).done(saveResponse => {
-                                        if (saveResponse.success) {
-                                            // Обновляем значение в инпуте carts после сохранения
-                                            if (saveResponse.carts !== null && saveResponse.carts !== undefined) {
-                                                $cartCountInput.val(parseFloat(saveResponse.carts).toFixed(2));
-                                            } else {
-                                                $cartCountInput.val('');
-                                            }
-                                            
-                                            // Обновляем точное значение в data-атрибуте
-                                            if (saveResponse.total_carts_value !== null && saveResponse.total_carts_value !== undefined) {
-                                                $totalCartsInput.data('exact-value', saveResponse.total_carts_value);
-                                                if (saveResponse.carts !== null && saveResponse.carts !== undefined) {
-                                                    const roundedValue = Math.round(saveResponse.total_carts_value);
-                                                    $totalCartsInput.val(roundedValue);
-                                                }
-                                            }
-                                            
-                                            // Обновляем итого в строке "Итого"
-                                            const $totalCells = $('#cart-totals-row .cart-total-cell');
-                                            if (productIndex >= 0 && saveResponse.calculated_total !== null && saveResponse.calculated_total !== undefined) {
-                                                const $totalCell = $totalCells.eq(productIndex);
-                                                if ($totalCell.length) {
-                                                    $totalCell.find('.calculated-total-value').text(Math.round(saveResponse.calculated_total));
-                                                }
-                                            }
-                                        }
-                                    }).fail(errorResponse => {
-                                        console.error('Ошибка при сохранении запаса тележек:', errorResponse);
-                                    });
-                                } else {
-                                    $cartCountInput.val('');
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Обновляем итого в строке "Итого" (округляем до целых)
-                    const $totalCells = $('#cart-totals-row .cart-total-cell');
-                    
-                    if (productIndex >= 0 && successResponse.calculated_total !== null && successResponse.calculated_total !== undefined) {
-                        const $totalCell = $totalCells.eq(productIndex);
-                        if ($totalCell.length) {
-                            $totalCell.find('.calculated-total-value').text(Math.round(successResponse.calculated_total));
-                        }
-                    }
-                }
-            }).fail(errorResponse => {
-                alert('Ошибка при сохранении остатков хлеба!');
-            });
-        }, 500);
+        if (activeEditDomain === 'bread') {
+            markDirty();
+        }
     });
 
-    // Обработчик события input для итогового количества тележек
-    let totalCartsDebounceTimer;
     $(document).on('input', '.total-carts-input', function () {
-        const $input = $(this);
-        let inputValue = $input.val();
-        
-        // Проверяем, что введено целое число
-        if (inputValue !== '' && inputValue !== null) {
-            // Удаляем все нецифровые символы, кроме минуса в начале
-            inputValue = inputValue.replace(/[^\d-]/g, '');
-            // Убираем минус, если он не в начале, или если значение отрицательное
-            if (inputValue.startsWith('-')) {
-                inputValue = inputValue.replace('-', '');
-            }
-            // Округляем до целого числа
-            const intValue = Math.floor(parseFloat(inputValue) || 0);
-            if (intValue < 0) {
-                inputValue = '0';
-            } else {
-                inputValue = intValue.toString();
-            }
-            $input.val(inputValue);
+        if (activeEditDomain === 'carts') {
+            markDirty();
         }
-        
-        const productId = $input.data('product-id');
-        const date = $input.data('date');
-        const totalCartsValue = parseInt(inputValue) || null;
-        
-        // Сохраняем точное значение в data-атрибуте
-        $input.data('exact-value', totalCartsValue);
-
-        // Получаем рассчитанное значение из заказов (находим в той же ячейке)
-        const $cell = $input.closest('.total-cart-cell');
-        const $calculatedCartsValue = $cell.find('.calculated-carts-value');
-        const calculatedCarts = parseFloat($calculatedCartsValue.text()) || 0;
-
-        // Вычисляем carts = итого - рассчитанное
-        let carts = null;
-        if (totalCartsValue !== null && !isNaN(totalCartsValue)) {
-            carts = totalCartsValue - calculatedCarts;
-        }
-
-        // Обновляем инпут carts (только для отображения)
-        const $cartCountInput = $('.cart-count-input').filter(function() {
-            return $(this).data('product-id') == productId;
-        });
-        if ($cartCountInput.length && carts !== null && !isNaN(carts)) {
-            $cartCountInput.val(carts.toFixed(2));
-        } else if ($cartCountInput.length && (carts === null || isNaN(carts))) {
-            $cartCountInput.val('');
-        }
-
-        // Очищаем предыдущий таймер
-        clearTimeout(totalCartsDebounceTimer);
-
-        // Устанавливаем новый таймер для debounce (задержка 500мс)
-        totalCartsDebounceTimer = setTimeout(function () {
-            const csrf_token = $('meta[name="csrf-token"]').attr('content');
-
-            $.ajax({
-                type: 'POST',
-                url: '/admin/update-cart-count',
-                headers: {'X-CSRF-TOKEN': csrf_token},
-                data: {
-                    product_id: productId,
-                    date: date,
-                    carts: carts
-                },
-            }).done(successResponse => {
-                if (successResponse.success) {
-                    // Обновляем значение в инпуте carts после сохранения
-                    if (successResponse.carts !== null && successResponse.carts !== undefined) {
-                        $cartCountInput.val(parseFloat(successResponse.carts).toFixed(2));
-                    } else {
-                        $cartCountInput.val('');
-                    }
-                    
-                    // Обновляем точное значение в data-атрибуте (без округления) для использования при печати
-                    if (successResponse.total_carts_value !== null && successResponse.total_carts_value !== undefined) {
-                        $input.data('exact-value', successResponse.total_carts_value);
-                        // Обновляем значение в инпуте только если пользователь заполнил поле (есть carts)
-                        if (successResponse.carts !== null && successResponse.carts !== undefined) {
-                            const roundedValue = Math.round(successResponse.total_carts_value);
-                            $input.val(roundedValue);
-                        } else {
-                            // Если пользователь не заполнил поле, очищаем его
-                            $input.val('');
-                        }
-                    }
-                    
-                    // Обновляем итого в строке "Итого" (округляем до целых, учитываем остатки хлеба)
-                    const $totalCells = $('#cart-totals-row .cart-total-cell');
-                    const $allTotalCartsInputs = $('.total-carts-input');
-                    const $allBreadRemainInputs = $('.bread-remain-input');
-                    const productIndex = $allTotalCartsInputs.index($input);
-                    
-                    if (productIndex >= 0 && successResponse.calculated_total !== null && successResponse.calculated_total !== undefined) {
-                        const $totalCell = $totalCells.eq(productIndex);
-                        const $breadRemainInput = $allBreadRemainInputs.eq(productIndex);
-                        const breadRemainValue = parseFloat($breadRemainInput.val()) || 0;
-                        const finalTotal = successResponse.calculated_total + breadRemainValue;
-                        
-                        if ($totalCell.length) {
-                            $totalCell.find('.calculated-total-value').text(Math.round(finalTotal));
-                        }
-                    }
-                }
-            }).fail(errorResponse => {
-                alert('Ошибка при сохранении данных итогового количества тележек!');
-            });
-        }, 500);
     });
 
-    // Обработчик кнопки печати
     $(document).on('click', '#print-btn', function () {
-        // Заменяем input на текст перед печатью
-        $('.order-amount-input').each(function() {
+        if ($('#orders-table').hasClass('orders-edit-mode')) {
+            return;
+        }
+
+        $('.total-carts-input').each(function () {
             const $input = $(this);
-            const value = $input.val() || '0';
-            const $span = $('<span class="print-value">' + value + '</span>');
-            $input.after($span);
-            $input.hide();
-        });
-        
-        // Заменяем input остатков хлеба на текст перед печатью
-        $('.bread-remain-input').each(function() {
-            const $input = $(this);
-            const value = $input.val() || '';
-            const $span = $('<span class="print-value">' + value + '</span>');
-            $input.after($span);
-            $input.hide();
-        });
-        
-        // Обновляем значения для печати итого тележек (используем точные значения из data-атрибута)
-        $('.total-carts-input').each(function() {
-            const $input = $(this);
-            // Используем точное значение из data-атрибута, если оно есть
             let exactValue = parseFloat($input.data('exact-value'));
             if (isNaN(exactValue)) {
-                // Если точного значения нет, пересчитываем из текущих значений
-                const $cell = $input.closest('.total-cart-cell');
-                const $calculatedCartsValue = $cell.find('.calculated-carts-value');
-                const calculatedCarts = parseFloat($calculatedCartsValue.text()) || 0;
-                const $cartCountInput = $cell.find('.cart-count-input');
-                const savedCarts = parseFloat($cartCountInput.val()) || 0;
+                const productId = $input.data('product-id');
+                const calculatedCarts =
+                    parseFloat($(`.calculated-carts-cell[data-product-id="${productId}"]`).find('.calculated-carts-value').text()) || 0;
+                const reserveText = $(`.cart-count-cell[data-product-id="${productId}"]`).find('.cart-count-view').text().trim();
+                const savedCarts = parseFloat(reserveText) || 0;
                 exactValue = calculatedCarts + savedCarts;
             }
-            const $printValue = $input.closest('.total-cart-cell').find('.print-total-carts-value');
+            const $printValue = $input.closest('.total-carts-summary-cell').find('.print-total-carts-value');
             if ($printValue.length) {
-                // Выводим точное значение без округления
                 $printValue.text(exactValue !== '' && !isNaN(exactValue) ? exactValue : '');
             }
         });
-        
-        // Печать
+
         window.print();
-        
-        // Возвращаем input после печати
-        setTimeout(function() {
-            $('.print-value').remove();
-            $('.order-amount-input').show();
-            $('.bread-remain-input').show();
-        }, 100);
+    });
+
+    $('#toggle-summary-rows-btn').on('click', function () {
+        const $table = $('#orders-table');
+        const isHidden = $table.hasClass('summary-rows-hidden');
+        $table.toggleClass('summary-rows-hidden');
+        $(this).html(
+            isHidden
+                ? '<i class="bi bi-eye-slash"></i> Сводные строки'
+                : '<i class="bi bi-eye"></i> Сводные строки'
+        );
     });
 });
