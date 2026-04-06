@@ -23,6 +23,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -102,19 +103,19 @@ class OrderController extends Controller
             $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
-            
+
             // Рассчитываем тележки из заказов
             $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
                 ? round($multipliedAmount / $piecesPerCart, 1)
                 : 0;
-            
+
             // Добавляем остатки хлеба в пересчете на тележки
             $breadRemain = $savedBreadRemainsForCarts->get($product->id);
             $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
             $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
                 ? round($breadRemainAmount / $piecesPerCart, 1)
                 : 0;
-            
+
             $totalCartsValue = $calculatedCartsFromOrders + $breadRemainCarts;
             return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
         });
@@ -278,31 +279,106 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function updateOrderAmount(Request $request): JsonResponse
+    public function updateOrderItemsBatch(Request $request): JsonResponse
     {
-        $date = $request->input('date');
-        $busId = $request->input('bus_id');
-        $productId = $request->input('product_id');
-        $amount = $request->input('amount');
+        $data = $request->validate([
+            'date' => 'required|date',
+            'order_items' => 'present|array',
+            'order_items.*.bus_id' => 'required|integer|exists:buses,id',
+            'order_items.*.product_id' => 'required|integer|exists:products,id',
+            'order_items.*.amount' => 'nullable',
+        ]);
 
-        // Найти или создать Order
+        $date = $data['date'];
+
+        DB::transaction(function () use ($data, $date) {
+            foreach ($data['order_items'] as $row) {
+                $amount = $this->normalizeNullableInt($row['amount']);
+                $this->persistOrderAmount($date, (int) $row['bus_id'], (int) $row['product_id'], $amount);
+            }
+        });
+
+        return response()->json(['success' => true]);
+    }
+
+    public function updateBreadRemainsBatch(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'bread_remains' => 'present|array',
+            'bread_remains.*.product_id' => 'required|integer|exists:products,id',
+            'bread_remains.*.amount' => 'nullable',
+        ]);
+
+        $date = $data['date'];
+
+        DB::transaction(function () use ($data, $date) {
+            foreach ($data['bread_remains'] as $row) {
+                $this->persistBreadRemainAmount($date, (int) $row['product_id'], $this->normalizeNullableInt($row['amount']));
+            }
+        });
+
+        return response()->json(['success' => true]);
+    }
+
+    public function updateCartCountsBatch(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'cart_counts' => 'present|array',
+            'cart_counts.*.product_id' => 'required|integer|exists:products,id',
+            'cart_counts.*.carts' => 'nullable',
+        ]);
+
+        $date = $data['date'];
+
+        DB::transaction(function () use ($data, $date) {
+            foreach ($data['cart_counts'] as $row) {
+                $this->persistCartCountValue($date, (int) $row['product_id'], $this->normalizeNullableFloat($row['carts']));
+            }
+        });
+
+        return response()->json(['success' => true]);
+    }
+
+    private function normalizeNullableInt(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    private function normalizeNullableFloat(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    private function persistOrderAmount(string $date, int $busId, int $productId, ?int $newAmount): void
+    {
         $order = Order::query()
             ->where('bus_id', $busId)
             ->whereDate('date', $date)
             ->first();
 
-        if (!$order) {
+        if (! $order) {
             $order = new Order();
             $order->bus_id = $busId;
             $order->date = $date;
             $order->save();
         }
 
-        // Получить цену продукта для автобуса
         $busProductPrice = BusProductPrice::query()
             ->where('bus_id', $busId)
             ->where('product_id', $productId)
@@ -310,29 +386,23 @@ class OrderController extends Controller
 
         $price = $busProductPrice ? $busProductPrice->price : 0;
 
-        // Найти или создать OrderItem
         $orderItem = OrderItem::query()
             ->where('order_id', $order->id)
             ->where('product_id', $productId)
             ->first();
 
-        $oldAmount = null;
-        if ($orderItem) {
-            $oldAmount = $orderItem->amount;
-        }
+        $oldAmount = $orderItem ? $orderItem->amount : null;
 
-        if (!$orderItem) {
+        if (! $orderItem) {
             $orderItem = new OrderItem();
             $orderItem->order_id = $order->id;
             $orderItem->product_id = $productId;
             $orderItem->price = $price;
         }
 
-        $newAmount = $amount ? (int)$amount : null;
         $orderItem->amount = $newAmount;
         $orderItem->save();
 
-        // Записать изменение в лог, если значение изменилось
         if ($oldAmount !== $newAmount) {
             OrderChangeLog::create([
                 'order_id' => $order->id,
@@ -343,138 +413,40 @@ class OrderController extends Controller
                 'new_amount' => $newAmount,
             ]);
         }
+    }
 
-        // Пересчитать totalCarts
-        $products = $this->getProducts();
-        $buses = Bus::query()
-            ->with([
-                'orders' => function ($query) use ($date) {
-                    $query->whereDate('date', $date)
-                        ->with(['items']);
-                }
-            ])
-            ->where('is_active', '=', Bus::IS_ACTIVE)
-            ->orderBy('sort')
-            ->get();
+    private function persistBreadRemainAmount(string $date, int $productId, ?int $amount): void
+    {
+        $breadRemain = BreadRemain::query()
+            ->whereDate('date', $date)
+            ->where('product_id', $productId)
+            ->first();
 
-        $totalOrderAmounts = [];
-        foreach ($buses as $bus) {
-            foreach ($bus->orders as $busOrder) {
-                foreach ($busOrder->items as $item) {
-                    $productIdKey = $item->product_id;
-                    $orderAmount = $item->amount ?: 0;
-                    $totalOrderAmounts[$productIdKey] = ($totalOrderAmounts[$productIdKey] ?? 0) + $orderAmount;
-                }
-            }
+        if (! $breadRemain) {
+            $breadRemain = new BreadRemain();
+            $breadRemain->date = $date;
+            $breadRemain->product_id = $productId;
         }
 
-        // Загружаем остатки хлеба для расчета тележек
-        $savedBreadRemainsForCarts = BreadRemain::query()
+        $breadRemain->amount = $amount;
+        $breadRemain->save();
+    }
+
+    private function persistCartCountValue(string $date, int $productId, ?float $carts): void
+    {
+        $cartCount = CartCount::query()
             ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
-            ->get()
-            ->keyBy('product_id');
+            ->where('product_id', $productId)
+            ->first();
 
-        $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedBreadRemainsForCarts) {
-            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
-            $orderMultiplier = $product->order_multiplier ?? 1;
-            $piecesPerCart = $product->pieces_per_cart ?? 1;
-            $multipliedAmount = $totalAmount * $orderMultiplier;
-            
-            // Рассчитываем тележки из заказов
-            $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 1)
-                : 0;
-            
-            // Добавляем остатки хлеба в пересчете на тележки
-            $breadRemain = $savedBreadRemainsForCarts->get($product->id);
-            $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
-            $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
-                ? round($breadRemainAmount / $piecesPerCart, 1)
-                : 0;
-            
-            $totalCartsValue = $calculatedCartsFromOrders + $breadRemainCarts;
-            return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
-        });
+        if (! $cartCount) {
+            $cartCount = new CartCount();
+            $cartCount->date = $date;
+            $cartCount->product_id = $productId;
+        }
 
-        $multipliedAmounts = $products->map(function ($product) use ($totalOrderAmounts) {
-            $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
-            $orderMultiplier = $product->order_multiplier ?? 1;
-            $multipliedAmount = $totalAmount * $orderMultiplier;
-            return $multipliedAmount > 0 ? $multipliedAmount : '';
-        });
-
-        $piecesPerCarts = $products->map(function ($product) {
-            return $product->pieces_per_cart ?? 1;
-        });
-
-        // Загружаем сохраненные значения тележек для расчета итого
-        $savedCartCounts = CartCount::query()
-            ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
-            ->get()
-            ->keyBy('product_id');
-
-        $savedCarts = $products->map(function ($product) use ($savedCartCounts) {
-            $cartCount = $savedCartCounts->get($product->id);
-            return $cartCount ? $cartCount->carts : null;
-        });
-
-        // Загружаем сохраненные остатки хлеба для расчета итого
-        $savedBreadRemains = BreadRemain::query()
-            ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
-            ->get()
-            ->keyBy('product_id');
-
-        $breadRemains = $products->map(function ($product) use ($savedBreadRemains) {
-            $breadRemain = $savedBreadRemains->get($product->id);
-            return $breadRemain ? $breadRemain->amount : null;
-        });
-
-        // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
-        // Точные значения (без округления) для использования в data-exact-value и при печати
-        $totalCartsValuesExact = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
-            $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? $totalCartsValue : '';
-        });
-
-        // Округленные значения для отображения в поле (только если пользователь заполнил поле)
-        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
-            // Показываем значение только если пользователь заполнил поле (есть savedCarts)
-            if ($savedCartsValue > 0) {
-                $totalCartsValue = $calculatedCarts + $savedCartsValue;
-                return $totalCartsValue > 0 ? round($totalCartsValue) : '';
-            }
-            return '';
-        });
-
-        // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем + остатки хлеба в тележках) * pieces_per_cart
-        // Остатки хлеба уже включены в totalCarts в пересчете на тележки
-        // Округляем до целых чисел
-        $finalTotals = $products->map(function ($product, $index) use ($totalCarts, $savedCarts, $piecesPerCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
-            $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
-            $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            // Итоговое значение = общее количество тележек * pieces_per_cart
-            $totalAmount = $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : 0;
-            return $totalAmount > 0 ? round($totalAmount) : '';
-        });
-
-        return response()->json([
-            'success' => true,
-            'totalCarts' => $totalCarts->values()->toArray(),
-            'multipliedAmounts' => $multipliedAmounts->values()->toArray(),
-            'piecesPerCarts' => $piecesPerCarts->values()->toArray(),
-            'finalTotals' => $finalTotals->values()->toArray(),
-            'totalCartsValues' => $totalCartsValues->values()->toArray(),
-            'totalCartsValuesExact' => $totalCartsValuesExact->values()->toArray()
-        ]);
+        $cartCount->carts = $carts;
+        $cartCount->save();
     }
 
     /**
@@ -535,190 +507,6 @@ class OrderController extends Controller
             ->whereNotNull('remainder_items.amount')
             ->groupBy('remainders.bus_id')
             ->pluck('total', 'bus_id');
-    }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function updateCartCount(Request $request): JsonResponse
-    {
-        $date = $request->input('date');
-        $productId = $request->input('product_id');
-        $carts = $request->input('carts');
-
-        $product = Product::find($productId);
-        if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Продукт не найден'], 404);
-        }
-
-        $cartCount = CartCount::query()
-            ->whereDate('date', $date)
-            ->where('product_id', $productId)
-            ->first();
-
-        if (!$cartCount) {
-            $cartCount = new CartCount();
-            $cartCount->date = $date;
-            $cartCount->product_id = $productId;
-        }
-
-        // Сохраняем только carts (введенное пользователем количество тележек)
-        $cartCount->carts = $carts !== null && $carts !== '' ? (float)$carts : null;
-        $cartCount->save();
-
-        // Рассчитываем итого динамически: (рассчитанное из заказов + введенное) * pieces_per_cart
-        // Для этого нужно получить рассчитанное значение из заказов
-        $buses = Bus::query()
-            ->with([
-                'orders' => function ($query) use ($date) {
-                    $query->whereDate('date', $date)
-                        ->with(['items']);
-                }
-            ])
-            ->where('is_active', '=', Bus::IS_ACTIVE)
-            ->orderBy('sort')
-            ->get();
-
-        $totalOrderAmounts = [];
-        foreach ($buses as $bus) {
-            foreach ($bus->orders as $busOrder) {
-                foreach ($busOrder->items as $item) {
-                    if ($item->product_id == $productId) {
-                        $orderAmount = $item->amount ?: 0;
-                        $totalOrderAmounts[$productId] = ($totalOrderAmounts[$productId] ?? 0) + $orderAmount;
-                    }
-                }
-            }
-        }
-
-        $totalAmount = $totalOrderAmounts[$productId] ?? 0;
-        $orderMultiplier = $product->order_multiplier ?? 1;
-        $piecesPerCart = $product->pieces_per_cart ?? 1;
-        $multipliedAmount = $totalAmount * $orderMultiplier;
-        $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
-            ? round($multipliedAmount / $piecesPerCart, 1)
-            : 0;
-
-        // Получаем остатки хлеба для этого продукта
-        $breadRemain = BreadRemain::query()
-            ->whereDate('date', $date)
-            ->where('product_id', $productId)
-            ->first();
-
-        // Добавляем остатки хлеба в пересчете на тележки
-        $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
-        $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
-            ? round($breadRemainAmount / $piecesPerCart, 1)
-            : 0;
-
-        // Итоговое количество тележек = рассчитанное из заказов + введенное пользователем + остатки хлеба (в тележках)
-        $savedCartsValue = $cartCount->carts ?? 0;
-        $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue + $breadRemainCarts;
-        
-        // Итого = (рассчитанное из заказов + введенное пользователем + остатки хлеба в тележках) * pieces_per_cart
-        // Округляем до целых чисел
-        $calculatedTotal = $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : 0;
-
-        return response()->json([
-            'success' => true,
-            'carts' => $cartCount->carts,
-            'calculated_total' => $calculatedTotal,
-            'calculated_carts' => $calculatedCartsFromOrders + $breadRemainCarts, // Возвращаем тележки с учетом остатков хлеба
-            'total_carts_value' => $totalCartsValue > 0 ? $totalCartsValue : 0, // Возвращаем точное значение, не округленное
-        ]);
-    }
-
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function updateBreadRemain(Request $request): JsonResponse
-    {
-        $date = $request->input('date');
-        $productId = $request->input('product_id');
-        $amount = $request->input('amount');
-
-        $product = Product::find($productId);
-        if (!$product) {
-            return response()->json(['success' => false, 'message' => 'Продукт не найден'], 404);
-        }
-
-        $breadRemain = BreadRemain::query()
-            ->whereDate('date', $date)
-            ->where('product_id', $productId)
-            ->first();
-
-        if (!$breadRemain) {
-            $breadRemain = new BreadRemain();
-            $breadRemain->date = $date;
-            $breadRemain->product_id = $productId;
-        }
-
-        // Сохраняем остатки хлеба
-        $breadRemain->amount = $amount !== null && $amount !== '' ? (int)$amount : null;
-        $breadRemain->save();
-
-        // Рассчитываем итого динамически: (рассчитанное из заказов + введенное пользователем + остатки хлеба) * pieces_per_cart
-        // Для этого нужно получить рассчитанное значение из заказов
-        $buses = Bus::query()
-            ->with([
-                'orders' => function ($query) use ($date) {
-                    $query->whereDate('date', $date)
-                        ->with(['items']);
-                }
-            ])
-            ->where('is_active', '=', Bus::IS_ACTIVE)
-            ->orderBy('sort')
-            ->get();
-
-        $totalOrderAmounts = [];
-        foreach ($buses as $bus) {
-            foreach ($bus->orders as $busOrder) {
-                foreach ($busOrder->items as $item) {
-                    if ($item->product_id == $productId) {
-                        $orderAmount = $item->amount ?: 0;
-                        $totalOrderAmounts[$productId] = ($totalOrderAmounts[$productId] ?? 0) + $orderAmount;
-                    }
-                }
-            }
-        }
-
-        $totalAmount = $totalOrderAmounts[$productId] ?? 0;
-        $orderMultiplier = $product->order_multiplier ?? 1;
-        $piecesPerCart = $product->pieces_per_cart ?? 1;
-        $multipliedAmount = $totalAmount * $orderMultiplier;
-        $calculatedCarts = $multipliedAmount > 0 && $piecesPerCart > 0
-            ? round($multipliedAmount / $piecesPerCart, 1)
-            : 0;
-
-        // Получаем сохраненные значения тележек
-        $cartCount = CartCount::query()
-            ->whereDate('date', $date)
-            ->where('product_id', $productId)
-            ->first();
-
-        $savedCartsValue = $cartCount ? ($cartCount->carts ?? 0) : 0;
-        
-        // Добавляем остатки хлеба в пересчете на тележки
-        $breadRemainAmount = $breadRemain->amount ?? 0;
-        $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
-            ? round($breadRemainAmount / $piecesPerCart, 1)
-            : 0;
-        
-        // Итоговое количество тележек = рассчитанное из заказов + введенное пользователем + остатки хлеба (в тележках)
-        $totalCartsValue = $calculatedCarts + $savedCartsValue + $breadRemainCarts;
-
-        // Итого = (рассчитанное из заказов + введенное пользователем + остатки хлеба в тележках) * pieces_per_cart
-        // Округляем до целых чисел
-        $calculatedTotal = $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : 0;
-
-        return response()->json([
-            'success' => true,
-            'amount' => $breadRemain->amount,
-            'calculated_total' => $calculatedTotal,
-            'calculated_carts' => $calculatedCarts + $breadRemainCarts, // Возвращаем тележки с учетом остатков хлеба
-        ]);
     }
 
 }
