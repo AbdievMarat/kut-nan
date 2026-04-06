@@ -52,8 +52,17 @@
     }
     
     .pieces-per-cart-row,
+    .carts-calculated-row,
+    .carts-reserve-row,
+    .bread-remain-row,
     .multiplied-amount-row {
         display: none !important;
+    }
+
+    /* При печати всегда показываем нужные сводные строки независимо от состояния таблицы */
+    #orders-table .carts-total-row,
+    #orders-table #cart-totals-row {
+        display: table-row !important;
     }
     
     .card {
@@ -110,6 +119,14 @@
     
     #orders-table input.order-amount-input {
         display: none !important;
+    }
+
+    #orders-table .order-amount-view {
+        all: unset !important;
+    }
+
+    #orders-table .carts-total-row td:first-child {
+        display: table-cell !important;
     }
 
     #orders-table .bread-remain-input {

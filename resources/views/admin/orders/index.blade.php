@@ -18,11 +18,11 @@
                             <i class="bi bi-file-earmark-excel"></i> Выгрузить
                         </button>
 
-                        <button type="button" class="btn btn-info" id="print-btn">
+                        <button type="button" class="btn btn-info no-print" id="print-btn">
                             <i class="bi bi-printer"></i> Распечатать
                         </button>
 
-                        <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn">
+                        <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn" data-user-id="{{ auth()->id() }}">
                             <i class="bi bi-eye"></i> Сводные строки
                         </button>
                     </div>
@@ -43,6 +43,42 @@
                 </tr>
                 </thead>
                 <tbody>
+                    <tr class="table-info fw-bold carts-total-row" id="total-carts-summary-row">
+                        <td class="d-flex align-items-center gap-2 flex-wrap">
+                            <span>Итого тележек</span>
+                            <button type="button" class="btn btn-sm btn-warning no-print carts-domain-enter-btn">Изменить</button>
+                            <button type="button" class="btn btn-sm btn-success no-print carts-domain-save-btn d-none">Сохранить</button>
+                            <button type="button" class="btn btn-sm btn-secondary no-print carts-domain-cancel-btn d-none">Отмена</button>
+                        </td>
+                        @foreach ($products as $index => $product)
+                            @php
+                                $totalCartsVal = $totalCartsValues->values()->get($index);
+                                $totalCartsExactVal = $totalCartsValuesExact->values()->get($index);
+                                $fromOrdersCartsVal = $totalCarts->values()->get($index);
+                                $displayCartsVal = ($totalCartsVal !== null && $totalCartsVal !== '') ? $totalCartsVal : ($fromOrdersCartsVal ?: '');
+                            @endphp
+                            <td class="text-center total-carts-summary-cell" data-product-id="{{ $product->id }}">
+                                <span class="total-carts-view align-middle px-1 fw-semibold" style="min-width: 55px;">{{ $displayCartsVal }}</span>
+                                <input
+                                    type="number"
+                                    class="form-control form-control-sm total-carts-input d-none mx-auto"
+                                    value="{{ $totalCartsVal !== null && $totalCartsVal !== '' ? $totalCartsVal : '' }}"
+                                    data-exact-value="{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}"
+                                    data-product-id="{{ $product->id }}"
+                                    data-date="{{ $date }}"
+                                    placeholder="Итого"
+                                    min="0"
+                                    step="1"
+                                    style="min-width: 55px; width: 55px;"
+                                >
+                                <span class="print-total-carts-value d-none">{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}</span>
+                            </td>
+                        @endforeach
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="print-only"></td>
+                    </tr>
                     <tr class="table-info fw-bold carts-calculated-row">
                         <td>Тележек из заказов</td>
                         @foreach ($products as $index => $product)
@@ -63,40 +99,6 @@
                             @endphp
                             <td class="text-center cart-count-cell" data-product-id="{{ $product->id }}">
                                 <span class="cart-count-view align-middle px-1" style="min-width: 55px;">{{ $savedCartVal !== null && $savedCartVal !== '' ? number_format((float) $savedCartVal, 2, '.', '') : '' }}</span>
-                            </td>
-                        @endforeach
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="print-only"></td>
-                    </tr>
-                    <tr class="table-info fw-bold carts-total-row" id="total-carts-summary-row">
-                        <td class="d-flex align-items-center gap-2 flex-wrap">
-                            <span>Итого тележек</span>
-                            <button type="button" class="btn btn-sm btn-warning no-print carts-domain-enter-btn">Изменить</button>
-                            <button type="button" class="btn btn-sm btn-success no-print carts-domain-save-btn d-none">Сохранить</button>
-                            <button type="button" class="btn btn-sm btn-secondary no-print carts-domain-cancel-btn d-none">Отмена</button>
-                        </td>
-                        @foreach ($products as $index => $product)
-                            @php
-                                $totalCartsVal = $totalCartsValues->values()->get($index);
-                                $totalCartsExactVal = $totalCartsValuesExact->values()->get($index);
-                            @endphp
-                            <td class="text-center total-carts-summary-cell" data-product-id="{{ $product->id }}">
-                                <span class="total-carts-view align-middle px-1 fw-semibold" style="min-width: 55px;">{{ $totalCartsVal !== null && $totalCartsVal !== '' ? $totalCartsVal : '' }}</span>
-                                <input
-                                    type="number"
-                                    class="form-control form-control-sm total-carts-input d-none mx-auto"
-                                    value="{{ $totalCartsVal !== null && $totalCartsVal !== '' ? $totalCartsVal : '' }}"
-                                    data-exact-value="{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}"
-                                    data-product-id="{{ $product->id }}"
-                                    data-date="{{ $date }}"
-                                    placeholder="Итого"
-                                    min="0"
-                                    step="1"
-                                    style="min-width: 55px; width: 55px;"
-                                >
-                                <span class="print-total-carts-value d-none">{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}</span>
                             </td>
                         @endforeach
                         <td></td>

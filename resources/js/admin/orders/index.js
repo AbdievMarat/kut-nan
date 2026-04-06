@@ -328,14 +328,35 @@ $(() => {
         window.print();
     });
 
-    $('#toggle-summary-rows-btn').on('click', function () {
-        const $table = $('#orders-table');
-        const isHidden = $table.hasClass('summary-rows-hidden');
-        $table.toggleClass('summary-rows-hidden');
-        $(this).html(
-            isHidden
-                ? '<i class="bi bi-eye-slash"></i> Сводные строки'
-                : '<i class="bi bi-eye"></i> Сводные строки'
-        );
+    const $toggleBtn = $('#toggle-summary-rows-btn');
+    const $table = $('#orders-table');
+    const $summaryRows = $table.find(
+        '.carts-calculated-row, .carts-reserve-row, .carts-total-row, ' +
+        '.pieces-per-cart-row, #cart-totals-row, .bread-remain-row, .multiplied-amount-row'
+    );
+
+    function showSummaryRows() {
+        $table.removeClass('summary-rows-hidden');
+        $summaryRows.hide().fadeIn(300);
+        $toggleBtn.html('<i class="bi bi-eye-slash"></i> Сводные строки');
+    }
+
+    function hideSummaryRows() {
+        $summaryRows.fadeOut(300, function () {
+            $table.addClass('summary-rows-hidden');
+        });
+        $toggleBtn.html('<i class="bi bi-eye"></i> Сводные строки');
+    }
+
+    if (parseInt($toggleBtn.data('user-id')) === 1) {
+        showSummaryRows();
+    }
+
+    $toggleBtn.on('click', function () {
+        if ($table.hasClass('summary-rows-hidden')) {
+            showSummaryRows();
+        } else {
+            hideSummaryRows();
+        }
     });
 });
