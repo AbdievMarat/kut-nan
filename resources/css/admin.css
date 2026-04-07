@@ -1,4 +1,4 @@
 .vertical-text {
-    writing-mode: vertical-rl;
+    writing-mode: vertical-lr;
     transform: rotate(180deg);
 }

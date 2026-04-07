@@ -151,7 +151,7 @@
                         @foreach ($products as $index => $product)
                             @php $breadVal = $breadRemains->values()->get($index); @endphp
                             <td class="bread-remain-cell">
-                                <span class="bread-remain-view d-inline-block" style="min-width: 60px;">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
+                                <span class="bread-remain-view d-inline-block" style="min-width: 40px;">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm bread-remain-input d-none"
@@ -160,7 +160,7 @@
                                     data-date="{{ $date }}"
                                     min="0"
                                     step="1"
-                                    style="min-width: 60px; width: 60px;"
+                                    style="min-width: 40px; width: 40px;"
                                 >
                             </td>
                         @endforeach
@@ -202,17 +202,17 @@
                         @foreach ($bus['products'] as $productData)
                             @php $ordAmt = $productData['order_amount']; @endphp
                             <td class="text-center">
-                                <span class="order-amount-view d-inline-block" style="min-width: 60px;">{{ $ordAmt === '' || $ordAmt === null ? '' : $ordAmt }}</span>
+                                <span class="order-amount-view d-inline-block" style="min-width: 40px;">{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm order-amount-input d-none"
-                                    value="{{ $ordAmt === '' || $ordAmt === null ? '' : $ordAmt }}"
+                                    value="{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}"
                                     data-bus-id="{{ $bus['id'] }}"
                                     data-product-id="{{ $productData['product_id'] }}"
                                     data-date="{{ $date }}"
                                     min="0"
                                     step="1"
-                                    style="min-width: 60px; width: 60px;"
+                                    style="min-width: 40px; width: 40px;"
                                 >
                             </td>
                         @endforeach

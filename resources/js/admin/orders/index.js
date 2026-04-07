@@ -383,6 +383,18 @@ $(() => {
         window.print();
     });
 
+    $(document).on('click', 'tr.bus-data-row', function (e) {
+        if (!$('#orders-table').hasClass('orders-view-mode')) return;
+        if ($(e.target).closest('a').length) return;
+
+        const $row = $(this);
+        const isSelected = $row.hasClass('row-selected');
+        $('tr.bus-data-row').removeClass('row-selected');
+        if (!isSelected) {
+            $row.addClass('row-selected');
+        }
+    });
+
     const $toggleBtn = $('#toggle-summary-rows-btn');
     const $table = $('#orders-table');
     const $summaryRows = $table.find(

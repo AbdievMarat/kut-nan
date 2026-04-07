@@ -26,6 +26,15 @@
     appearance: textfield;
 }
 
+/* Выделение строки в режиме просмотра */
+#orders-table.orders-view-mode tr.bus-data-row {
+    cursor: pointer;
+}
+
+#orders-table.orders-view-mode tr.bus-data-row.row-selected td {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
 /* Скрытие сводных строк по умолчанию */
 #orders-table.summary-rows-hidden .carts-calculated-row,
 #orders-table.summary-rows-hidden .carts-reserve-row,
