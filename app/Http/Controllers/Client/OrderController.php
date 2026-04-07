@@ -43,6 +43,10 @@ class OrderController extends Controller
             return redirect()->route('remainders.create');
         } else if ($data['type_operation'] == Order::TYPE_OPERATION_MARKDOWN) {
             return redirect()->route('markdowns.create');
+        } else if ($data['type_operation'] == Order::TYPE_OPERATION_INVOICE) {
+            return redirect()->route('invoices.create');
+        } else if ($data['type_operation'] == Order::TYPE_OPERATION_INVOICE_RETURN) {
+            return redirect()->route('invoice-returns.create');
         } else {
             return redirect()->route('orders.create');
         }

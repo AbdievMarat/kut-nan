@@ -17,19 +17,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $updated_at
  *
  * @property-read Bus $bus
- * @property-read OrderItem|null $items
+ * @property-read InvoiceShop|null $shops
  *
  * @mixin Builder
  */
-class Order extends Model
+class Invoice extends Model
 {
-    const TYPE_OPERATION_ORDER = 1;
-    const TYPE_OPERATION_REALIZATION = 2;
-    const TYPE_OPERATION_REMAINDER = 3;
-    const TYPE_OPERATION_MARKDOWN = 4;
-    const TYPE_OPERATION_INVOICE = 5;
-    const TYPE_OPERATION_INVOICE_RETURN = 6;
-
     use HasFactory;
 
     /**
@@ -43,8 +36,8 @@ class Order extends Model
     /**
      * @return HasMany
      */
-    public function items(): HasMany
+    public function shops(): HasMany
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(InvoiceShop::class);
     }
 }

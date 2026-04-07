@@ -1,38 +1,63 @@
-<div class="toast show mb-3 shop_item">
-    <div class="toast-header @error("shop.{$index}") is-invalid @enderror">
-        <input type="hidden" name="realization_shop_id[]" value="{{ $id ?? 0 }}">
+<div class="sc shop_item">
+    <input type="hidden" name="realization_shop_id[]" value="{{ $id ?? 0 }}">
 
-        <input
-            type="text"
-            class="form-control mb-2 @error("shop.{$index}") is-invalid @enderror"
-            name="shop[]"
-            value="{{ $shop ?? '' }}"
-            placeholder="Название магазина"
-            autocomplete="off"
-        >
-        <button type="button" class="btn-close me-0 mb-1 remove_shop" aria-label="Удалить"></button>
+    {{-- Шапка карточки --}}
+    <div class="sc__head">
+        <div class="sc__head-left">
+            <span class="sc__num-dot"></span>
+            <span class="sc__num">Магазин {{ $num ?? '#' }}</span>
+        </div>
+        <button type="button" class="sc__del remove_shop" aria-label="Удалить">
+            <i class="bi bi-trash3"></i>
+        </button>
     </div>
 
-    @error(("shop.{$index}"))
-    <span class="invalid-feedback ms-3" role="alert"><strong>{{ $message }}</strong></span>
-    @enderror
-
-    <div class="toast-body pt-0 pb-0">
-        <div class="input-group mb-3">
-            <span class="input-group-text" id="amount">Сумма</span>
+    {{-- Поле: магазин --}}
+    <div class="sc__field @error("shop.{$index}") sc__field--error @enderror">
+        <span class="sc__chip sc__chip--blue">
+            <i class="bi bi-shop-window"></i>
+        </span>
+        <div class="sc__field-inner">
+            <label class="sc__field-label">Название магазина</label>
             <input
-                    class="form-control @error("amount.{$index}") is-invalid @enderror"
-                    type="number"
-                    name="amount[]"
-                    aria-describedby="amount"
-                    value="{{ $amount ?? '' }}"
-                    placeholder="Сумма реализации"
-                    autocomplete="off"
+                type="text"
+                class="sc__input"
+                name="shop[]"
+                value="{{ $shop ?? '' }}"
+                placeholder="Введите название..."
+                autocomplete="off"
+                autocapitalize="words"
             >
-
-            @error("amount.{$index}")
-            <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
-            @enderror
         </div>
     </div>
+
+    @error("shop.{$index}")
+        <p class="sc__err"><i class="bi bi-exclamation-circle me-1"></i>{{ $message }}</p>
+    @enderror
+
+    <div class="sc__divider"></div>
+
+    {{-- Поле: сумма --}}
+    <div class="sc__field @error("amount.{$index}") sc__field--error @enderror">
+        <span class="sc__chip sc__chip--green">
+            <i class="bi bi-cash-coin"></i>
+        </span>
+        <div class="sc__field-inner">
+            <label class="sc__field-label">Сумма</label>
+            <input
+                class="sc__input sc__input--amount"
+                type="number"
+                inputmode="numeric"
+                name="amount[]"
+                value="{{ $amount ?? '' }}"
+                placeholder="0"
+                autocomplete="off"
+                min="0"
+            >
+        </div>
+    </div>
+
+    @error("amount.{$index}")
+        <p class="sc__err"><i class="bi bi-exclamation-circle me-1"></i>{{ $message }}</p>
+    @enderror
 </div>

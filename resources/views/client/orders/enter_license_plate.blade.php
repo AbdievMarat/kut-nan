@@ -46,6 +46,14 @@
             <button class="btn btn-dark w-100 mt-4" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_MARKDOWN }})">
                 Ввести уценку
             </button>
+
+            <button class="btn btn-warning w-100 mt-4" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_INVOICE }})">
+                Накладные
+            </button>
+
+            <button class="btn btn-secondary w-100 mt-4" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_INVOICE_RETURN }})">
+                Возврат по накладным
+            </button>
         </form>
     </div>
 @endsection
