@@ -62,12 +62,14 @@ class PublicOrderController extends Controller
 
         $busesData = $buses->map(function ($bus) use ($products, $changeLogs) {
             $orderAmounts = [];
+            $orderMarked = [];
 
             /** @var Order $order */
             foreach ($bus->orders as $order) {
                 /** @var OrderItem $item */
                 foreach ($order->items as $item) {
                     $orderAmounts[$item->product_id] = $item->amount;
+                    $orderMarked[$item->product_id] = (bool) $item->is_marked;
                 }
             }
 
@@ -88,7 +90,7 @@ class PublicOrderController extends Controller
             return [
                 'id' => $bus->id,
                 'license_plate' => $bus->license_plate . ' ' . $bus->serial_number,
-                'products' => $products->map(function ($product) use ($orderAmounts, $changeLogs, $bus) {
+                'products' => $products->map(function ($product) use ($orderAmounts, $orderMarked, $changeLogs, $bus) {
                     $logKey = $bus->id . '_' . $product->id;
                     $changeLog = $changeLogs->get($logKey);
 
@@ -111,6 +113,7 @@ class PublicOrderController extends Controller
                         'product_id' => $product->id,
                         'order_amount' => $orderAmounts[$product->id] ?? '',
                         'change_type' => $changeType,
+                        'is_marked' => $orderMarked[$product->id] ?? false,
                     ];
                 }),
             ];

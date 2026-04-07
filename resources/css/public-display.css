@@ -66,8 +66,8 @@
 
 /* Подсветка ячеек при изменении значений */
 .order-cell.change-increase {
-    background-color: #d4edda !important;
-    color: #155724 !important;
+    background-color: #fff3cd !important;
+    color: #856404 !important;
     font-weight: bold;
     transition: background-color 0.3s ease;
 }
@@ -81,9 +81,17 @@
 
 /* Учитываем чередование строк при подсветке */
 #public-orders-table tbody tr:nth-child(even) td.order-cell.change-increase {
-    background-color: #c3e6cb !important;
+    background-color: #ffecb5 !important;
 }
 
 #public-orders-table tbody tr:nth-child(even) td.order-cell.change-decrease {
     background-color: #f5c6cb !important;
+}
+
+/* Отметка is_marked — зелёный, перекрывает все остальные стили */
+#public-orders-table tbody tr:nth-child(odd) td.order-cell.order-cell-marked,
+#public-orders-table tbody tr:nth-child(even) td.order-cell.order-cell-marked {
+    background-color: #28a745 !important;
+    color: #fff !important;
+    font-weight: bold;
 }

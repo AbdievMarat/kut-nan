@@ -201,7 +201,10 @@
                         <td>{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
                             @php $ordAmt = $productData['order_amount']; @endphp
-                            <td class="text-center">
+                            <td class="text-center order-cell{{ $productData['is_marked'] ? ' order-cell-marked' : '' }}"
+                                data-bus-id="{{ $bus['id'] }}"
+                                data-product-id="{{ $productData['product_id'] }}"
+                                data-date="{{ $date }}">
                                 <span class="order-amount-view d-inline-block" style="min-width: 40px;">{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}</span>
                                 <input
                                     type="number"

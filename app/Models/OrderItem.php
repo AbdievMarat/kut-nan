@@ -31,6 +31,7 @@ class OrderItem extends Model
         'product_id',
         'price',
         'amount',
+        'is_marked',
     ];
 
     /**

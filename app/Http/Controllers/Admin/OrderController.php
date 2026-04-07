@@ -61,22 +61,25 @@ class OrderController extends Controller
 
         $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns) {
             $orderAmounts = [];
+            $orderMarked = [];
 
             /** @var Order $order */
             foreach ($bus->orders as $order) {
                 /** @var OrderItem $item */
                 foreach ($order->items as $item) {
                     $orderAmounts[$item->product_id] = $item->amount;
+                    $orderMarked[$item->product_id] = (bool) $item->is_marked;
                 }
             }
 
             return [
                 'id' => $bus->id,
                 'license_plate' => $bus->license_plate . ' ' . $bus->serial_number,
-                'products' => $products->map(function ($product) use ($orderAmounts) {
+                'products' => $products->map(function ($product) use ($orderAmounts, $orderMarked) {
                     return [
                         'product_id' => $product->id,
                         'order_amount' => $orderAmounts[$product->id] ?? '',
+                        'is_marked' => $orderMarked[$product->id] ?? false,
                     ];
                 }),
                 'total_markdown_sum' => $sumMarkdowns[$bus->id] ?? '',
@@ -329,6 +332,38 @@ class OrderController extends Controller
                 'invoiceReturn' => $invoiceReturn
             ])->render()
         ]);
+    }
+
+    public function toggleOrderItemMark(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'bus_id' => 'required|integer|exists:buses,id',
+            'product_id' => 'required|integer|exists:products,id',
+        ]);
+
+        $order = Order::query()
+            ->where('bus_id', $data['bus_id'])
+            ->whereDate('date', $data['date'])
+            ->first();
+
+        if (! $order) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        $orderItem = OrderItem::query()
+            ->where('order_id', $order->id)
+            ->where('product_id', $data['product_id'])
+            ->first();
+
+        if (! $orderItem) {
+            return response()->json(['success' => false, 'message' => 'Позиция заказа не найдена'], 404);
+        }
+
+        $orderItem->is_marked = ! $orderItem->is_marked;
+        $orderItem->save();
+
+        return response()->json(['success' => true, 'is_marked' => $orderItem->is_marked]);
     }
 
     public function updateOrderItemsBatch(Request $request): JsonResponse

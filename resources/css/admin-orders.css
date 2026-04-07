@@ -31,6 +31,15 @@
     cursor: pointer;
 }
 
+/* Отметка ячейки двойным кликом */
+#orders-table.orders-view-mode td.order-cell {
+    cursor: default;
+}
+
+#orders-table td.order-cell-marked {
+    background-color: rgba(40, 167, 69, 0.25) !important;
+}
+
 #orders-table.orders-view-mode tr.bus-data-row.row-selected td {
     background-color: rgba(0, 0, 0, 0.075);
 }

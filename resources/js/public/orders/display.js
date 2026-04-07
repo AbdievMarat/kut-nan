@@ -123,8 +123,13 @@ $(document).ready(function() {
                             .attr('data-bus-id', bus.id)
                             .attr('data-product-id', productData.product_id)
                             .attr('data-change-type', finalChangeType)
+                            .attr('data-is-marked', productData.is_marked ? '1' : '0')
                             .text(amount);
-                        
+
+                        if (productData.is_marked) {
+                            $cell.addClass('order-cell-marked');
+                        }
+
                         applyChangeStyle($cell, finalChangeType);
                         $row.append($cell);
                     });

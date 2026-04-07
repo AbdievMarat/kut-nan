@@ -29,10 +29,11 @@
                     <tr>
                         <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
-                            <td class="text-center align-middle order-cell"
+                            <td class="text-center align-middle order-cell{{ $productData['is_marked'] ? ' order-cell-marked' : '' }}"
                                 data-bus-id="{{ $bus['id'] }}"
                                 data-product-id="{{ $productData['product_id'] }}"
-                                data-change-type="{{ $productData['change_type'] ?? '' }}">
+                                data-change-type="{{ $productData['change_type'] ?? '' }}"
+                                data-is-marked="{{ $productData['is_marked'] ? '1' : '0' }}">
                                 {{ $productData['order_amount'] ?: '' }}
                             </td>
                         @endforeach

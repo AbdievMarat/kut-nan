@@ -383,6 +383,29 @@ $(() => {
         window.print();
     });
 
+    $(document).on('dblclick', '#orders-table.orders-view-mode td.order-cell', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const $td = $(this);
+        const busId = $td.data('bus-id');
+        const productId = $td.data('product-id');
+        const date = $td.data('date');
+
+        $.ajax({
+            type: 'POST',
+            url: '/admin/orders/toggle-order-item-mark',
+            contentType: 'application/json; charset=UTF-8',
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
+            data: JSON.stringify({ bus_id: busId, product_id: productId, date: date }),
+        })
+            .done((res) => {
+                if (res.success) {
+                    $td.toggleClass('order-cell-marked', res.is_marked);
+                }
+            });
+    });
+
     $(document).on('click', 'tr.bus-data-row', function (e) {
         if (!$('#orders-table').hasClass('orders-view-mode')) return;
         if ($(e.target).closest('a').length) return;
