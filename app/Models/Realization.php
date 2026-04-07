@@ -25,6 +25,8 @@ class Realization extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['bus_id', 'date'];
+
     /**
      * @return BelongsTo
      */
