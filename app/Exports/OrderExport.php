@@ -148,8 +148,8 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                         ? round($breadRemainAmount / $piecesPerCart, 2)
                         : 0;
                     
-                    // Итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках), используем точное значение
-                    $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue + $breadRemainCarts;
+                    // Итоговое количество тележек (рассчитанное + введенное - остатки хлеба в тележках), используем точное значение
+                    $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue - $breadRemainCarts;
                     $cartsCount = $totalCartsValue > 0 ? $totalCartsValue : '';
                     
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);

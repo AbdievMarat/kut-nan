@@ -139,7 +139,7 @@
                         @foreach ($products as $index => $product)
                             @php $breadVal = $breadRemains->values()->get($index); @endphp
                             <td class="bread-remain-cell">
-                                <span class="bread-remain-view d-inline-block text-center" style="min-width: 60px;">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
+                                <span class="bread-remain-view d-inline-block" style="min-width: 60px;">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm bread-remain-input d-none"

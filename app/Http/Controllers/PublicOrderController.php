@@ -163,8 +163,8 @@ class PublicOrderController extends Controller
                 ? round($breadRemainAmount / $piecesPerCart, 1)
                 : 0;
 
-            // Итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках), используем точное значение
-            $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue + $breadRemainCarts;
+            // Итоговое количество тележек (рассчитанное + введенное - остатки хлеба в тележках), используем точное значение
+            $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue - $breadRemainCarts;
             return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
         });
 

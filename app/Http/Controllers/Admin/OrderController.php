@@ -97,27 +97,22 @@ class OrderController extends Controller
             ->keyBy('product_id');
 
         // Рассчитываем количество тележек для итоговой строки
-        // Учитываем остатки хлеба в пересчете на тележки
+        // Вычитаем остатки хлеба в штуках перед делением, чтобы избежать двойного округления
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedBreadRemainsForCarts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
 
-            // Рассчитываем тележки из заказов
-            $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 1)
-                : 0;
-
-            // Добавляем остатки хлеба в пересчете на тележки
             $breadRemain = $savedBreadRemainsForCarts->get($product->id);
             $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
-            $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
-                ? round($breadRemainAmount / $piecesPerCart, 1)
+
+            $netPieces = $multipliedAmount - $breadRemainAmount;
+            $calculatedCarts = $netPieces > 0 && $piecesPerCart > 0
+                ? round($netPieces / $piecesPerCart, 1)
                 : 0;
 
-            $totalCartsValue = $calculatedCartsFromOrders + $breadRemainCarts;
-            return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
+            return $calculatedCarts > 0 ? $calculatedCarts : '';
         });
 
         // Рассчитываем промежуточные значения для отображения
@@ -177,16 +172,18 @@ class OrderController extends Controller
             return '';
         });
 
-        // Рассчитываем итоговые значения: (рассчитанное из заказов + введенное пользователем + остатки хлеба в тележках) * pieces_per_cart
-        // Остатки хлеба уже включены в totalCarts в пересчете на тележки
-        // Округляем до целых чисел
-        $finalTotals = $products->map(function ($product, $index) use ($totalCarts, $savedCarts, $piecesPerCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+        // Рассчитываем итоговые значения: multipliedAmount + savedCarts * piecesPerCart - breadRemainAmount
+        // Используем multipliedAmounts напрямую (в штуках), чтобы избежать погрешности от конвертации шт→тележки→шт
+        $finalTotals = $products->map(function ($product, $index) use ($multipliedAmounts, $savedCarts, $piecesPerCarts, $savedBreadRemainsForCarts) {
+            $multipliedAmount = (float)($multipliedAmounts->values()->get($index) ?? 0);
             $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
             $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
-            $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            // Итоговое значение = общее количество тележек * pieces_per_cart
-            $totalAmount = $totalCartsValue > 0 ? round($totalCartsValue * $piecesPerCart) : 0;
+            $savedCartsPieces = round($savedCartsValue * $piecesPerCart);
+
+            $breadRemain = $savedBreadRemainsForCarts->get($product->id);
+            $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
+
+            $totalAmount = $multipliedAmount + $savedCartsPieces - $breadRemainAmount;
             return $totalAmount > 0 ? round($totalAmount) : '';
         });
 
