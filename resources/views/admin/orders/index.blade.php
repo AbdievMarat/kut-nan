@@ -3,7 +3,7 @@
 @section('content')
     <div class="card">
         <div class="card-header">Отчёт по заказам {{ date('d.m.Y', strtotime($date)) }}</div>
-        <div class="card-body overflow-auto">
+        <div class="card-body">
             <form method="GET" action="{{ route('admin.orders.index') }}" class="mb-4 no-print" id="orders-filter-form">
                 <div class="row align-items-end">
                     <div class="col-md-3 mb-3">
@@ -29,17 +29,18 @@
                 </div>
             </form>
 
+            <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
             <table id="orders-table" class="table table-bordered table-hover orders-view-mode summary-rows-hidden">
-                <thead>
+                <thead style="position: sticky; top: 0; z-index: 2;">
                 <tr>
-                    <th>Автобус</th>
+                    <th style="background: #fff;">Автобус</th>
                     @foreach ($products as $product)
-                        <th class="vertical-text">{{ $product->name }}</th>
+                        <th class="vertical-text" style="background: #fff;">{{ $product->name }}</th>
                     @endforeach
-                    <th class="vertical-text">Уценка</th>
-                    <th class="vertical-text">Реализации</th>
-                    <th class="vertical-text">Остаток</th>
-                    <th class="vertical-text print-only">Подпись</th>
+                    <th class="vertical-text" style="background: #fff;">Уценка</th>
+                    <th class="vertical-text" style="background: #fff;">Реализации</th>
+                    <th class="vertical-text" style="background: #fff;">Остаток</th>
+                    <th class="vertical-text print-only" style="background: #fff;">Подпись</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -211,6 +212,7 @@
                 @endforeach
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
 
