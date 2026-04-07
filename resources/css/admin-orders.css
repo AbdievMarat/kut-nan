@@ -64,6 +64,11 @@
     #orders-table #cart-totals-row {
         display: table-row !important;
     }
+
+    #cart-totals-row .calculated-total-value {
+        display: block;
+        text-align: center;
+    }
     
     .card {
         border: none;
