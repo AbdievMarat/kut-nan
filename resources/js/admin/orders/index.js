@@ -42,6 +42,7 @@ $(() => {
 
         $('.order-amount-input, .bread-remain-input, .total-carts-input').addClass('d-none');
         $('.order-amount-view, .bread-remain-view, .total-carts-view').removeClass('d-none');
+        $('.clear-column-btn').addClass('d-none');
 
         if (domain === 'none') {
             setFormsDisabled(false);
@@ -58,6 +59,7 @@ $(() => {
             $('.orders-domain-save-btn, .orders-domain-cancel-btn').removeClass('d-none');
             $('.order-amount-view').addClass('d-none');
             $('.order-amount-input').removeClass('d-none');
+            $('.clear-column-btn').removeClass('d-none');
             $('tr.bus-data-row, tr.multiplied-amount-row').addClass('table-warning');
         } else if (domain === 'bread') {
             $('.bread-domain-save-btn, .bread-domain-cancel-btn').removeClass('d-none');
@@ -283,6 +285,11 @@ $(() => {
     });
     $('.carts-domain-save-btn').on('click', function () {
         ajaxSave(URL_CART_COUNTS, collectCartCountsPayload(), $(this));
+    });
+
+    $(document).on('click', '.clear-column-btn', function () {
+        const productId = $(this).data('product-id');
+        $(`.order-amount-input[data-product-id="${productId}"]`).val('').trigger('input');
     });
 
     $(document).on('input', '.order-amount-input', function () {

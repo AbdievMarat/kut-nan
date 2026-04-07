@@ -164,8 +164,16 @@
                             <button type="button" class="btn btn-sm btn-success no-print orders-domain-save-btn d-none">Сохранить</button>
                             <button type="button" class="btn btn-sm btn-secondary no-print orders-domain-cancel-btn d-none">Отмена</button>
                         </td>
-                        @foreach ($multipliedAmounts as $multipliedAmount)
-                            <td class="multiplied-amount-cell">{{ $multipliedAmount }}</td>
+                        @foreach ($products as $index => $product)
+                            @php $multipliedAmount = $multipliedAmounts->get($index); @endphp
+                            <td class="multiplied-amount-cell">
+                                <span class="multiplied-amount-value">{{ $multipliedAmount }}</span>
+                                <button type="button"
+                                    class="btn btn-sm btn-danger no-print clear-column-btn d-none"
+                                    data-product-id="{{ $product->id }}"
+                                    style="font-size: 0.65rem; padding: 1px 5px; line-height: 1; margin-left: 4px;"
+                                    title="Очистить столбец">×</button>
+                            </td>
                         @endforeach
                         <td></td>
                         <td></td>
