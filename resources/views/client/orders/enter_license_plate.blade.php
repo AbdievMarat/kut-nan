@@ -62,7 +62,7 @@
 
                     <button class="lp-btn lp-btn--slate" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_INVOICE_RETURN }})">
                         <span class="lp-btn-icon"><i class="bi bi-arrow-counterclockwise"></i></span>
-                        <span class="lp-btn-label">Возврат</span>
+                        <span class="lp-btn-label">Возврат накладных</span>
                     </button>
                 </div>
             </form>
