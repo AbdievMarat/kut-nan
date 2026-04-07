@@ -23,7 +23,7 @@
                         class="lp-input @error('license_plate') is-invalid @enderror"
                         id="license_plate"
                         placeholder="Номер машины"
-                        value="{{ old('license_plate') }}"
+                        value="{{ old('li1cense_plate') }}"
                         autofocus
                         autocomplete="off"
                     >
@@ -40,11 +40,6 @@
                         <span class="lp-btn-label">Оформить заказ</span>
                     </button>
 
-                    <button class="lp-btn lp-btn--blue" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_REALIZATION }})">
-                        <span class="lp-btn-icon"><i class="bi bi-bag-check-fill"></i></span>
-                        <span class="lp-btn-label">Реализации</span>
-                    </button>
-
                     <button class="lp-btn lp-btn--teal" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_REMAINDER }})">
                         <span class="lp-btn-icon"><i class="bi bi-box-seam-fill"></i></span>
                         <span class="lp-btn-label">Остатки</span>
@@ -53,6 +48,11 @@
                     <button class="lp-btn lp-btn--plum" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_MARKDOWN }})">
                         <span class="lp-btn-icon"><i class="bi bi-tag-fill"></i></span>
                         <span class="lp-btn-label">Уценка</span>
+                    </button>
+
+                    <button class="lp-btn lp-btn--blue" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_REALIZATION }})">
+                        <span class="lp-btn-icon"><i class="bi bi-bag-check-fill"></i></span>
+                        <span class="lp-btn-label">Реализации</span>
                     </button>
 
                     <button class="lp-btn lp-btn--amber" type="button" onclick="submitForm({{ Order::TYPE_OPERATION_INVOICE }})">

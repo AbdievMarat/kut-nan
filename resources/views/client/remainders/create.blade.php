@@ -1,36 +1,77 @@
 @extends('layouts.client')
 
 @section('content')
-    <h1>Форма для ввода остатков на {{ date('d.m.Y', strtotime($remainder->date)) }} от буса № {{ $licensePlate }}</h1>
-    <form action="{{ route('remainders.store') }}" method="POST">
-        @csrf
 
-        <input type="hidden" name="id" value="{{ $remainder->id }}">
-
-        @foreach ($products as $product)
-            <x-client-forms-input
-                    type="number"
-                    name="item_amounts[{{ $product->id }}]"
-                    id="item_{{ $product->id }}"
-                    label="{{ $product->name }}"
-                    placeholder=""
-                    value="{{ $itemAmounts->has($product->id) ? $itemAmounts[$product->id]->amount : old('item_amounts.'.$product->id) }}"
-                    data-product-price="{{ $product->price }}"
-            >
-            </x-client-forms-input>
-
-            <input type="hidden" name="item_price[{{ $product->id }}]" value="{{ $product->price }}">
-        @endforeach
-
-        <div id="price-label" class="alert alert-success" role="alert">
-            <i class="bi bi-calculator-fill me-2"></i>
-            <strong>Итого: <span id="total-price">0</span></strong>
+    <div class="inv-hero inv-hero--teal">
+        <div class="inv-hero__inner">
+            <div class="inv-hero__icon">
+                <i class="bi bi-box-seam-fill"></i>
+            </div>
+            <div>
+                <div class="inv-hero__title">Остатки</div>
+                <div class="inv-hero__meta">
+                    <span class="inv-hero__badge">
+                        <i class="bi bi-truck-front-fill"></i>{{ $licensePlate }}
+                    </span>
+                    <span class="inv-hero__sep">·</span>
+                    <span class="inv-hero__badge">
+                        <i class="bi bi-calendar3"></i>{{ date('d.m.Y', strtotime($remainder->date)) }}
+                    </span>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <button type="submit" class="btn btn-success w-100 mb-3">Сохранить</button>
-    </form>
+    <div class="inv-page">
+        <form action="{{ route('remainders.store') }}" method="POST" id="remainder-form">
+            @csrf
+            <input type="hidden" name="id" value="{{ $remainder->id }}">
+
+            <div class="pf-card pf-card--teal">
+                @foreach ($products as $product)
+                    <div class="pf-row">
+                        <label class="pf-label" for="item_{{ $product->id }}">{{ $product->name }}</label>
+                        <div class="pf-input-wrap">
+                            <input
+                                type="number"
+                                class="pf-input @error('item_amounts.'.$product->id) is-invalid @enderror"
+                                id="item_{{ $product->id }}"
+                                name="item_amounts[{{ $product->id }}]"
+                                placeholder="0"
+                                value="{{ $itemAmounts->has($product->id) ? $itemAmounts[$product->id]->amount : old('item_amounts.'.$product->id) }}"
+                                autocomplete="off"
+                                data-product-price="{{ $product->price }}"
+                            >
+                        </div>
+                        <input type="hidden" name="item_price[{{ $product->id }}]" value="{{ $product->price }}">
+                    </div>
+                    @error('item_amounts.'.$product->id)
+                        <p class="pf-err" style="display:block">{{ $message }}</p>
+                    @enderror
+                @endforeach
+            </div>
+        </form>
+    </div>
+
+    <div class="inv-bar">
+        <div class="inv-bar__total">
+            <div class="inv-bar__total-left">
+                <div class="inv-bar__total-icon inv-bar__total-icon--teal">
+                    <i class="bi bi-calculator-fill"></i>
+                </div>
+                <span class="inv-bar__label">Итого</span>
+            </div>
+            <div class="inv-bar__total-right">
+                <span class="inv-bar__amount inv-bar__amount--teal" id="total-price">0</span>
+            </div>
+        </div>
+        <button type="submit" form="remainder-form" class="inv-bar__save">
+            <i class="bi bi-check2-circle"></i>Сохранить
+        </button>
+    </div>
 
     @push('scripts')
-        @vite(['resources/js/client/remainders/create.js'])
+        @vite(['resources/css/client-invoices.css', 'resources/js/client/remainders/create.js'])
     @endpush
+
 @endsection
