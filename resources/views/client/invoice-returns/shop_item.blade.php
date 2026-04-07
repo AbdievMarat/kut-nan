@@ -55,7 +55,6 @@
                 min="0"
             >
         </div>
-        <span class="sc__currency">сум</span>
     </div>
 
     @error("amount.{$index}")

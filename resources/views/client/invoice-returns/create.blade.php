@@ -69,7 +69,6 @@
             </div>
             <div class="inv-bar__total-right">
                 <span class="inv-bar__amount inv-bar__amount--return" id="total-amount">0</span>
-                <span class="inv-bar__currency">сум</span>
             </div>
         </div>
         <button type="submit" form="invoice-return-form" class="inv-bar__save inv-bar__save--return">
