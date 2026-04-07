@@ -41,16 +41,16 @@
     * {
         font-size: 11px !important;
     }
-    
+
     body {
         margin: 0 !important;
         padding: 0 !important;
     }
-    
+
     .no-print {
         display: none !important;
     }
-    
+
     .pieces-per-cart-row,
     .carts-calculated-row,
     .carts-reserve-row,
@@ -69,26 +69,26 @@
         display: block;
         text-align: center;
     }
-    
+
     .card {
         border: none;
         box-shadow: none;
         margin: 0 !important;
         padding: 0 !important;
     }
-    
+
     .card-header {
         font-size: 13px !important;
         padding: 3px 0 !important;
         margin: 0 !important;
         margin-bottom: 3px !important;
     }
-    
+
     .card-body {
         padding: 0 !important;
         margin: 0 !important;
     }
-    
+
     #orders-table {
         font-size: 10px !important;
         width: 100% !important;
@@ -96,14 +96,14 @@
         margin: 0 !important;
         table-layout: fixed !important;
     }
-    
+
     #orders-table th:first-child,
     #orders-table td:first-child {
         width: 70px !important;
         min-width: 70px !important;
         max-width: 70px !important;
     }
-    
+
     #orders-table th,
     #orders-table td {
         padding: 2px 2px !important;
@@ -111,17 +111,17 @@
         border: 1px solid #000 !important;
         line-height: 1.1 !important;
     }
-    
+
     #orders-table th.vertical-text,
     #orders-table td:not(:first-child):not(:nth-last-child(-n+4)) {
         width: 25px !important;
     }
-    
+
     #orders-table th {
         font-size: 10px !important;
         font-weight: bold;
     }
-    
+
     #orders-table input.order-amount-input {
         display: none !important;
     }
@@ -142,36 +142,36 @@
     #orders-table .total-carts-view {
         display: none !important;
     }
-    
+
     /* Скрываем инпуты тележек при печати */
     #orders-table .total-carts-input {
         display: none !important;
     }
-    
+
     /* Показываем только итоговые значения тележек при печати */
     #orders-table .total-carts-summary-cell {
         text-align: center !important;
     }
-    
+
     #orders-table .print-total-carts-value {
         display: inline-block !important;
         font-size: 11px !important;
         font-weight: bold !important;
     }
-    
+
     /* Уменьшаем шрифт в строке "Итого" на 1px для печати */
     #orders-table #cart-totals-row td,
     #orders-table #cart-totals-row .cart-total-cell,
     #orders-table #cart-totals-row .calculated-total-value {
         font-size: 8px !important;
     }
-    
+
     /* Скрываем промежуточные элементы при печати */
     #orders-table .calculated-carts-value,
     #orders-table .text-muted {
         display: none !important;
     }
-    
+
     /* Скрываем столбцы Уценка (4-й с конца), Реализации (3-й с конца), Остаток (2-й с конца) */
     #orders-table th:nth-last-child(4),
     #orders-table td:nth-last-child(4),
@@ -181,7 +181,7 @@
     #orders-table td:nth-last-child(2) {
         display: none !important;
     }
-    
+
     /* Показываем столбец "Подпись" (последний столбец) при печати */
     .print-only {
         display: table-cell !important;
@@ -189,14 +189,14 @@
         min-width: 60px !important;
         max-width: 60px !important;
     }
-    
+
     .vertical-text {
         writing-mode: vertical-rl;
         text-orientation: mixed;
         height: 55px !important;
         width: 25px !important;
     }
-    
+
     @page {
         size: landscape;
         margin: 0.2cm !important;

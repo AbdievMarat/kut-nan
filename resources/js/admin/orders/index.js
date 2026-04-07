@@ -238,6 +238,54 @@ $(() => {
             });
     });
 
+    $(document).on('click', '.get-invoice-shops', function (event) {
+        event.preventDefault();
+
+        const date = $(this).data('date');
+        const busId = $(this).data('bus_id');
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/get-invoice-shops',
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
+            data: {
+                date: date,
+                bus_id: busId,
+            },
+        })
+            .done((successResponse) => {
+                $('#orderContent').html(successResponse.invoiceDetails);
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке данных накладной!');
+            });
+    });
+
+    $(document).on('click', '.get-invoice-return-shops', function (event) {
+        event.preventDefault();
+
+        const date = $(this).data('date');
+        const busId = $(this).data('bus_id');
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/get-invoice-return-shops',
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
+            data: {
+                date: date,
+                bus_id: busId,
+            },
+        })
+            .done((successResponse) => {
+                $('#orderContent').html(successResponse.invoiceReturnDetails);
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке данных возврата накладной!');
+            });
+    });
+
     $(document).on('click', '.get-markdown-items', function (event) {
         event.preventDefault();
 

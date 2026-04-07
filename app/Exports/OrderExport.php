@@ -18,14 +18,18 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
     protected $products;
     protected $sumMarkdowns;
     protected $sumRealizations;
+    protected $sumInvoices;
+    protected $sumInvoiceReturns;
     protected $sumRemainders;
 
-    public function __construct($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders)
+    public function __construct($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns)
     {
         $this->date = $date;
         $this->products = $products;
         $this->sumMarkdowns = $sumMarkdowns;
         $this->sumRealizations = $sumRealizations;
+        $this->sumInvoices = $sumInvoices;
+        $this->sumInvoiceReturns = $sumInvoiceReturns;
         $this->sumRemainders = $sumRemainders;
     }
 
@@ -49,7 +53,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
         return array_merge(
             ['Автобус'],
             $productNames,
-            ['Сумма', 'Уценка', 'Реализации', 'Остаток']
+            ['Сумма', 'Уценка', 'Реализации', 'Накладные', 'Возврат накладных', 'Остаток']
         );
     }
 
@@ -82,6 +86,8 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
         $mappedRow[] = ''; // Сумма
         $mappedRow[] = $this->sumMarkdowns[$row->id] ?? '';
         $mappedRow[] = $this->sumRealizations[$row->id] ?? '';
+        $mappedRow[] = $this->sumInvoices[$row->id] ?? '';
+        $mappedRow[] = $this->sumInvoiceReturns[$row->id] ?? '';
         $mappedRow[] = $this->sumRemainders[$row->id] ?? '';
 
         return $mappedRow;
@@ -123,7 +129,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
 
                 // Вставляем новую строку после заголовков (строка 2)
                 $sheet->insertNewRowBefore(2, 1);
-                
+
                 // Заполняем строку "Тележки" с итоговым количеством (рассчитанное + введенное + остатки хлеба в тележках)
                 $sheet->setCellValue('A2', 'Тележки');
                 $colIndex = 2;
@@ -133,30 +139,30 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                     $orderMultiplier = $product->order_multiplier ?? 1;
                     $piecesPerCart = $product->pieces_per_cart ?? 1;
                     $multipliedAmount = $totalAmount * $orderMultiplier;
-                    $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0 
-                        ? round($multipliedAmount / $piecesPerCart, 2) 
+                    $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
+                        ? round($multipliedAmount / $piecesPerCart, 2)
                         : 0;
-                    
+
                     // Получаем введенное пользователем количество тележек
                     $cartCount = $savedCartCounts->get($product->id);
                     $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
-                    
+
                     // Добавляем остатки хлеба в пересчете на тележки
                     $breadRemain = $savedBreadRemains->get($product->id);
                     $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
                     $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
                         ? round($breadRemainAmount / $piecesPerCart, 2)
                         : 0;
-                    
+
                     // Итоговое количество тележек (рассчитанное + введенное - остатки хлеба в тележках), используем точное значение
                     $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue - $breadRemainCarts;
                     $cartsCount = $totalCartsValue > 0 ? $totalCartsValue : '';
-                    
+
                     $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
                     $sheet->setCellValue($colLetter . '2', $cartsCount);
                     $colIndex++;
                 }
-                
+
                 // Стилизуем строку "Тележки"
                 $lastColIndex = 1 + count($this->products); // A (1) + количество продуктов
                 $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($lastColIndex);
@@ -169,7 +175,7 @@ class OrderExport implements FromQuery, WithHeadings, WithMapping, WithEvents
                 ]);
 
                 // Стилизуем заголовки (теперь строка 1)
-                $sheet->getStyle('A1:AH1')->applyFromArray([
+                $sheet->getStyle('A1:AK1')->applyFromArray([
                     'alignment' => [
                         'textRotation' => 90,
                         'vertical' => Alignment::VERTICAL_CENTER,

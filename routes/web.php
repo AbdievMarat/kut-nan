@@ -55,6 +55,8 @@ Route::middleware(['auth', 'role:admin,manager'])->prefix('admin')->name('admin.
     Route::get('get-markdown-items', [AdminOrderController::class, 'getMarkdownItems'])->name('orders.get_markdown_items');
     Route::get('get-realization-shops', [AdminOrderController::class, 'getRealizationShops'])->name('orders.get_realization_shops');
     Route::get('get-remainder-items', [AdminOrderController::class, 'getRemainderItems'])->name('orders.get_remainder_items');
+    Route::get('get-invoice-shops', [AdminOrderController::class, 'getInvoiceShops'])->name('orders.get_invoice_shops');
+    Route::get('get-invoice-return-shops', [AdminOrderController::class, 'getInvoiceReturnShops'])->name('orders.get_invoice_return_shops');
     Route::post('orders/update-order-items', [AdminOrderController::class, 'updateOrderItemsBatch'])->name('orders.update_order_items');
     Route::post('orders/update-bread-remains', [AdminOrderController::class, 'updateBreadRemainsBatch'])->name('orders.update_bread_remains');
     Route::post('orders/update-cart-counts', [AdminOrderController::class, 'updateCartCountsBatch'])->name('orders.update_cart_counts');

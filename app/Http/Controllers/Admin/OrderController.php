@@ -8,6 +8,10 @@ use App\Models\BreadRemain;
 use App\Models\Bus;
 use App\Models\BusProductPrice;
 use App\Models\CartCount;
+use App\Models\Invoice;
+use App\Models\InvoiceReturn;
+use App\Models\InvoiceReturnShop;
+use App\Models\InvoiceShop;
 use App\Models\Markdown;
 use App\Models\Order;
 use App\Models\OrderChangeLog;
@@ -52,8 +56,10 @@ class OrderController extends Controller
         $sumMarkdowns = $this->getSumMarkdowns($date);
         $sumRealizations = $this->getSumRealizations($date);
         $sumRemainders = $this->getSumRemainders($date);
+        $sumInvoices = $this->getSumInvoices($date);
+        $sumInvoiceReturns = $this->getSumInvoiceReturns($date);
 
-        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders) {
+        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns) {
             $orderAmounts = [];
 
             /** @var Order $order */
@@ -75,6 +81,8 @@ class OrderController extends Controller
                 }),
                 'total_markdown_sum' => $sumMarkdowns[$bus->id] ?? '',
                 'total_realization_sum' => $sumRealizations[$bus->id] ?? '',
+                'total_invoice_sum' => $sumInvoices[$bus->id] ?? '',
+                'total_invoice_return_sum' => $sumInvoiceReturns[$bus->id] ?? '',
                 'total_remainder_sum' => $sumRemainders[$bus->id] ?? ''
             ];
         });
@@ -202,7 +210,10 @@ class OrderController extends Controller
         $sumRealizations = $this->getSumRealizations($date);
         $sumRemainders = $this->getSumRemainders($date);
 
-        return Excel::download(new OrderExport($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders), 'orders_' . date('d.m.Y', strtotime($date)) . '.xlsx');
+        $sumInvoices = $this->getSumInvoices($date);
+        $sumInvoiceReturns = $this->getSumInvoiceReturns($date);
+
+        return Excel::download(new OrderExport($date, $products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns), 'orders_' . date('d.m.Y', strtotime($date)) . '.xlsx');
     }
 
     /**
@@ -272,6 +283,50 @@ class OrderController extends Controller
         return response()->json([
             'remainderDetails' => view('admin.orders.remainder_details', [
                 'remainder' => $remainder
+            ])->render()
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getInvoiceShops(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $busId = $request->input('bus_id');
+
+        $invoice = Invoice::query()
+            ->with('shops')
+            ->whereDate('date', $date)
+            ->where('bus_id', '=', $busId)
+            ->first();
+
+        return response()->json([
+            'invoiceDetails' => view('admin.orders.invoice_details', [
+                'invoice' => $invoice
+            ])->render()
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getInvoiceReturnShops(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $busId = $request->input('bus_id');
+
+        $invoiceReturn = InvoiceReturn::query()
+            ->with('shops')
+            ->whereDate('date', $date)
+            ->where('bus_id', '=', $busId)
+            ->first();
+
+        return response()->json([
+            'invoiceReturnDetails' => view('admin.orders.invoice_return_details', [
+                'invoiceReturn' => $invoiceReturn
             ])->render()
         ]);
     }
@@ -503,6 +558,38 @@ class OrderController extends Controller
             ->whereDate('remainders.date', $date)
             ->whereNotNull('remainder_items.amount')
             ->groupBy('remainders.bus_id')
+            ->pluck('total', 'bus_id');
+    }
+
+    /**
+     * @param $date
+     * @return Collection
+     */
+    private function getSumInvoices($date): Collection
+    {
+        return InvoiceShop::query()
+            ->select('invoices.bus_id')
+            ->selectRaw('SUM(invoice_shops.amount) as total')
+            ->leftJoin('invoices', 'invoice_shops.invoice_id', '=', 'invoices.id')
+            ->whereDate('invoices.date', $date)
+            ->whereNotNull('invoice_shops.amount')
+            ->groupBy('invoices.bus_id')
+            ->pluck('total', 'bus_id');
+    }
+
+    /**
+     * @param $date
+     * @return Collection
+     */
+    private function getSumInvoiceReturns($date): Collection
+    {
+        return InvoiceReturnShop::query()
+            ->select('invoice_returns.bus_id')
+            ->selectRaw('SUM(invoice_return_shops.amount) as total')
+            ->leftJoin('invoice_returns', 'invoice_return_shops.invoice_return_id', '=', 'invoice_returns.id')
+            ->whereDate('invoice_returns.date', $date)
+            ->whereNotNull('invoice_return_shops.amount')
+            ->groupBy('invoice_returns.bus_id')
             ->pluck('total', 'bus_id');
     }
 

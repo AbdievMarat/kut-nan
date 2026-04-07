@@ -37,8 +37,10 @@
                     @foreach ($products as $product)
                         <th class="vertical-text" style="background: #fff;">{{ $product->name }}</th>
                     @endforeach
-                    <th class="vertical-text" style="background: #fff;">Уценка</th>
-                    <th class="vertical-text" style="background: #fff;">Реализации</th>
+                    <th class="vertical-text no-print" style="background: #fff;">Уценка</th>
+                    <th class="vertical-text no-print" style="background: #fff;">Реализации</th>
+                    <th class="vertical-text no-print" style="background: #fff;">Накладные</th>
+                    <th class="vertical-text no-print" style="background: #fff;">Возврат накладных</th>
                     <th class="vertical-text" style="background: #fff;">Остаток</th>
                     <th class="vertical-text print-only" style="background: #fff;">Подпись</th>
                 </tr>
@@ -75,8 +77,10 @@
                                 <span class="print-total-carts-value d-none">{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}</span>
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -87,8 +91,10 @@
                                 <span class="calculated-carts-value">{{ $totalCarts->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -102,8 +108,10 @@
                                 <span class="cart-count-view align-middle px-1" style="min-width: 55px;">{{ $savedCartVal !== null && $savedCartVal !== '' ? number_format((float) $savedCartVal, 2, '.', '') : '' }}</span>
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -112,8 +120,10 @@
                         @foreach ($piecesPerCarts as $piecesPerCart)
                             <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -124,8 +134,10 @@
                                 <span class="calculated-total-value">{{ $finalTotals->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -152,8 +164,10 @@
                                 >
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -175,8 +189,10 @@
                                     title="Очистить столбец">×</button>
                             </td>
                         @endforeach
-                        <td></td>
-                        <td></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -200,14 +216,24 @@
                                 >
                             </td>
                         @endforeach
-                        <td>
+                        <td class="no-print">
                             @if($bus['total_markdown_sum'])
                                 <a href="#" class="get-markdown-items" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
                             @endif
                         </td>
-                        <td>
+                        <td class="no-print">
                             @if($bus['total_realization_sum'])
                                 <a href="#" class="get-realization-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_realization_sum'] }}</a>
+                            @endif
+                        </td>
+                        <td class="no-print">
+                            @if($bus['total_invoice_sum'])
+                                <a href="#" class="get-invoice-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_sum'] }}</a>
+                            @endif
+                        </td>
+                        <td class="no-print">
+                            @if($bus['total_invoice_return_sum'])
+                                <a href="#" class="get-invoice-return-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_return_sum'] }}</a>
                             @endif
                         </td>
                         <td>
