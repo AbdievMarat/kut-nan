@@ -44,7 +44,7 @@ img {
 /* Стили применяются только к формам без Bootstrap классов */
 form:not(#feedback-form) input:not(.form-control) {
     border: 1px solid #8200a6;
-    padding: 18px 8px;
+    padding: 12px 8px;
     border-radius: 15px;
     margin-bottom: 15px;
     font-size: 20px;

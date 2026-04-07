@@ -16,7 +16,7 @@
             <form action="{{ route('orders.process_license_plate') }}" id="order_form" method="POST">
                 @csrf
 
-                <div class="lp-input-wrap mb-4">
+                <div class="lp-input-wrap mb-2">
                     <input
                         type="number"
                         name="license_plate"
