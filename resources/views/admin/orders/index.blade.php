@@ -29,7 +29,7 @@
                 </div>
             </form>
 
-            <div style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
+            <div class="orders-table-container" style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
             <table id="orders-table" class="table table-bordered table-hover orders-view-mode summary-rows-hidden">
                 <thead style="position: sticky; top: 0; z-index: 2;">
                 <tr>

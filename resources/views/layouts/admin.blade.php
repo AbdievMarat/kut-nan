@@ -16,7 +16,7 @@
     @stack('scripts')
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark" style="background-color: #4c2d10;">
+<nav class="navbar navbar-expand-md navbar-dark no-print" style="background-color: #4c2d10;">
     <div class="container-fluid">
         <a class="navbar-brand" href="{{ url('/') }}">
             {{ config('app.name', 'Laravel') }}

@@ -4,6 +4,23 @@
     vertical-align: middle;
 }
 
+/* Фикс: sticky thead + border-collapse: separate чтобы бордеры не терялись */
+#orders-table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* Убираем задвоение бордеров в tbody из-за separate */
+#orders-table tbody td,
+#orders-table tbody th {
+    border-top: none !important;
+}
+
+#orders-table th:not(:first-child),
+#orders-table td:not(:first-child) {
+    border-left: none !important;
+}
+
 /* Скрываем столбец "Подпись" на экране */
 .print-only {
     display: none !important;
@@ -125,7 +142,7 @@
     #orders-table th,
     #orders-table td {
         padding: 2px 2px !important;
-        font-size: 11px !important;
+        font-size: 13px !important;
         border: 1px solid #000 !important;
         line-height: 1.1 !important;
     }
@@ -213,6 +230,15 @@
         text-orientation: mixed;
         height: 55px !important;
         width: 25px !important;
+    }
+
+    main.container-fluid {
+        padding: 0 !important;
+    }
+
+    .orders-table-container {
+        overflow: visible !important;
+        max-height: none !important;
     }
 
     @page {
