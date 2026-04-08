@@ -10,6 +10,31 @@
     border-spacing: 0 !important;
 }
 
+/* Фиксация первого столбца при горизонтальном скролле */
+#orders-table th:first-child,
+#orders-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: #fff;
+}
+
+#orders-table thead th:first-child {
+    z-index: 3;
+}
+
+#orders-table tr.table-info td:first-child {
+    background-color: #cff4fc;
+}
+
+#orders-table tr.table-secondary td:first-child {
+    background-color: #e2e3e5;
+}
+
+#orders-table tr.table-warning td:first-child {
+    background-color: #fff3cd;
+}
+
 /* Убираем задвоение бордеров в tbody из-за separate */
 #orders-table tbody td,
 #orders-table tbody th {
@@ -59,6 +84,18 @@
 
 #orders-table.orders-view-mode tr.bus-data-row.row-selected td {
     background-color: rgba(0, 0, 0, 0.075);
+}
+
+/* Фиксация строки "Итого шт. из заказов" под заголовком при вертикальном скролле */
+#orders-table .multiplied-amount-row td {
+    position: sticky;
+    z-index: 2;
+    background-color: #e2e3e5;
+    /* top задаётся через JS после загрузки, равен высоте thead */
+}
+
+#orders-table .multiplied-amount-row td:first-child {
+    z-index: 3;
 }
 
 /* Скрытие сводных строк по умолчанию */

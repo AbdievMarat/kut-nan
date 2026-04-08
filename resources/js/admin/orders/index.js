@@ -462,4 +462,13 @@ $(() => {
             hideSummaryRows();
         }
     });
+
+    // Фиксируем строку "Итого шт. из заказов" под заголовком таблицы
+    function updateStickyRowTop() {
+        const theadHeight = $('#orders-table thead').outerHeight();
+        $('#orders-table .multiplied-amount-row td').css('top', theadHeight + 'px');
+    }
+
+    updateStickyRowTop();
+    $(window).on('resize', updateStickyRowTop);
 });
