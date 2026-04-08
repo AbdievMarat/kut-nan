@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('realizations:copy-previous-day')->dailyAt('11:00');
+        $schedule->command('realizations:copy-previous-day')->dailyAt('05:00');
     }
 
     /**
