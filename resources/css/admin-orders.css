@@ -285,6 +285,17 @@
         max-height: none !important;
     }
 
+    /* Сброс sticky-позиционирования при печати */
+    #orders-table thead,
+    #orders-table th:first-child,
+    #orders-table td:first-child,
+    #orders-table .multiplied-amount-row td {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        z-index: auto !important;
+    }
+
     @page {
         size: landscape;
         margin: 0.2cm !important;
