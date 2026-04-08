@@ -10,27 +10,29 @@
                         <input type="date" name="date" class="form-control orders-filter-control" value="{{ $date }}">
                     </div>
                     <div class="col-md-9 mb-3">
-                        <button type="submit" class="btn btn-success orders-filter-control">
-                            <i class="bi bi-search"></i> Вывести
-                        </button>
+                        <div class="d-grid d-md-flex gap-2">
+                            <button type="submit" class="btn btn-success orders-filter-control">
+                                <i class="bi bi-search"></i> Вывести
+                            </button>
 
-                        <button type="submit" class="btn btn-primary orders-filter-control" formaction="{{ route('admin.orders.export_to_excel') }}" id="orders-export-btn">
-                            <i class="bi bi-file-earmark-excel"></i> Выгрузить
-                        </button>
+                            <button type="submit" class="btn btn-primary orders-filter-control" formaction="{{ route('admin.orders.export_to_excel') }}" id="orders-export-btn">
+                                <i class="bi bi-file-earmark-excel"></i> Выгрузить
+                            </button>
 
-                        <button type="button" class="btn btn-info no-print" id="print-btn">
-                            <i class="bi bi-printer"></i> Распечатать
-                        </button>
+                            <button type="button" class="btn btn-info no-print" id="print-btn">
+                                <i class="bi bi-printer"></i> Распечатать
+                            </button>
 
-                        <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn" data-user-id="{{ auth()->id() }}">
-                            <i class="bi bi-eye"></i> Сводные строки
-                        </button>
+                            <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn" data-user-id="{{ auth()->id() }}">
+                                <i class="bi bi-eye"></i> Сводные строки
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
 
             <div class="orders-table-container" style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
-            <table id="orders-table" class="table table-bordered table-hover orders-view-mode summary-rows-hidden">
+            <table id="orders-table" class="table table-bordered table-hover orders-view-mode">
                 <thead style="position: sticky; top: 0; z-index: 2;">
                 <tr>
                     <th style="background: #fff;">Автобус</th>

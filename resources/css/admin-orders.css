@@ -4,10 +4,12 @@
     vertical-align: middle;
 }
 
-/* Фикс: sticky thead + border-collapse: separate чтобы бордеры не терялись */
-#orders-table {
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
+/* Фикс: sticky thead + border-collapse: separate чтобы бордеры не терялись (только на экране) */
+@media screen {
+    #orders-table {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
 }
 
 /* Фиксация первого столбца при горизонтальном скролле */
@@ -35,15 +37,17 @@
     background-color: #fff3cd;
 }
 
-/* Убираем задвоение бордеров в tbody из-за separate */
-#orders-table tbody td,
-#orders-table tbody th {
-    border-top: none !important;
-}
+/* Убираем задвоение бордеров в tbody из-за separate (только на экране) */
+@media screen {
+    #orders-table tbody td,
+    #orders-table tbody th {
+        border-top: none !important;
+    }
 
-#orders-table th:not(:first-child),
-#orders-table td:not(:first-child) {
-    border-left: none !important;
+    #orders-table th:not(:first-child),
+    #orders-table td:not(:first-child) {
+        border-left: none !important;
+    }
 }
 
 /* Скрываем столбец "Подпись" на экране */
@@ -171,7 +175,8 @@
     #orders-table {
         font-size: 10px !important;
         width: 100% !important;
-        border-collapse: collapse;
+        border-collapse: collapse !important;
+        border: 1px solid #000 !important;
         margin: 0 !important;
         table-layout: fixed !important;
     }
@@ -181,6 +186,12 @@
         width: 70px !important;
         min-width: 70px !important;
         max-width: 70px !important;
+        border-left: 1px solid #000 !important;
+    }
+
+    #orders-table th:last-child,
+    #orders-table td:last-child {
+        border-right: 1px solid #000 !important;
     }
 
     #orders-table th,

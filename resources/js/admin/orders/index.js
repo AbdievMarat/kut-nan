@@ -451,9 +451,7 @@ $(() => {
         $toggleBtn.html('<i class="bi bi-eye"></i> Сводные строки');
     }
 
-    if (parseInt($toggleBtn.data('user-id')) === 1) {
-        showSummaryRows();
-    }
+    showSummaryRows();
 
     $toggleBtn.on('click', function () {
         if ($table.hasClass('summary-rows-hidden')) {
