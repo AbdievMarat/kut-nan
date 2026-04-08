@@ -180,7 +180,7 @@
                         </td>
                         @foreach ($products as $index => $product)
                             @php $multipliedAmount = $multipliedAmounts->get($index); @endphp
-                            <td class="multiplied-amount-cell">
+                            <td class="multiplied-amount-cell" data-product-id="{{ $product->id }}" data-multiplier="{{ $product->order_multiplier ?? 1 }}">
                                 <span class="multiplied-amount-value">{{ $multipliedAmount }}</span>
                                 <button type="button"
                                     class="btn btn-sm btn-danger no-print clear-column-btn d-none"

@@ -344,6 +344,19 @@ $(() => {
         if (activeEditDomain === 'orders') {
             markDirty();
         }
+
+        const productId = $(this).data('product-id');
+        const $cell = $(`.multiplied-amount-cell[data-product-id="${productId}"]`);
+        const multiplier = parseFloat($cell.data('multiplier')) || 1;
+
+        let total = 0;
+        $(`.order-amount-input[data-product-id="${productId}"]`).each(function () {
+            const v = parseFloat($(this).val());
+            if (!isNaN(v)) total += v;
+        });
+
+        const multiplied = total * multiplier;
+        $cell.find('.multiplied-amount-value').text(multiplied > 0 ? multiplied : '');
     });
 
     $(document).on('input', '.bread-remain-input', function () {
