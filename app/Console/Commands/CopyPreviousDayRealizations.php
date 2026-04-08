@@ -16,16 +16,10 @@ class CopyPreviousDayRealizations extends Command
     public function handle(): int
     {
         $today = Carbon::today();
-
-        $todayExists = Realization::whereDate('date', $today)->exists();
-
-        if ($todayExists) {
-            $this->info('Realizations for today already exist. Nothing to do.');
-            return self::SUCCESS;
-        }
+        $yesterday = $today->copy()->subDay();
 
         $previousDayRealizations = Realization::with('shops')
-            ->whereDate('date', $today->copy()->subDay())
+            ->whereDate('date', $yesterday)
             ->get();
 
         if ($previousDayRealizations->isEmpty()) {
@@ -33,8 +27,21 @@ class CopyPreviousDayRealizations extends Command
             return self::SUCCESS;
         }
 
-        DB::transaction(function () use ($previousDayRealizations, $today) {
-            foreach ($previousDayRealizations as $previousRealization) {
+        $todayBusIds = Realization::whereDate('date', $today)
+            ->pluck('bus_id')
+            ->toArray();
+
+        $missingRealizations = $previousDayRealizations->filter(
+            fn ($realization) => !in_array($realization->bus_id, $todayBusIds)
+        );
+
+        if ($missingRealizations->isEmpty()) {
+            $this->info('All buses already have realizations for today. Nothing to do.');
+            return self::SUCCESS;
+        }
+
+        DB::transaction(function () use ($missingRealizations, $today) {
+            foreach ($missingRealizations as $previousRealization) {
                 $newRealization = Realization::create([
                     'bus_id' => $previousRealization->bus_id,
                     'date'   => $today,
@@ -54,7 +61,7 @@ class CopyPreviousDayRealizations extends Command
             }
         });
 
-        $this->info("Copied {$previousDayRealizations->count()} realization(s) from previous day to today ({$today->toDateString()}).");
+        $this->info("Copied {$missingRealizations->count()} realization(s) from previous day to today ({$today->toDateString()}).");
 
         return self::SUCCESS;
     }
