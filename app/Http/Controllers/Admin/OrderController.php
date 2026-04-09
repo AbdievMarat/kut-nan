@@ -315,6 +315,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws \Throwable
      */
     public function getInvoiceReturnShops(Request $request): JsonResponse
     {
@@ -334,6 +335,10 @@ class OrderController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function toggleOrderItemMark(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -366,6 +371,11 @@ class OrderController extends Controller
         return response()->json(['success' => true, 'is_marked' => $orderItem->is_marked]);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Throwable
+     */
     public function updateOrderItemsBatch(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -388,6 +398,11 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Throwable
+     */
     public function updateBreadRemainsBatch(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -408,6 +423,11 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws \Throwable
+     */
     public function updateCartCountsBatch(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -428,6 +448,10 @@ class OrderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * @param mixed $value
+     * @return int|null
+     */
     private function normalizeNullableInt(mixed $value): ?int
     {
         if ($value === null || $value === '') {
@@ -440,6 +464,10 @@ class OrderController extends Controller
         return (int) $value;
     }
 
+    /**
+     * @param mixed $value
+     * @return float|null
+     */
     private function normalizeNullableFloat(mixed $value): ?float
     {
         if ($value === null || $value === '') {
@@ -452,6 +480,13 @@ class OrderController extends Controller
         return (float) $value;
     }
 
+    /**
+     * @param string $date
+     * @param int $busId
+     * @param int $productId
+     * @param int|null $newAmount
+     * @return void
+     */
     private function persistOrderAmount(string $date, int $busId, int $productId, ?int $newAmount): void
     {
         $order = Order::query()
@@ -502,6 +537,12 @@ class OrderController extends Controller
         }
     }
 
+    /**
+     * @param string $date
+     * @param int $productId
+     * @param int|null $amount
+     * @return void
+     */
     private function persistBreadRemainAmount(string $date, int $productId, ?int $amount): void
     {
         $breadRemain = BreadRemain::query()
@@ -519,6 +560,12 @@ class OrderController extends Controller
         $breadRemain->save();
     }
 
+    /**
+     * @param string $date
+     * @param int $productId
+     * @param float|null $carts
+     * @return void
+     */
     private function persistCartCountValue(string $date, int $productId, ?float $carts): void
     {
         $cartCount = CartCount::query()
