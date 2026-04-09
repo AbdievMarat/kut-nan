@@ -61,9 +61,12 @@
                                 $fromOrdersCartsVal = $totalCarts->values()->get($index);
                                 $displayCartsVal = ($totalCartsVal !== null && $totalCartsVal !== '') ? $totalCartsVal : ($fromOrdersCartsVal ?: '');
                                 $inputDefaultVal = $displayCartsVal;
+                                $isUnderOrders = $totalCartsVal !== null && $totalCartsVal !== ''
+                                    && $fromOrdersCartsVal !== null && $fromOrdersCartsVal !== ''
+                                    && (float)$totalCartsVal < (float)$fromOrdersCartsVal;
                             @endphp
                             <td class="text-center total-carts-summary-cell" data-product-id="{{ $product->id }}">
-                                <span class="total-carts-view align-middle px-1 fw-semibold">{{ $displayCartsVal }}</span>
+                                <span class="total-carts-view align-middle px-1 fw-semibold{{ $isUnderOrders ? ' carts-warning-blink' : '' }}">{{ $displayCartsVal }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm total-carts-input d-none mx-auto"

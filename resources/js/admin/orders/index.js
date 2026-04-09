@@ -367,11 +367,14 @@ $(() => {
         const calculatedCarts =
             parseFloat($(`.calculated-carts-cell[data-product-id="${productId}"]`).find('.calculated-carts-value').text()) || 0;
         const $reserveCell = $(`.cart-count-cell[data-product-id="${productId}"]`).find('.cart-count-view');
+        const $viewSpan = $(`.total-carts-summary-cell[data-product-id="${productId}"]`).find('.total-carts-view');
         if (!isNaN(totalVal)) {
             const reserve = Math.round((totalVal - calculatedCarts) * 100) / 100;
             $reserveCell.text(reserve !== 0 ? reserve : 0);
+            $viewSpan.toggleClass('carts-warning-blink', totalVal < calculatedCarts);
         } else {
             $reserveCell.text('');
+            $viewSpan.removeClass('carts-warning-blink');
         }
     });
 
