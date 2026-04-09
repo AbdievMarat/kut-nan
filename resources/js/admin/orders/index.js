@@ -91,8 +91,7 @@ $(() => {
     }
 
     function collectOrderItemsPayload() {
-        const $first = $('.order-amount-input').first();
-        const date = $first.data('date');
+        const date = $('#orders-table').data('date');
         const order_items = [];
         $('.order-amount-input').each(function () {
             const $i = $(this);
@@ -107,8 +106,7 @@ $(() => {
     }
 
     function collectBreadRemainsPayload() {
-        const $first = $('.bread-remain-input').first();
-        const date = $first.data('date');
+        const date = $('#orders-table').data('date');
         const bread_remains = [];
         $('.bread-remain-input').each(function () {
             const $i = $(this);
@@ -122,8 +120,7 @@ $(() => {
     }
 
     function collectCartCountsPayload() {
-        const $first = $('.total-carts-input').first();
-        const date = $first.data('date');
+        const date = $('#orders-table').data('date');
         const cart_counts = [];
         $('.total-carts-input').each(function () {
             const $i = $(this);
@@ -193,7 +190,7 @@ $(() => {
     $(document).on('click', '.get-realization-shops', function (event) {
         event.preventDefault();
 
-        const date = $(this).data('date');
+        const date = $('#orders-table').data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
@@ -217,7 +214,7 @@ $(() => {
     $(document).on('click', '.get-remainder-items', function (event) {
         event.preventDefault();
 
-        const date = $(this).data('date');
+        const date = $('#orders-table').data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
@@ -241,7 +238,7 @@ $(() => {
     $(document).on('click', '.get-invoice-shops', function (event) {
         event.preventDefault();
 
-        const date = $(this).data('date');
+        const date = $('#orders-table').data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
@@ -265,7 +262,7 @@ $(() => {
     $(document).on('click', '.get-invoice-return-shops', function (event) {
         event.preventDefault();
 
-        const date = $(this).data('date');
+        const date = $('#orders-table').data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
@@ -289,7 +286,7 @@ $(() => {
     $(document).on('click', '.get-markdown-items', function (event) {
         event.preventDefault();
 
-        const date = $(this).data('date');
+        const date = $('#orders-table').data('date');
         const busId = $(this).data('bus_id');
 
         $.ajax({
@@ -403,7 +400,7 @@ $(() => {
         const $td = $(this);
         const busId = $td.data('bus-id');
         const productId = $td.data('product-id');
-        const date = $td.data('date');
+        const date = $('#orders-table').data('date');
 
         $.ajax({
             type: 'POST',

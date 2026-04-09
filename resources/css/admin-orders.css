@@ -1,7 +1,54 @@
+/* Контейнер таблицы */
+.orders-table-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+/* Sticky-заголовок */
+#orders-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+#orders-table thead th {
+    background: #fff;
+}
+
 /* Стили для вертикального текста в заголовках таблицы */
 #orders-table th.vertical-text {
     text-align: center;
     vertical-align: middle;
+}
+
+/* Размеры ячеек ввода и отображения */
+.total-carts-view,
+.total-carts-input {
+    min-width: 55px;
+}
+
+.total-carts-input {
+    width: 55px;
+}
+
+.order-amount-view,
+.order-amount-input,
+.bread-remain-view,
+.bread-remain-input {
+    min-width: 40px;
+}
+
+.order-amount-input,
+.bread-remain-input {
+    width: 40px;
+}
+
+.clear-column-btn {
+    font-size: 0.65rem;
+    padding: 1px 5px;
+    line-height: 1;
+    margin-left: 4px;
 }
 
 /* Фикс: sticky thead + border-collapse: separate чтобы бордеры не терялись (только на экране) */

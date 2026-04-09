@@ -23,7 +23,7 @@
                                 <i class="bi bi-printer"></i> Распечатать
                             </button>
 
-                            <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn" data-user-id="{{ auth()->id() }}">
+                            <button type="button" class="btn btn-secondary no-print" id="toggle-summary-rows-btn">
                                 <i class="bi bi-eye"></i> Сводные строки
                             </button>
                         </div>
@@ -31,20 +31,20 @@
                 </div>
             </form>
 
-            <div class="orders-table-container" style="overflow-x: auto; overflow-y: auto; max-height: 80vh;">
-            <table id="orders-table" class="table table-bordered table-hover orders-view-mode">
-                <thead style="position: sticky; top: 0; z-index: 2;">
+            <div class="orders-table-container">
+            <table id="orders-table" class="table table-bordered table-hover orders-view-mode" data-date="{{ $date }}">
+                <thead>
                 <tr>
-                    <th style="background: #fff;">Автобус</th>
+                    <th>Автобус</th>
                     @foreach ($products as $product)
-                        <th class="vertical-text" style="background: #fff;">{{ $product->name }}</th>
+                        <th class="vertical-text">{{ $product->name }}</th>
                     @endforeach
-                    <th class="vertical-text no-print" style="background: #fff;">Уценка</th>
-                    <th class="vertical-text no-print" style="background: #fff;">Реализации</th>
-                    <th class="vertical-text no-print" style="background: #fff;">Накладные</th>
-                    <th class="vertical-text no-print" style="background: #fff;">Возврат накладных</th>
-                    <th class="vertical-text" style="background: #fff;">Остаток</th>
-                    <th class="vertical-text print-only" style="background: #fff;">Подпись</th>
+                    <th class="vertical-text no-print">Уценка</th>
+                    <th class="vertical-text no-print">Реализации</th>
+                    <th class="vertical-text no-print">Накладные</th>
+                    <th class="vertical-text no-print">Возврат накладных</th>
+                    <th class="vertical-text">Остаток</th>
+                    <th class="vertical-text print-only">Подпись</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -63,18 +63,16 @@
                                 $displayCartsVal = ($totalCartsVal !== null && $totalCartsVal !== '') ? $totalCartsVal : ($fromOrdersCartsVal ?: '');
                             @endphp
                             <td class="text-center total-carts-summary-cell" data-product-id="{{ $product->id }}">
-                                <span class="total-carts-view align-middle px-1 fw-semibold" style="min-width: 55px;">{{ $displayCartsVal }}</span>
+                                <span class="total-carts-view align-middle px-1 fw-semibold">{{ $displayCartsVal }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm total-carts-input d-none mx-auto"
                                     value="{{ $totalCartsVal !== null && $totalCartsVal !== '' ? $totalCartsVal : '' }}"
                                     data-exact-value="{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}"
                                     data-product-id="{{ $product->id }}"
-                                    data-date="{{ $date }}"
                                     placeholder="Итого"
                                     min="0"
                                     step="1"
-                                    style="min-width: 55px; width: 55px;"
                                 >
                                 <span class="print-total-carts-value d-none">{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}</span>
                             </td>
@@ -107,7 +105,7 @@
                                 $savedCartVal = $savedCarts->values()->get($index);
                             @endphp
                             <td class="text-center cart-count-cell" data-product-id="{{ $product->id }}">
-                                <span class="cart-count-view align-middle px-1" style="min-width: 55px;">{{ $savedCartVal !== null && $savedCartVal !== '' ? number_format((float) $savedCartVal, 2, '.', '') : '' }}</span>
+                                <span class="cart-count-view align-middle px-1">{{ $savedCartVal !== null && $savedCartVal !== '' ? number_format((float) $savedCartVal, 2, '.', '') : '' }}</span>
                             </td>
                         @endforeach
                         <td class="no-print"></td>
@@ -153,16 +151,14 @@
                         @foreach ($products as $index => $product)
                             @php $breadVal = $breadRemains->values()->get($index); @endphp
                             <td class="bread-remain-cell">
-                                <span class="bread-remain-view d-inline-block" style="min-width: 40px;">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
+                                <span class="bread-remain-view d-inline-block">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm bread-remain-input d-none"
                                     value="{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}"
                                     data-product-id="{{ $product->id }}"
-                                    data-date="{{ $date }}"
                                     min="0"
                                     step="1"
-                                    style="min-width: 40px; width: 40px;"
                                 >
                             </td>
                         @endforeach
@@ -187,7 +183,6 @@
                                 <button type="button"
                                     class="btn btn-sm btn-danger no-print clear-column-btn d-none"
                                     data-product-id="{{ $product->id }}"
-                                    style="font-size: 0.65rem; padding: 1px 5px; line-height: 1; margin-left: 4px;"
                                     title="Очистить столбец">×</button>
                             </td>
                         @endforeach
@@ -205,45 +200,42 @@
                             @php $ordAmt = $productData['order_amount']; @endphp
                             <td class="text-center order-cell{{ $productData['is_marked'] ? ' order-cell-marked' : '' }}"
                                 data-bus-id="{{ $bus['id'] }}"
-                                data-product-id="{{ $productData['product_id'] }}"
-                                data-date="{{ $date }}">
-                                <span class="order-amount-view d-inline-block" style="min-width: 40px;">{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}</span>
+                                data-product-id="{{ $productData['product_id'] }}">
+                                <span class="order-amount-view d-inline-block">{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm order-amount-input d-none"
                                     value="{{ $ordAmt === '' || $ordAmt === null || $ordAmt == 0 ? '' : $ordAmt }}"
                                     data-bus-id="{{ $bus['id'] }}"
                                     data-product-id="{{ $productData['product_id'] }}"
-                                    data-date="{{ $date }}"
                                     min="0"
                                     step="1"
-                                    style="min-width: 40px; width: 40px;"
                                 >
                             </td>
                         @endforeach
                         <td class="no-print">
                             @if($bus['total_markdown_sum'])
-                                <a href="#" class="get-markdown-items" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
+                                <a href="#" class="get-markdown-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
                             @endif
                         </td>
                         <td class="no-print">
                             @if($bus['total_realization_sum'])
-                                <a href="#" class="get-realization-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_realization_sum'] }}</a>
+                                <a href="#" class="get-realization-shops" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_realization_sum'] }}</a>
                             @endif
                         </td>
                         <td class="no-print">
                             @if($bus['total_invoice_sum'])
-                                <a href="#" class="get-invoice-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_sum'] }}</a>
+                                <a href="#" class="get-invoice-shops" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_sum'] }}</a>
                             @endif
                         </td>
                         <td class="no-print">
                             @if($bus['total_invoice_return_sum'])
-                                <a href="#" class="get-invoice-return-shops" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_return_sum'] }}</a>
+                                <a href="#" class="get-invoice-return-shops" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_invoice_return_sum'] }}</a>
                             @endif
                         </td>
                         <td>
                             @if($bus['total_remainder_sum'])
-                                <a href="#" class="get-remainder-items" data-date="{{ $date }}" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_remainder_sum'] }}</a>
+                                <a href="#" class="get-remainder-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_remainder_sum'] }}</a>
                             @endif
                         </td>
                         <td class="print-only"></td>
