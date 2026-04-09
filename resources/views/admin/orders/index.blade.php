@@ -58,23 +58,23 @@
                         @foreach ($products as $index => $product)
                             @php
                                 $totalCartsVal = $totalCartsValues->values()->get($index);
-                                $totalCartsExactVal = $totalCartsValuesExact->values()->get($index);
                                 $fromOrdersCartsVal = $totalCarts->values()->get($index);
                                 $displayCartsVal = ($totalCartsVal !== null && $totalCartsVal !== '') ? $totalCartsVal : ($fromOrdersCartsVal ?: '');
+                                $inputDefaultVal = $displayCartsVal;
                             @endphp
                             <td class="text-center total-carts-summary-cell" data-product-id="{{ $product->id }}">
                                 <span class="total-carts-view align-middle px-1 fw-semibold">{{ $displayCartsVal }}</span>
                                 <input
                                     type="number"
                                     class="form-control form-control-sm total-carts-input d-none mx-auto"
-                                    value="{{ $totalCartsVal !== null && $totalCartsVal !== '' ? $totalCartsVal : '' }}"
-                                    data-exact-value="{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}"
+                                    value="{{ $inputDefaultVal }}"
+                                    data-exact-value="{{ $inputDefaultVal }}"
                                     data-product-id="{{ $product->id }}"
                                     placeholder="Итого"
                                     min="0"
-                                    step="1"
+                                    step="any"
                                 >
-                                <span class="print-total-carts-value d-none">{{ $totalCartsExactVal !== null && $totalCartsExactVal !== '' ? $totalCartsExactVal : '' }}</span>
+                                <span class="print-total-carts-value d-none">{{ $displayCartsVal }}</span>
                             </td>
                         @endforeach
                         <td class="no-print"></td>
@@ -102,10 +102,10 @@
                         <td>Запас тележек</td>
                         @foreach ($products as $index => $product)
                             @php
-                                $savedCartVal = $savedCarts->values()->get($index);
+                                $reserveCartVal = $reserveCarts->values()->get($index);
                             @endphp
                             <td class="text-center cart-count-cell" data-product-id="{{ $product->id }}">
-                                <span class="cart-count-view align-middle px-1">{{ $savedCartVal !== null && $savedCartVal !== '' ? number_format((float) $savedCartVal, 2, '.', '') : '' }}</span>
+                                <span class="cart-count-view align-middle px-1">{{ $reserveCartVal !== null && $reserveCartVal !== '' ? $reserveCartVal : '' }}</span>
                             </td>
                         @endforeach
                         <td class="no-print"></td>

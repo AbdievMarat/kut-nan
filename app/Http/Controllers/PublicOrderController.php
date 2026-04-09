@@ -143,32 +143,30 @@ class PublicOrderController extends Controller
             ->get()
             ->keyBy('product_id');
 
-        // Рассчитываем итоговое количество тележек (рассчитанное + введенное + остатки хлеба в тележках)
-        // Используем точное значение без округления
+        // Итого тележек: если есть сохранённое значение — берём его; иначе считаем из заказов
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedCartCounts, $savedBreadRemains) {
-            // Рассчитываем количество тележек из заказов
+            $cartCount = $savedCartCounts->get($product->id);
+
+            if ($cartCount && $cartCount->carts !== null) {
+                $value = round((float)$cartCount->carts, 1);
+                return $value > 0 ? $value : '';
+            }
+
+            // Fallback: рассчитываем из заказов с учётом остатков хлеба
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $orderMultiplier = $product->order_multiplier ?? 1;
             $piecesPerCart = $product->pieces_per_cart ?? 1;
             $multipliedAmount = $totalAmount * $orderMultiplier;
-            $calculatedCartsFromOrders = $multipliedAmount > 0 && $piecesPerCart > 0
-                ? round($multipliedAmount / $piecesPerCart, 1)
-                : 0;
 
-            // Получаем введенное пользователем количество тележек
-            $cartCount = $savedCartCounts->get($product->id);
-            $savedCartsValue = $cartCount ? (float)$cartCount->carts : 0;
-
-            // Добавляем остатки хлеба в пересчете на тележки
             $breadRemain = $savedBreadRemains->get($product->id);
             $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
-            $breadRemainCarts = $breadRemainAmount > 0 && $piecesPerCart > 0
-                ? round($breadRemainAmount / $piecesPerCart, 1)
+
+            $netPieces = $multipliedAmount - $breadRemainAmount;
+            $calculatedCarts = $netPieces > 0 && $piecesPerCart > 0
+                ? round($netPieces / $piecesPerCart, 1)
                 : 0;
 
-            // Итоговое количество тележек (рассчитанное + введенное - остатки хлеба в тележках), используем точное значение
-            $totalCartsValue = $calculatedCartsFromOrders + $savedCartsValue - $breadRemainCarts;
-            return $totalCartsValue > 0 ? round($totalCartsValue, 1) : '';
+            return $calculatedCarts > 0 ? $calculatedCarts : '';
         });
 
         // Если это AJAX запрос, возвращаем JSON

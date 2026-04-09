@@ -162,43 +162,46 @@ class OrderController extends Controller
             return $breadRemain ? $breadRemain->amount : null;
         });
 
-        // Рассчитываем итоговые значения тележек (рассчитанное + введенное)
-        // Точные значения (без округления) для использования в data-exact-value и при печати
-        $totalCartsValuesExact = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
-            $totalCartsValue = $calculatedCarts + $savedCartsValue;
-            return $totalCartsValue > 0 ? $totalCartsValue : '';
+        // Итого тележек: берём значение из базы напрямую (теперь хранится итого, а не запас)
+        $totalCartsValues = $products->map(function ($product, $index) use ($savedCarts) {
+            $savedCartsValue = $savedCarts->values()->get($index);
+            return ($savedCartsValue !== null && $savedCartsValue !== '') ? (float)$savedCartsValue : '';
         });
 
-        // Округленные значения для отображения в поле (только если пользователь заполнил поле)
-        $totalCartsValues = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
-            $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
-            // Показываем значение только если пользователь заполнил поле (есть savedCarts)
-            if ($savedCartsValue > 0) {
-                $totalCartsValue = $calculatedCarts + $savedCartsValue;
-                return $totalCartsValue > 0 ? round($totalCartsValue) : '';
+        $totalCartsValuesExact = $products->map(function ($product, $index) use ($savedCarts) {
+            $savedCartsValue = $savedCarts->values()->get($index);
+            return ($savedCartsValue !== null && $savedCartsValue !== '') ? (float)$savedCartsValue : '';
+        });
+
+        // Запас тележек = Итого тележек (из базы) - Тележек из заказов
+        $reserveCarts = $products->map(function ($product, $index) use ($totalCarts, $savedCarts) {
+            $savedCartsValue = $savedCarts->values()->get($index);
+            if ($savedCartsValue !== null && $savedCartsValue !== '') {
+                $calculatedCarts = $totalCarts->values()->get($index) ? (float)$totalCarts->values()->get($index) : 0;
+                $reserve = round((float)$savedCartsValue - $calculatedCarts, 2);
+                return $reserve != 0 ? $reserve : 0;
             }
             return '';
         });
 
-        // Рассчитываем итоговые значения: multipliedAmount + savedCarts * piecesPerCart - breadRemainAmount
-        // Используем multipliedAmounts напрямую (в штуках), чтобы избежать погрешности от конвертации шт→тележки→шт
+        // Итого шт.: если есть итого тележек из базы → итогоТележек * шт.на тележку, иначе из заказов
         $finalTotals = $products->map(function ($product, $index) use ($multipliedAmounts, $savedCarts, $piecesPerCarts, $savedBreadRemainsForCarts) {
-            $multipliedAmount = (float)($multipliedAmounts->values()->get($index) ?? 0);
-            $savedCartsValue = $savedCarts->values()->get($index) ? (float)$savedCarts->values()->get($index) : 0;
+            $savedCartsValue = $savedCarts->values()->get($index);
             $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
-            $savedCartsPieces = round($savedCartsValue * $piecesPerCart);
 
+            if ($savedCartsValue !== null && $savedCartsValue !== '') {
+                $totalPieces = round((float)$savedCartsValue * $piecesPerCart);
+                return $totalPieces > 0 ? $totalPieces : '';
+            }
+
+            $multipliedAmount = (float)($multipliedAmounts->values()->get($index) ?? 0);
             $breadRemain = $savedBreadRemainsForCarts->get($product->id);
             $breadRemainAmount = $breadRemain ? ($breadRemain->amount ?? 0) : 0;
-
-            $totalAmount = $multipliedAmount + $savedCartsPieces - $breadRemainAmount;
+            $totalAmount = $multipliedAmount - $breadRemainAmount;
             return $totalAmount > 0 ? round($totalAmount) : '';
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues', 'totalCartsValuesExact', 'breadRemains'));
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues', 'totalCartsValuesExact', 'reserveCarts', 'breadRemains'));
     }
 
     /**

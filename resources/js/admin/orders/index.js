@@ -77,15 +77,16 @@ $(() => {
     function normalizeTotalCartsInput($input) {
         let inputValue = $input.val();
         if (inputValue !== '' && inputValue !== null) {
-            inputValue = String(inputValue).replace(/[^\d-]/g, '');
-            if (inputValue.startsWith('-')) {
-                inputValue = inputValue.replace('-', '');
+            // Allow digits and decimal point only
+            inputValue = String(inputValue).replace(/[^\d.]/g, '');
+            // Keep only first decimal point
+            const dotIndex = inputValue.indexOf('.');
+            if (dotIndex !== -1) {
+                inputValue = inputValue.slice(0, dotIndex + 1) + inputValue.slice(dotIndex + 1).replace(/\./g, '');
             }
-            const intValue = Math.floor(parseFloat(inputValue) || 0);
-            inputValue = intValue < 0 ? '0' : String(intValue);
             $input.val(inputValue);
         }
-        const totalCartsValue = inputValue === '' || inputValue === null ? null : parseInt(inputValue, 10);
+        const totalCartsValue = inputValue === '' || inputValue === null ? null : parseFloat(inputValue);
         $input.data('exact-value', totalCartsValue !== null && !isNaN(totalCartsValue) ? totalCartsValue : '');
         return totalCartsValue;
     }
@@ -128,16 +129,10 @@ $(() => {
             normalizeTotalCartsInput($i);
             const rawExact = $i.data('exact-value');
             const parsedTotal =
-                rawExact === '' || rawExact === undefined || rawExact === null ? null : parseInt(String(rawExact), 10);
-            const calculatedCarts =
-                parseFloat($(`.calculated-carts-cell[data-product-id="${productId}"]`).find('.calculated-carts-value').text()) || 0;
-            let carts = null;
-            if (parsedTotal !== null && !isNaN(parsedTotal)) {
-                carts = parsedTotal - calculatedCarts;
-            }
+                rawExact === '' || rawExact === undefined || rawExact === null ? null : parseFloat(String(rawExact));
             cart_counts.push({
                 product_id: productId,
-                carts: carts === null || isNaN(carts) ? null : carts.toFixed(2),
+                carts: parsedTotal === null || isNaN(parsedTotal) ? null : parsedTotal.toFixed(2),
             });
         });
         return { date, cart_counts };
@@ -365,6 +360,18 @@ $(() => {
     $(document).on('input', '.total-carts-input', function () {
         if (activeEditDomain === 'carts') {
             markDirty();
+        }
+        const $input = $(this);
+        const productId = $input.data('product-id');
+        const totalVal = parseFloat($input.val());
+        const calculatedCarts =
+            parseFloat($(`.calculated-carts-cell[data-product-id="${productId}"]`).find('.calculated-carts-value').text()) || 0;
+        const $reserveCell = $(`.cart-count-cell[data-product-id="${productId}"]`).find('.cart-count-view');
+        if (!isNaN(totalVal)) {
+            const reserve = Math.round((totalVal - calculatedCarts) * 100) / 100;
+            $reserveCell.text(reserve !== 0 ? reserve : 0);
+        } else {
+            $reserveCell.text('');
         }
     });
 
