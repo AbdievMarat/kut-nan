@@ -29,7 +29,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -53,6 +55,7 @@ class OrderController extends Controller
             ->get();
 
         $products = $this->getProducts();
+        $productIds = $products->pluck('id');
         $sumMarkdowns = $this->getSumMarkdowns($date);
         $sumRealizations = $this->getSumRealizations($date);
         $sumRemainders = $this->getSumRemainders($date);
@@ -103,12 +106,12 @@ class OrderController extends Controller
         // Загружаем сохраненные остатки хлеба для расчета тележек
         $savedBreadRemainsForCarts = BreadRemain::query()
             ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
+            ->whereIn('product_id', $productIds)
             ->get()
             ->keyBy('product_id');
 
         // Рассчитываем количество тележек для итоговой строки
-        // Вычитаем остатки хлеба в штуках перед делением, чтобы избежать двойного округления
+        // вычитаем остатки хлеба в штуках перед делением, чтобы избежать двойного округления
         $totalCarts = $products->map(function ($product) use ($totalOrderAmounts, $savedBreadRemainsForCarts) {
             $totalAmount = $totalOrderAmounts[$product->id] ?? 0;
             $orderMultiplier = $product->order_multiplier ?? 1;
@@ -141,7 +144,7 @@ class OrderController extends Controller
         // Загружаем сохраненные значения тележек
         $savedCartCounts = CartCount::query()
             ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
+            ->whereIn('product_id', $productIds)
             ->get()
             ->keyBy('product_id');
 
@@ -150,25 +153,13 @@ class OrderController extends Controller
             return $cartCount ? $cartCount->carts : null;
         });
 
-        // Загружаем сохраненные остатки хлеба
-        $savedBreadRemains = BreadRemain::query()
-            ->whereDate('date', $date)
-            ->whereIn('product_id', $products->pluck('id'))
-            ->get()
-            ->keyBy('product_id');
-
-        $breadRemains = $products->map(function ($product) use ($savedBreadRemains) {
-            $breadRemain = $savedBreadRemains->get($product->id);
+        $breadRemains = $products->map(function ($product) use ($savedBreadRemainsForCarts) {
+            $breadRemain = $savedBreadRemainsForCarts->get($product->id);
             return $breadRemain ? $breadRemain->amount : null;
         });
 
         // Итого тележек: берём значение из базы напрямую (теперь хранится итого, а не запас)
         $totalCartsValues = $products->map(function ($product, $index) use ($savedCarts) {
-            $savedCartsValue = $savedCarts->values()->get($index);
-            return ($savedCartsValue !== null && $savedCartsValue !== '') ? (float)$savedCartsValue : '';
-        });
-
-        $totalCartsValuesExact = $products->map(function ($product, $index) use ($savedCarts) {
             $savedCartsValue = $savedCarts->values()->get($index);
             return ($savedCartsValue !== null && $savedCartsValue !== '') ? (float)$savedCartsValue : '';
         });
@@ -184,7 +175,7 @@ class OrderController extends Controller
             return '';
         });
 
-        // Итого шт.: если есть итого тележек из базы → итогоТележек * шт.на тележку, иначе из заказов
+        // Итого шт.: если есть итого тележек из базы → итогоТележек * штук на тележку, иначе из заказов
         $finalTotals = $products->map(function ($product, $index) use ($multipliedAmounts, $savedCarts, $piecesPerCarts, $savedBreadRemainsForCarts) {
             $savedCartsValue = $savedCarts->values()->get($index);
             $piecesPerCart = $piecesPerCarts->values()->get($index) ?? 1;
@@ -201,12 +192,14 @@ class OrderController extends Controller
             return $totalAmount > 0 ? round($totalAmount) : '';
         });
 
-        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues', 'totalCartsValuesExact', 'reserveCarts', 'breadRemains'));
+        return view('admin.orders.index', compact('date', 'busesData', 'products', 'totalCarts', 'multipliedAmounts', 'piecesPerCarts', 'savedCarts', 'finalTotals', 'totalCartsValues', 'reserveCarts', 'breadRemains'));
     }
 
     /**
      * @param Request $request
      * @return BinaryFileResponse
+     * @throws Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
     public function exportToExcel(Request $request): BinaryFileResponse
     {
@@ -225,6 +218,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function getMarkdownItems(Request $request): JsonResponse
     {
@@ -247,6 +241,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function getRealizationShops(Request $request): JsonResponse
     {
@@ -269,6 +264,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function getRemainderItems(Request $request): JsonResponse
     {
@@ -296,6 +292,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws Throwable
      */
     public function getInvoiceShops(Request $request): JsonResponse
     {
@@ -318,7 +315,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function getInvoiceReturnShops(Request $request): JsonResponse
     {
@@ -377,7 +374,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function updateOrderItemsBatch(Request $request): JsonResponse
     {
@@ -404,7 +401,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function updateBreadRemainsBatch(Request $request): JsonResponse
     {
@@ -429,7 +426,7 @@ class OrderController extends Controller
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function updateCartCountsBatch(Request $request): JsonResponse
     {
