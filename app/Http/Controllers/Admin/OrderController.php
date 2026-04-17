@@ -62,9 +62,14 @@ class OrderController extends Controller
         $sumInvoices = $this->getSumInvoices($date);
         $sumInvoiceReturns = $this->getSumInvoiceReturns($date);
 
-        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns) {
+        $prevDate = date('Y-m-d', strtotime($date . ' -1 day'));
+        $prevSumRemainders = $this->getSumRemainders($prevDate);
+        $prevSumRealizations = $this->getSumRealizations($prevDate);
+
+        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations) {
             $orderAmounts = [];
             $orderMarked = [];
+            $orderSum = 0;
 
             /** @var Order $order */
             foreach ($bus->orders as $order) {
@@ -72,8 +77,18 @@ class OrderController extends Controller
                 foreach ($order->items as $item) {
                     $orderAmounts[$item->product_id] = $item->amount;
                     $orderMarked[$item->product_id] = (bool) $item->is_marked;
+                    $orderSum += ($item->amount ?? 0) * ($item->price ?? 0);
                 }
             }
+
+            $cashbox = $orderSum
+                - ($sumMarkdowns[$bus->id] ?? 0)
+                - ($sumRealizations[$bus->id] ?? 0)
+                - ($sumInvoices[$bus->id] ?? 0)
+                + ($sumInvoiceReturns[$bus->id] ?? 0)
+                - ($sumRemainders[$bus->id] ?? 0)
+                + ($prevSumRemainders[$bus->id] ?? 0)
+                + ($prevSumRealizations[$bus->id] ?? 0);
 
             return [
                 'id' => $bus->id,
@@ -89,7 +104,11 @@ class OrderController extends Controller
                 'total_realization_sum' => $sumRealizations[$bus->id] ?? '',
                 'total_invoice_sum' => $sumInvoices[$bus->id] ?? '',
                 'total_invoice_return_sum' => $sumInvoiceReturns[$bus->id] ?? '',
-                'total_remainder_sum' => $sumRemainders[$bus->id] ?? ''
+                'total_remainder_sum' => $sumRemainders[$bus->id] ?? '',
+                'order_sum' => $orderSum,
+                'prev_remainder_sum' => $prevSumRemainders[$bus->id] ?? 0,
+                'prev_realization_sum' => $prevSumRealizations[$bus->id] ?? 0,
+                'total_cashbox' => $cashbox ?: '',
             ];
         });
 

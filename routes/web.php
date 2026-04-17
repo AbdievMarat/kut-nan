@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [OrderController::class, 'showEnterLicensePlateForm'])->name('orders.enter_license_plate');
 Route::post('/process-license-plate', [OrderController::class, 'processLicensePlate'])->name('orders.process_license_plate');
+Route::get('/cashbox', [OrderController::class, 'getCashboxBreakdown'])->name('cashbox.breakdown');
 Route::resource('orders', OrderController::class)->only(['create', 'store']);
 Route::resource('realizations', RealizationController::class)->only(['create', 'store']);
 Route::resource('remainders', RemainderController::class)->only(['create', 'store']);

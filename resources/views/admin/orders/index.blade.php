@@ -44,6 +44,7 @@
                     <th class="vertical-text no-print">Накладные</th>
                     <th class="vertical-text no-print">Возврат накладных</th>
                     <th class="vertical-text">Остаток</th>
+                    <th class="vertical-text">Касса</th>
                     <th class="vertical-text print-only">Подпись</th>
                 </tr>
                 </thead>
@@ -85,6 +86,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td></td>
+                        <td></td>
                         <td class="print-only"></td>
                     </tr>
                     <tr class="table-info fw-bold carts-calculated-row">
@@ -98,6 +100,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -116,6 +119,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td></td>
+                        <td></td>
                         <td class="print-only"></td>
                     </tr>
                     <tr class="table-secondary fw-bold pieces-per-cart-row">
@@ -127,6 +131,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -141,6 +146,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -170,6 +176,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td></td>
+                        <td></td>
                         <td class="print-only"></td>
                     </tr>
                     <tr class="table-secondary fw-bold multiplied-amount-row">
@@ -193,6 +200,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td></td>
                         <td></td>
                         <td class="print-only"></td>
                     </tr>
@@ -239,6 +247,20 @@
                         <td>
                             @if($bus['total_remainder_sum'])
                                 <a href="#" class="get-remainder-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_remainder_sum'] }}</a>
+                            @endif
+                        </td>
+                        <td>
+                            @if($bus['total_cashbox'] !== '')
+                                <a href="#" class="get-cashbox-breakdown"
+                                   data-order-sum="{{ $bus['order_sum'] }}"
+                                   data-markdown="{{ $bus['total_markdown_sum'] ?: 0 }}"
+                                   data-realization="{{ $bus['total_realization_sum'] ?: 0 }}"
+                                   data-invoice="{{ $bus['total_invoice_sum'] ?: 0 }}"
+                                   data-invoice-return="{{ $bus['total_invoice_return_sum'] ?: 0 }}"
+                                   data-remainder="{{ $bus['total_remainder_sum'] ?: 0 }}"
+                                   data-prev-remainder="{{ $bus['prev_remainder_sum'] }}"
+                                   data-prev-realization="{{ $bus['prev_realization_sum'] }}"
+                                   data-total="{{ $bus['total_cashbox'] }}">{{ $bus['total_cashbox'] }}</a>
                             @endif
                         </td>
                         <td class="print-only"></td>

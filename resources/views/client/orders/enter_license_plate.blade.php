@@ -64,8 +64,26 @@
                         <span class="lp-btn-icon"><i class="bi bi-arrow-counterclockwise"></i></span>
                         <span class="lp-btn-label">Возврат накладных</span>
                     </button>
+
+                    <button class="lp-btn lp-btn--gold lp-btn--wide" type="button" id="cashbox-btn">
+                        <span class="lp-btn-icon"><i class="bi bi-cash-stack"></i></span>
+                        <span class="lp-btn-label">Касса</span>
+                    </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="cashbox-sheet" class="cashbox-sheet">
+        <div class="cashbox-sheet-backdrop"></div>
+        <div class="cashbox-sheet-panel">
+            <div class="cashbox-sheet-header">
+                <span id="cashbox-sheet-bus"></span>
+                <button type="button" class="cashbox-sheet-close" id="cashbox-sheet-close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div id="cashbox-sheet-body"></div>
         </div>
     </div>
 @endsection
@@ -277,6 +295,99 @@
     .lp-btn--slate .lp-btn-icon  { color: #475569; }
     .lp-btn--slate .lp-btn-label { color: #334155; }
 
+    .lp-btn--gold {
+        background: linear-gradient(145deg, #fef3c7, #fcd34d);
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+    }
+    .lp-btn--gold .lp-btn-icon  { color: #b45309; }
+    .lp-btn--gold .lp-btn-label { color: #92400e; }
+
+    .lp-btn--wide {
+        grid-column: span 2;
+    }
+
+    /* ── Cashbox bottom sheet ── */
+    .cashbox-sheet {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+    }
+    .cashbox-sheet.open { display: block; }
+
+    .cashbox-sheet-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        animation: sheet-backdrop-in 0.25s ease both;
+    }
+
+    .cashbox-sheet-panel {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: #fff;
+        border-radius: 24px 24px 0 0;
+        padding: 1.5rem 1.5rem 2rem;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: sheet-slide-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .cashbox-sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1rem;
+        color: #4c2d10;
+        margin-bottom: 1.25rem;
+    }
+
+    .cashbox-sheet-close {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #94a3b8;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .cashbox-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+    }
+
+    .cashbox-table td {
+        padding: 0.45rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .cashbox-table td:last-child { text-align: right; font-weight: 600; }
+
+    .cashbox-table .cashbox-total td {
+        border-top: 2px solid #e2e8f0;
+        border-bottom: none;
+        padding-top: 0.75rem;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #1e293b;
+    }
+
+    .val-pos { color: #16a34a; }
+    .val-neg { color: #dc2626; }
+
+    @keyframes sheet-backdrop-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    @keyframes sheet-slide-in {
+        from { transform: translateY(100%); }
+        to   { transform: translateY(0); }
+    }
+
     /* ── Animations ── */
     @keyframes lp-fadein {
         from { opacity: 0; }
@@ -302,4 +413,73 @@
         document.getElementById('type_operation').value = typeOperation;
         document.getElementById('order_form').submit();
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sheet     = document.getElementById('cashbox-sheet');
+        const backdrop  = sheet.querySelector('.cashbox-sheet-backdrop');
+        const closeBtn  = document.getElementById('cashbox-sheet-close');
+        const busLabel  = document.getElementById('cashbox-sheet-bus');
+        const body      = document.getElementById('cashbox-sheet-body');
+
+        function fmt(n) {
+            return Number(n).toLocaleString('ru-RU');
+        }
+
+        function closeSheet() {
+            sheet.classList.remove('open');
+        }
+
+        backdrop.addEventListener('click', closeSheet);
+        closeBtn.addEventListener('click', closeSheet);
+
+        document.getElementById('cashbox-btn').addEventListener('click', function () {
+            const lp = document.getElementById('license_plate').value.trim();
+            if (!lp) {
+                document.getElementById('license_plate').focus();
+                return;
+            }
+
+            body.innerHTML = '<p style="text-align:center;color:#94a3b8;padding:1rem 0">Загрузка...</p>';
+            busLabel.textContent = '';
+            sheet.classList.add('open');
+
+            fetch('/cashbox?license_plate=' + encodeURIComponent(lp))
+                .then(function (r) {
+                    if (!r.ok) return r.json().then(function (d) { throw new Error(d.error || 'Ошибка'); });
+                    return r.json();
+                })
+                .then(function (d) {
+                    busLabel.textContent = 'Маршрутка ' + d.bus;
+
+                    var rows = [
+                        { label: 'Сумма заказа',                sign: '+', val: d.order_sum },
+                        { label: 'Уценка',                    sign: '-', val: d.markdown },
+                        { label: 'Реализации',                sign: '-', val: d.realization },
+                        { label: 'Накладные',                 sign: '-', val: d.invoice },
+                        { label: 'Возврат накладных',         sign: '+', val: d.invoice_return },
+                        { label: 'Остаток',                   sign: '-', val: d.remainder },
+                        { label: 'Остаток предыдущего дня',   sign: '+', val: d.prev_remainder },
+                        { label: 'Реализация предыдущего дня',sign: '+', val: d.prev_realization },
+                    ];
+
+                    var html = '<table class="cashbox-table">';
+                    rows.forEach(function (r) {
+                        var n = Number(r.val);
+                        var cls = n === 0 ? '' : (r.sign === '+' ? 'val-pos' : 'val-neg');
+                        var prefix = r.sign === '+' ? '+' : '−';
+                        var displayed = n !== 0
+                            ? '<span class="' + cls + '">' + prefix + fmt(Math.abs(n)) + '</span>'
+                            : '<span style="color:#94a3b8">0</span>';
+                        html += '<tr><td>' + r.label + '</td><td>' + displayed + '</td></tr>';
+                    });
+                    html += '<tr class="cashbox-total"><td>Касса</td><td>' + fmt(d.total) + '</td></tr>';
+                    html += '</table>';
+
+                    body.innerHTML = html;
+                })
+                .catch(function (e) {
+                    body.innerHTML = '<p style="text-align:center;color:#dc2626;padding:1rem 0">' + e.message + '</p>';
+                });
+        });
+    });
 </script>
