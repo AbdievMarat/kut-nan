@@ -47,23 +47,23 @@
 /* Размеры ячеек ввода и отображения */
 .total-carts-view,
 .total-carts-input {
-    min-width: 55px;
+    min-width: 28px;
 }
 
 .total-carts-input {
-    width: 55px;
+    width: 48px;
 }
 
 .order-amount-view,
 .order-amount-input,
 .bread-remain-view,
 .bread-remain-input {
-    min-width: 40px;
+    min-width: 18px;
 }
 
 .order-amount-input,
 .bread-remain-input {
-    width: 40px;
+    width: 38px;
 }
 
 .clear-column-btn {
@@ -78,6 +78,22 @@
     #orders-table {
         border-collapse: separate !important;
         border-spacing: 0 !important;
+    }
+
+    #orders-table th,
+    #orders-table td {
+        padding: 1px 2px !important;
+        font-size: 12px !important;
+        /*white-space: nowrap;*/
+        /*overflow: hidden;*/
+    }
+
+    #orders-table th:first-child,
+    #orders-table td:first-child {
+        width: 85px;
+        min-width: 85px;
+        /*white-space: normal;*/
+        /*overflow: visible;*/
     }
 }
 

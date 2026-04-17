@@ -125,7 +125,7 @@
                     <tr class="table-secondary fw-bold pieces-per-cart-row">
                         <td>Шт. на тележку</td>
                         @foreach ($piecesPerCarts as $piecesPerCart)
-                            <td class="pieces-per-cart-cell">{{ $piecesPerCart }}</td>
+                            <td class="text-center pieces-per-cart-cell">{{ $piecesPerCart }}</td>
                         @endforeach
                         <td class="no-print"></td>
                         <td class="no-print"></td>
@@ -138,7 +138,7 @@
                     <tr class="table-warning fw-bold" id="cart-totals-row">
                         <td>Итого шт.</td>
                         @foreach ($products as $index => $product)
-                            <td class="cart-total-cell">
+                            <td class="text-center cart-total-cell">
                                 <span class="calculated-total-value">{{ $finalTotals->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
@@ -159,7 +159,7 @@
                         </td>
                         @foreach ($products as $index => $product)
                             @php $breadVal = $breadRemains->values()->get($index); @endphp
-                            <td class="bread-remain-cell">
+                            <td class="text-center bread-remain-cell">
                                 <span class="bread-remain-view d-inline-block">{{ $breadVal !== null && $breadVal !== '' ? $breadVal : '' }}</span>
                                 <input
                                     type="number"
@@ -188,7 +188,7 @@
                         </td>
                         @foreach ($products as $index => $product)
                             @php $multipliedAmount = $multipliedAmounts->get($index); @endphp
-                            <td class="multiplied-amount-cell" data-product-id="{{ $product->id }}" data-multiplier="{{ $product->order_multiplier ?? 1 }}">
+                            <td class="text-center multiplied-amount-cell" data-product-id="{{ $product->id }}" data-multiplier="{{ $product->order_multiplier ?? 1 }}">
                                 <span class="multiplied-amount-value">{{ $multipliedAmount }}</span>
                                 <button type="button"
                                     class="btn btn-sm btn-danger no-print clear-column-btn d-none"
