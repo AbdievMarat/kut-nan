@@ -155,7 +155,7 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    const PAGE_SIZE = 15;
+    const PAGE_SIZE = 14;
     const PAGE_DURATION = 20000;
 
     let currentPage = 0;
