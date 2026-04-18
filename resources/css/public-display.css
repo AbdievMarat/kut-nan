@@ -23,16 +23,28 @@
 /* Вертикальный текст для заголовков продуктов */
 .vertical-text {
     height: 120px;
-    width: 32px;
-    max-width: 32px;
+    width: 36px;
+    max-width: 36px;
+    padding: 0 !important;
+    position: relative;
+    overflow: visible;
+}
+
+.vertical-text-inner {
+    position: absolute;
+    left: -42px;
+    top: 42px;
+    width: 120px;
+    height: 36px;
+    line-height: 36px;
     text-align: center;
-    vertical-align: middle !important;
-    -webkit-writing-mode: vertical-lr;
-    -ms-writing-mode: tb-lr;
-    writing-mode: vertical-lr;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    -webkit-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+    -webkit-transform-origin: center center;
+    transform-origin: center center;
 }
 
 /* Контейнер таблицы для лучшей совместимости */
