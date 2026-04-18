@@ -27,7 +27,7 @@
                 <tbody>
                 @foreach ($busesData as $bus)
                     <tr>
-                        <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
+                        <td class="text-center align-middle fw-bold bg-light license-plate-cell">{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
                             <td class="text-center align-middle order-cell{{ $productData['is_marked'] ? ' order-cell-marked' : '' }}"
                                 data-bus-id="{{ $bus['id'] }}"

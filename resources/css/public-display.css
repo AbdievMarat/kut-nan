@@ -33,6 +33,13 @@
     line-height: 1.2;
 }
 
+/* Вертикальный текст для колонки с номером автобуса */
+.license-plate-cell {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
+}
+
 /* Контейнер таблицы для лучшей совместимости */
 .table-container {
     width: 100%;
