@@ -154,8 +154,8 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    const SCROLL_STEP_PX = 2;
-    const SCROLL_STEP_MS = 30;
+    const SCROLL_STEP_PX = 1;
+    const SCROLL_STEP_MS = 50;
     const PAUSE_AT_BOTTOM_MS = 5000;
     const PAUSE_AT_TOP_MS = 3000;
 
