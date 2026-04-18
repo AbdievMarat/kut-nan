@@ -154,33 +154,27 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    /**
-     * Автоматический скроллинг
-     */
-    function autoScroll() {
-        // Вычисляем максимальную высоту страницы
-        const maxHeight = Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight
-        );
+    const SCROLL_STEP_PX = 2;
+    const SCROLL_STEP_MS = 30;
+    const PAUSE_AT_BOTTOM_MS = 5000;
+    const PAUSE_AT_TOP_MS = 3000;
 
-        window.scrollTo({
-            top: maxHeight,
-            behavior: 'smooth'
-        });
+    let scrollTimer = null;
 
-        // Через 10 секунд быстро возвращаемся наверх
-        setTimeout(() => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'instant'
-            });
-
-            // Через полсекунды повторяем цикл
-            setTimeout(autoScroll, 10000);
-        }, 10000);
+    function startScrolling() {
+        scrollTimer = setInterval(() => {
+            const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 2;
+            if (atBottom) {
+                clearInterval(scrollTimer);
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                    setTimeout(startScrolling, PAUSE_AT_TOP_MS);
+                }, PAUSE_AT_BOTTOM_MS);
+            } else {
+                window.scrollBy(0, SCROLL_STEP_PX);
+            }
+        }, SCROLL_STEP_MS);
     }
-
 
     // Запускаем первое обновление данных через 5 секунд после загрузки
     setTimeout(updateData, 5000);
@@ -188,6 +182,6 @@ $(document).ready(function() {
     // Устанавливаем периодическое обновление данных
     setInterval(updateData, UPDATE_INTERVAL);
 
-    // Начинаем автоскроллинг сразу после загрузки (сначала 10 сек наверху)
-    setTimeout(autoScroll, 1000);
+    // Начинаем автоскроллинг после загрузки
+    setTimeout(startScrolling, PAUSE_AT_TOP_MS);
 });
