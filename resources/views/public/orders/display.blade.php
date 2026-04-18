@@ -14,7 +14,7 @@
                 <tr>
                     <th class="text-center align-middle" style="width: 40px;">Автобус</th>
                     @foreach ($products as $product)
-                        <th class="vertical-text">{{ $product->name }}</th>
+                        <th class="vertical-text"><span>{{ $product->name }}</span></th>
                     @endforeach
                 </tr>
                 <tr class="table-info fw-bold" id="total-carts-row">
@@ -27,7 +27,7 @@
                 <tbody>
                 @foreach ($busesData as $bus)
                     <tr>
-                        <td class="text-center align-middle fw-bold bg-light license-plate-cell">{{ $bus['license_plate'] }}</td>
+                        <td class="text-center align-middle fw-bold bg-light">{{ $bus['license_plate'] }}</td>
                         @foreach ($bus['products'] as $productData)
                             <td class="text-center align-middle order-cell{{ $productData['is_marked'] ? ' order-cell-marked' : '' }}"
                                 data-bus-id="{{ $bus['id'] }}"

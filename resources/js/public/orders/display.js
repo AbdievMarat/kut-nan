@@ -99,7 +99,7 @@ $(document).ready(function() {
         if (data.busesData && data.busesData.length > 0) {
             data.busesData.forEach(function(bus) {
                 const $row = $('<tr></tr>');
-                $row.append('<td class="text-center align-middle fw-bold bg-light license-plate-cell">' + escapeHtml(bus.license_plate) + '</td>');
+                $row.append('<td class="text-center align-middle fw-bold bg-light">' + escapeHtml(bus.license_plate) + '</td>');
 
                 if (bus.products && bus.products.length > 0) {
                     bus.products.forEach(function(productData) {
