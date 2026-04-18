@@ -191,12 +191,10 @@ $(document).ready(function() {
         pageTimer = setTimeout(nextPage, PAGE_DURATION);
     }
 
-    // Запускаем первое обновление данных через 5 секунд после загрузки
+    // Скрываем строки до инициализации пагинации
+    $('#public-orders-table tbody tr').hide();
+
     setTimeout(updateData, 5000);
-
-    // Устанавливаем периодическое обновление данных
     setInterval(updateData, UPDATE_INTERVAL);
-
-    // Запускаем постраничное переключение
     resetPaging();
 });
