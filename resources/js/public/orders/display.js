@@ -155,7 +155,7 @@ $(document).ready(function() {
     }
 
     const SCROLL_STEP_PX = 1;
-    const SCROLL_STEP_MS = 50;
+    const SCROLL_STEP_MS = 80;
     const PAUSE_AT_BOTTOM_MS = 5000;
     const PAUSE_AT_TOP_MS = 3000;
 
