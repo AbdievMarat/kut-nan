@@ -34,6 +34,7 @@ $(document).ready(function() {
         .done(function(response) {
             if (response && response.busesData && response.products && response.totalCarts) {
                 updateTable(response);
+                resetPaging();
             }
         })
         .fail(function(xhr, status, error) {
@@ -154,26 +155,40 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    const SCROLL_STEP_PX = 1;
-    const SCROLL_STEP_MS = 80;
-    const PAUSE_AT_BOTTOM_MS = 5000;
-    const PAUSE_AT_TOP_MS = 3000;
+    const PAGE_SIZE = 8;
+    const PAGE_DURATION = 8000;
 
-    let scrollTimer = null;
+    let currentPage = 0;
+    let pageTimer = null;
 
-    function startScrolling() {
-        scrollTimer = setInterval(() => {
-            const atBottom = window.scrollY + window.innerHeight >= document.body.scrollHeight - 2;
-            if (atBottom) {
-                clearInterval(scrollTimer);
-                setTimeout(() => {
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                    setTimeout(startScrolling, PAUSE_AT_TOP_MS);
-                }, PAUSE_AT_BOTTOM_MS);
-            } else {
-                window.scrollBy(0, SCROLL_STEP_PX);
-            }
-        }, SCROLL_STEP_MS);
+    function showPage(pageIndex) {
+        const rows = $('#public-orders-table tbody tr').toArray();
+        const total = Math.ceil(rows.length / PAGE_SIZE);
+        if (total === 0) return;
+        currentPage = pageIndex % total;
+        const start = currentPage * PAGE_SIZE;
+        rows.forEach(function(row, i) {
+            $(row).toggle(i >= start && i < start + PAGE_SIZE);
+        });
+    }
+
+    function nextPage() {
+        const total = Math.ceil($('#public-orders-table tbody tr').length / PAGE_SIZE);
+        if (total <= 1) {
+            showPage(0);
+            pageTimer = setTimeout(nextPage, PAGE_DURATION);
+            return;
+        }
+        currentPage = (currentPage + 1) % total;
+        showPage(currentPage);
+        pageTimer = setTimeout(nextPage, PAGE_DURATION);
+    }
+
+    function resetPaging() {
+        if (pageTimer) clearTimeout(pageTimer);
+        currentPage = 0;
+        showPage(0);
+        pageTimer = setTimeout(nextPage, PAGE_DURATION);
     }
 
     // Запускаем первое обновление данных через 5 секунд после загрузки
@@ -182,6 +197,6 @@ $(document).ready(function() {
     // Устанавливаем периодическое обновление данных
     setInterval(updateData, UPDATE_INTERVAL);
 
-    // Начинаем автоскроллинг после загрузки
-    setTimeout(startScrolling, PAUSE_AT_TOP_MS);
+    // Запускаем постраничное переключение
+    resetPaging();
 });
