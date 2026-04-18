@@ -8,7 +8,7 @@ $(document).ready(function() {
     function applyChangeStyle($cell, changeType) {
         // Удаляем предыдущие классы изменений
         $cell.removeClass('change-increase change-decrease');
-        
+
         if (changeType === 'increase') {
             $cell.addClass('change-increase');
         } else if (changeType === 'decrease') {
@@ -106,7 +106,7 @@ $(document).ready(function() {
                         const amount = productData.order_amount || '';
                         const changeType = productData.change_type || '';
                         const key = bus.id + '_' + productData.product_id;
-                        
+
                         // Используем тип изменения из данных сервера (изменения за весь день)
                         // Если тип не передан, проверяем изменение относительно предыдущего значения
                         let finalChangeType = changeType;
@@ -155,7 +155,7 @@ $(document).ready(function() {
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
-    const PAGE_SIZE = 8;
+    const PAGE_SIZE = 13;
     const PAGE_DURATION = 8000;
 
     let currentPage = 0;

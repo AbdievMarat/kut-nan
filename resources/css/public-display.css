@@ -22,18 +22,19 @@
 
 /* Вертикальный текст для заголовков продуктов */
 .vertical-text {
-    white-space: nowrap;
+    height: 120px;
+    width: 32px;
+    max-width: 32px;
     text-align: center;
-    vertical-align: bottom !important;
-}
-
-.vertical-text span {
-    display: inline-block;
-    -webkit-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    transform: rotate(-90deg);
+    vertical-align: middle !important;
+    -webkit-writing-mode: vertical-rl;
+    -ms-writing-mode: tb-rl;
+    writing-mode: vertical-rl;
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Контейнер таблицы для лучшей совместимости */
@@ -59,7 +60,7 @@
 
 /* Вторая строка заголовка (строка "Тележки") */
 #public-orders-table thead tr:nth-child(2) th {
-    top: 80px; /* Примерная высота первой строки */
+    top: 120px;
 }
 
 /* Чередование строк - серый фон для четных строк */

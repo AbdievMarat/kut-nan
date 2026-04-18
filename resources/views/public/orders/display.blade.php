@@ -14,7 +14,7 @@
                 <tr>
                     <th class="text-center align-middle" style="width: 40px;">Автобус</th>
                     @foreach ($products as $product)
-                        <th class="vertical-text"><span>{{ $product->name }}</span></th>
+                        <th class="vertical-text">{{ $product->name }}</th>
                     @endforeach
                 </tr>
                 <tr class="table-info fw-bold" id="total-carts-row">
