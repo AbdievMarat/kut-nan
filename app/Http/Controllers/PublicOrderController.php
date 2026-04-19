@@ -25,9 +25,9 @@ class PublicOrderController extends Controller
      */
     public function display(Request $request): Factory|Application|View|\Illuminate\Contracts\Foundation\Application|JsonResponse
     {
-        // Переключаемся на следующий день только после 08:00 утра
+        // Переключаемся на следующий день только после 09:00 утра
         $currentHour = (int)date('H');
-        if ($currentHour >= 8) {
+        if ($currentHour >= 9) {
             $date = date('Y-m-d', strtotime('+1 day'));
         } else {
             $date = date('Y-m-d');

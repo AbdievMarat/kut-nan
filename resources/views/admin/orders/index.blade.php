@@ -260,6 +260,9 @@
                                    data-remainder="{{ $bus['total_remainder_sum'] ?: 0 }}"
                                    data-prev-remainder="{{ $bus['prev_remainder_sum'] }}"
                                    data-prev-realization="{{ $bus['prev_realization_sum'] }}"
+                                   data-bus="{{ $bus['license_plate'] }}"
+                                   data-date="{{ date('d.m.Y', strtotime($date . ' -1 day')) }}"
+                                   data-prev-date="{{ date('d.m.Y', strtotime($date . ' -2 day')) }}"
                                    data-total="{{ $bus['total_cashbox'] }}">{{ $bus['total_cashbox'] }}</a>
                             @endif
                         </td>

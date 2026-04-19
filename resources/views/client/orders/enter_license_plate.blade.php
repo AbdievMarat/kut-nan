@@ -449,17 +449,17 @@
                     return r.json();
                 })
                 .then(function (d) {
-                    busLabel.textContent = 'Маршрутка ' + d.bus;
+                    busLabel.textContent = 'Сдать в кассу ' + d.date;
 
                     var rows = [
-                        { label: 'Сумма заказа',                sign: '+', val: d.order_sum },
-                        { label: 'Уценка',                    sign: '-', val: d.markdown },
-                        { label: 'Реализации',                sign: '-', val: d.realization },
-                        { label: 'Накладные',                 sign: '-', val: d.invoice },
-                        { label: 'Возврат накладных',         sign: '+', val: d.invoice_return },
-                        { label: 'Остаток',                   sign: '-', val: d.remainder },
-                        { label: 'Остаток предыдущего дня',   sign: '+', val: d.prev_remainder },
-                        { label: 'Реализация предыдущего дня',sign: '+', val: d.prev_realization },
+                        { label: 'Сумма заказа за ' + d.prev_date, sign: '+', val: d.order_sum },
+                        { label: 'Уценка',                        sign: '-', val: d.markdown },
+                        { label: 'Реализации',                    sign: '-', val: d.realization },
+                        { label: 'Накладные',                     sign: '-', val: d.invoice },
+                        { label: 'Возврат накладных',             sign: '+', val: d.invoice_return },
+                        { label: 'Остаток',                       sign: '-', val: d.remainder },
+                        { label: 'Остаток за ' + d.prev_date,     sign: '+', val: d.prev_remainder },
+                        { label: 'Реализация за ' + d.prev_date,  sign: '+', val: d.prev_realization },
                     ];
 
                     var html = '<table class="cashbox-table">';
@@ -469,10 +469,10 @@
                         var prefix = r.sign === '+' ? '+' : '−';
                         var displayed = n !== 0
                             ? '<span class="' + cls + '">' + prefix + fmt(Math.abs(n)) + '</span>'
-                            : '<span style="color:#94a3b8">0</span>';
+                            : '<span style="color:#94a3b8">' + prefix + ' 0</span>';
                         html += '<tr><td>' + r.label + '</td><td>' + displayed + '</td></tr>';
                     });
-                    html += '<tr class="cashbox-total"><td>Касса</td><td>' + fmt(d.total) + '</td></tr>';
+                    html += '<tr class="cashbox-total"><td>Итого в кассу</td><td>' + fmt(d.total) + '</td></tr>';
                     html += '</table>';
 
                     body.innerHTML = html;

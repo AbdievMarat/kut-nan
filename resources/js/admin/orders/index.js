@@ -191,28 +191,29 @@ $(() => {
         const abs = (n) => Math.abs(Number(n)).toLocaleString('ru-RU');
 
         const rows = [
-            { label: 'Сумма заказа',              sign: '+', value: d.orderSum },
-            { label: 'Уценка',                    sign: '-', value: d.markdown },
-            { label: 'Реализация',                sign: '-', value: d.realization },
-            { label: 'Накладные',                 sign: '-', value: d.invoice },
-            { label: 'Возврат накладных',         sign: '+', value: d.invoiceReturn },
-            { label: 'Остаток',                   sign: '-', value: d.remainder },
-            { label: 'Остаток предыдущего дня',   sign: '+', value: d.prevRemainder },
-            { label: 'Реализация предыдущего дня',sign: '+', value: d.prevRealization },
+            { label: `Сумма заказа за ${d.prevDate}`,   sign: '+', value: d.orderSum },
+            { label: 'Уценка',                        sign: '-', value: d.markdown },
+            { label: 'Реализация',                    sign: '-', value: d.realization },
+            { label: 'Накладные',                     sign: '-', value: d.invoice },
+            { label: 'Возврат накладных',             sign: '+', value: d.invoiceReturn },
+            { label: 'Остаток',                       sign: '-', value: d.remainder },
+            { label: `Остаток за ${d.prevDate}`,      sign: '+', value: d.prevRemainder },
+            { label: `Реализация за ${d.prevDate}`,   sign: '+', value: d.prevRealization },
         ];
 
         let html = '<table class="table table-sm mb-0">';
         rows.forEach(({ label, sign: s, value }) => {
             const num = Number(value);
             const colored = num !== 0
-                ? `<span class="${s === '+' ? 'text-success' : 'text-danger'}">${s === '+' ? '+' : '−'}${abs(num)}</span>`
-                : '<span class="text-muted">0</span>';
+                ? `<span class="${s === '+' ? 'text-success' : 'text-danger'}">${s === '+' ? '+' : '−'} ${abs(num)}</span>`
+                : `<span class="text-muted">${s === '+' ? '+' : '−'} 0</span>`;
             html += `<tr><td>${label}</td><td class="text-end">${colored}</td></tr>`;
         });
-        html += `<tr class="fw-bold table-active"><td>Касса</td><td class="text-end">${fmt(d.total)}</td></tr>`;
+        html += `<tr class="fw-bold table-active"><td>Итого в кассу</td><td class="text-end">${fmt(d.total)}</td></tr>`;
         html += '</table>';
 
         $('#orderContent').html(html);
+        $('#orderModal .modal-title').text(`${d.bus} - касса за ${d.date}`);
         $('#orderModal').modal('show');
     });
 

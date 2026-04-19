@@ -142,6 +142,19 @@ class OrderController extends Controller
             }
         }
 
+        $prevOrder = Order::query()
+            ->where('bus_id', $bus->id)
+            ->whereDate('date', $prevDate)
+            ->with('items')
+            ->first();
+
+        $prevOrderSum = 0;
+        if ($prevOrder) {
+            foreach ($prevOrder->items as $item) {
+                $prevOrderSum += ($item->amount ?? 0) * ($item->price ?? 0);
+            }
+        }
+
         $markdownSum = (int) MarkdownItem::query()
             ->selectRaw('COALESCE(SUM(markdown_items.amount), 0) as total')
             ->join('markdowns', 'markdown_items.markdown_id', '=', 'markdowns.id')
@@ -198,7 +211,7 @@ class OrderController extends Controller
             ->whereNotNull('realization_shops.amount')
             ->value('total');
 
-        $cashbox = $orderSum
+        $cashbox = $prevOrderSum
             - $markdownSum
             - $realizationSum
             - $invoiceSum
@@ -209,7 +222,9 @@ class OrderController extends Controller
 
         return response()->json([
             'bus' => $bus->license_plate . ' ' . $bus->serial_number,
-            'order_sum' => $orderSum,
+            'date' => date('d.m.Y', strtotime($date . ' -1 day')),
+            'prev_date' => date('d.m.Y', strtotime($prevDate . ' -1 day')),
+            'order_sum' => $prevOrderSum,
             'markdown' => $markdownSum,
             'realization' => $realizationSum,
             'invoice' => $invoiceSum,

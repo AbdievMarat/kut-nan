@@ -65,11 +65,11 @@ class OrderController extends Controller
         $prevDate = date('Y-m-d', strtotime($date . ' -1 day'));
         $prevSumRemainders = $this->getSumRemainders($prevDate);
         $prevSumRealizations = $this->getSumRealizations($prevDate);
+        $prevSumOrders = $this->getSumOrders($prevDate);
 
-        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations) {
+        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations, $prevSumOrders) {
             $orderAmounts = [];
             $orderMarked = [];
-            $orderSum = 0;
 
             /** @var Order $order */
             foreach ($bus->orders as $order) {
@@ -77,11 +77,12 @@ class OrderController extends Controller
                 foreach ($order->items as $item) {
                     $orderAmounts[$item->product_id] = $item->amount;
                     $orderMarked[$item->product_id] = (bool) $item->is_marked;
-                    $orderSum += ($item->amount ?? 0) * ($item->price ?? 0);
                 }
             }
 
-            $cashbox = $orderSum
+            $prevOrderSum = $prevSumOrders[$bus->id] ?? 0;
+
+            $cashbox = $prevOrderSum
                 - ($sumMarkdowns[$bus->id] ?? 0)
                 - ($sumRealizations[$bus->id] ?? 0)
                 - ($sumInvoices[$bus->id] ?? 0)
@@ -105,7 +106,7 @@ class OrderController extends Controller
                 'total_invoice_sum' => $sumInvoices[$bus->id] ?? '',
                 'total_invoice_return_sum' => $sumInvoiceReturns[$bus->id] ?? '',
                 'total_remainder_sum' => $sumRemainders[$bus->id] ?? '',
-                'order_sum' => $orderSum,
+                'order_sum' => $prevOrderSum,
                 'prev_remainder_sum' => $prevSumRemainders[$bus->id] ?? 0,
                 'prev_realization_sum' => $prevSumRealizations[$bus->id] ?? 0,
                 'total_cashbox' => $cashbox ?: '',
@@ -691,6 +692,22 @@ class OrderController extends Controller
             ->whereDate('invoice_returns.date', $date)
             ->whereNotNull('invoice_return_shops.amount')
             ->groupBy('invoice_returns.bus_id')
+            ->pluck('total', 'bus_id');
+    }
+
+    /**
+     * @param $date
+     * @return Collection
+     */
+    private function getSumOrders($date): Collection
+    {
+        return OrderItem::query()
+            ->select('orders.bus_id')
+            ->selectRaw('SUM(order_items.amount * order_items.price) as total')
+            ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
+            ->whereDate('orders.date', $date)
+            ->whereNotNull('order_items.amount')
+            ->groupBy('orders.bus_id')
             ->pluck('total', 'bus_id');
     }
 
