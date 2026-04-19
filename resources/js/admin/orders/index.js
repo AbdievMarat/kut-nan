@@ -213,7 +213,7 @@ $(() => {
         html += '</table>';
 
         $('#orderContent').html(html);
-        $('#orderModal .modal-title').text(`${d.bus} - касса за ${d.date}`);
+        $('#orderModal .modal-title').text(`Бус ${d.bus} должен сдать в кассу ${d.date}`);
         $('#orderModal').modal('show');
     });
 
