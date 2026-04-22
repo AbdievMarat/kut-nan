@@ -191,14 +191,14 @@ $(() => {
         const abs = (n) => Math.abs(Number(n)).toLocaleString('ru-RU');
 
         const rows = [
-            { label: `Сумма заказа за ${d.prevDate}`,   sign: '+', value: d.orderSum },
+            { label: `Сумма заказа за ${d.date}`,   sign: '+', value: d.orderSum },
             { label: 'Уценка',                        sign: '-', value: d.markdown },
             { label: 'Реализация',                    sign: '-', value: d.realization },
             { label: 'Накладные',                     sign: '-', value: d.invoice },
             { label: 'Возврат накладных',             sign: '+', value: d.invoiceReturn },
             { label: 'Остаток',                       sign: '-', value: d.remainder },
-            { label: `Остаток за ${d.prevDate}`,      sign: '+', value: d.prevRemainder },
-            { label: `Реализация за ${d.prevDate}`,   sign: '+', value: d.prevRealization },
+            { label: `Остаток за ${d.date}`,      sign: '+', value: d.prevRemainder },
+            { label: `Реализация за ${d.date}`,   sign: '+', value: d.prevRealization },
         ];
 
         let html = '<table class="table table-sm mb-0">';
