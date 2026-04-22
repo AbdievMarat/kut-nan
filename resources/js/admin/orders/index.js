@@ -197,8 +197,8 @@ $(() => {
             { label: 'Накладные',                     sign: '-', value: d.invoice },
             { label: 'Возврат накладных',             sign: '+', value: d.invoiceReturn },
             { label: 'Остаток',                       sign: '-', value: d.remainder },
-            { label: `Остаток за ${d.date}`,      sign: '+', value: d.prevRemainder },
-            { label: `Реализация за ${d.date}`,   sign: '+', value: d.prevRealization },
+            { label: `Остаток за ${d.prevDate}`,      sign: '+', value: d.prevRemainder },
+            { label: `Реализация за ${d.prevDate}`,   sign: '+', value: d.prevRealization },
         ];
 
         let html = '<table class="table table-sm mb-0">';

@@ -452,7 +452,7 @@
                     busLabel.textContent = 'Сдать в кассу ' + d.date;
 
                     var rows = [
-                        { label: 'Сумма заказа за ' + d.prev_date, sign: '+', val: d.order_sum },
+                        { label: 'Сумма заказа за ' + d.date, sign: '+', val: d.order_sum },
                         { label: 'Уценка',                        sign: '-', val: d.markdown },
                         { label: 'Реализации',                    sign: '-', val: d.realization },
                         { label: 'Накладные',                     sign: '-', val: d.invoice },
