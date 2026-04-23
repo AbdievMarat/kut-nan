@@ -128,30 +128,33 @@ class OrderController extends Controller
 
         $date = date('Y-m-d', strtotime('+1 day'));
         $prevDate = date('Y-m-d');
+        $prevPrevDate = date('Y-m-d', strtotime('-1 day'));;
 
         $order = Order::query()
             ->where('bus_id', $bus->id)
             ->whereDate('date', $date)
-            ->with('items')
+            ->with('items.product')
             ->first();
 
         $orderSum = 0;
         if ($order) {
             foreach ($order->items as $item) {
-                $orderSum += ($item->amount ?? 0) * ($item->price ?? 0);
+                $multiplier = $item->product->order_multiplier ?? 1;
+                $orderSum += ($item->amount ?? 0) * $multiplier * ($item->price ?? 0);
             }
         }
 
         $prevOrder = Order::query()
             ->where('bus_id', $bus->id)
-            ->whereDate('date', $prevDate)
-            ->with('items')
+            ->whereDate('date', $prevPrevDate)
+            ->with('items.product')
             ->first();
 
         $prevOrderSum = 0;
         if ($prevOrder) {
             foreach ($prevOrder->items as $item) {
-                $prevOrderSum += ($item->amount ?? 0) * ($item->price ?? 0);
+                $multiplier = $item->product->order_multiplier ?? 1;
+                $prevOrderSum += ($item->amount ?? 0) * $multiplier * ($item->price ?? 0);
             }
         }
 
