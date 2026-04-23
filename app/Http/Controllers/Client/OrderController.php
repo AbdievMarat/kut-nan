@@ -128,7 +128,11 @@ class OrderController extends Controller
 
         $date = date('Y-m-d', strtotime('+1 day'));
         $prevDate = date('Y-m-d');
-        $prevPrevDate = date('Y-m-d', strtotime('-1 day'));;
+
+        $prevPrevDate = date('Y-m-d', strtotime('-1 day'));
+        if (date('N', strtotime($prevPrevDate)) === '7') {
+            $prevPrevDate = date('Y-m-d', strtotime($prevPrevDate . ' -1 day'));
+        }
 
         $order = Order::query()
             ->where('bus_id', $bus->id)

@@ -63,6 +63,7 @@ class OrderController extends Controller
         $sumInvoiceReturns = $this->getSumInvoiceReturns($date);
 
         $prevDate = date('Y-m-d', strtotime($date . ' -1 day'));
+
         $prevPrevDate = date('Y-m-d', strtotime($date . ' -2 day'));
         if (date('N', strtotime($prevPrevDate)) === '7') {
             $prevPrevDate = date('Y-m-d', strtotime($prevPrevDate . ' -1 day'));
