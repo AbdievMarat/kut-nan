@@ -250,7 +250,8 @@ class OrderController extends Controller
         $busId = $request->input('bus_id');
 
         $items = OrderItem::query()
-            ->select('order_items.amount', 'order_items.price', 'products.name')
+            ->select('order_items.price', 'products.name', 'products.order_multiplier')
+            ->selectRaw('order_items.amount * products.order_multiplier as amount')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->whereDate('orders.date', $date)
@@ -726,8 +727,9 @@ class OrderController extends Controller
     {
         return OrderItem::query()
             ->select('orders.bus_id')
-            ->selectRaw('SUM(order_items.amount * order_items.price) as total')
+            ->selectRaw('SUM(order_items.amount * products.order_multiplier * order_items.price) as total')
             ->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
             ->whereDate('orders.date', $date)
             ->whereNotNull('order_items.amount')
             ->groupBy('orders.bus_id')
