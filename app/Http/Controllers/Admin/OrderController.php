@@ -67,9 +67,10 @@ class OrderController extends Controller
 
         $prevSumRemainders = $this->getSumRemainders($prevDate);
         $prevSumRealizations = $this->getSumRealizations($prevDate);
-        $prevSumOrders = $this->getSumOrders($prevPrevDate);
+        $prevSumOrders = $this->getSumOrders($prevPrevDate);// как быть в воскрсеньем
+        $currentSumOrders = $this->getSumOrders($date);
 
-        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations, $prevSumOrders) {
+        $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations, $prevSumOrders, $currentSumOrders) {
             $orderAmounts = [];
             $orderMarked = [];
 
@@ -108,6 +109,7 @@ class OrderController extends Controller
                 'total_invoice_sum' => $sumInvoices[$bus->id] ?? '',
                 'total_invoice_return_sum' => $sumInvoiceReturns[$bus->id] ?? '',
                 'total_remainder_sum' => $sumRemainders[$bus->id] ?? '',
+                'current_order_sum' => $currentSumOrders[$bus->id] ?? '',
                 'order_sum' => $prevOrderSum,
                 'prev_remainder_sum' => $prevSumRemainders[$bus->id] ?? 0,
                 'prev_realization_sum' => $prevSumRealizations[$bus->id] ?? 0,

@@ -39,6 +39,7 @@
                     @foreach ($products as $product)
                         <th class="vertical-text">{{ $product->name }}</th>
                     @endforeach
+                    <th class="vertical-text no-print">Сумма заказа</th>
                     <th class="vertical-text no-print">Уценка</th>
                     <th class="vertical-text no-print">Реализации</th>
                     <th class="vertical-text no-print">Накладные</th>
@@ -85,6 +86,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td></td>
                         <td class="print-only"></td>
@@ -96,6 +98,7 @@
                                 <span class="calculated-carts-value">{{ $totalCarts->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
+                        <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
@@ -118,6 +121,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td></td>
                         <td class="print-only"></td>
@@ -127,6 +131,7 @@
                         @foreach ($piecesPerCarts as $piecesPerCart)
                             <td class="text-center pieces-per-cart-cell">{{ $piecesPerCart }}</td>
                         @endforeach
+                        <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
@@ -142,6 +147,7 @@
                                 <span class="calculated-total-value">{{ $finalTotals->values()->get($index) ?? '' }}</span>
                             </td>
                         @endforeach
+                        <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
@@ -175,6 +181,7 @@
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
+                        <td class="no-print"></td>
                         <td></td>
                         <td></td>
                         <td class="print-only"></td>
@@ -196,6 +203,7 @@
                                     title="Очистить столбец">×</button>
                             </td>
                         @endforeach
+                        <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
                         <td class="no-print"></td>
@@ -224,6 +232,7 @@
                                 >
                             </td>
                         @endforeach
+                        <td class="no-print">{{ $bus['current_order_sum'] ?: '' }}</td>
                         <td class="no-print">
                             @if($bus['total_markdown_sum'])
                                 <a href="#" class="get-markdown-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
