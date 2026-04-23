@@ -63,9 +63,11 @@ class OrderController extends Controller
         $sumInvoiceReturns = $this->getSumInvoiceReturns($date);
 
         $prevDate = date('Y-m-d', strtotime($date . ' -1 day'));
+        $prevPrevDate = date('Y-m-d', strtotime($date . ' -2 day'));
+
         $prevSumRemainders = $this->getSumRemainders($prevDate);
         $prevSumRealizations = $this->getSumRealizations($prevDate);
-        $prevSumOrders = $this->getSumOrders($prevDate);
+        $prevSumOrders = $this->getSumOrders($prevPrevDate);
 
         $busesData = $buses->map(function ($bus) use ($products, $sumMarkdowns, $sumRealizations, $sumRemainders, $sumInvoices, $sumInvoiceReturns, $prevSumRemainders, $prevSumRealizations, $prevSumOrders) {
             $orderAmounts = [];
