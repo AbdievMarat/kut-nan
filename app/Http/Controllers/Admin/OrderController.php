@@ -258,7 +258,7 @@ class OrderController extends Controller
             ->where('orders.bus_id', $busId)
             ->whereNotNull('order_items.amount')
             ->where('order_items.amount', '>', 0)
-            ->orderBy('products.name')
+            ->orderBy('products.sort')
             ->get();
 
         return response()->json(['items' => $items]);
