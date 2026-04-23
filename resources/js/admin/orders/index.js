@@ -217,6 +217,37 @@ $(() => {
         $('#orderModal').modal('show');
     });
 
+    $(document).on('click', '.get-order-breakdown', function (event) {
+        event.preventDefault();
+
+        const date = $('#orders-table').data('date');
+        const busId = $(this).data('bus_id');
+
+        $.ajax({
+            type: 'GET',
+            url: '/admin/get-order-items',
+            headers: { 'X-CSRF-TOKEN': csrfToken() },
+            data: { date, bus_id: busId },
+        })
+            .done((res) => {
+                let total = 0;
+                let html = '<table class="table table-sm mb-0">';
+                res.items.forEach(({ name, amount, price }) => {
+                    const subtotal = amount * price;
+                    total += subtotal;
+                    html += `<tr><td>${name}</td><td class="text-end text-nowrap">${amount} шт × ${price} = ${subtotal.toLocaleString('ru-RU')}</td></tr>`;
+                });
+                html += `<tr class="fw-bold table-active"><td>Итого</td><td class="text-end">${total.toLocaleString('ru-RU')}</td></tr>`;
+                html += '</table>';
+                $('#orderContent').html(html);
+                $('#orderModal .modal-title').text('Детализация заказа');
+                $('#orderModal').modal('show');
+            })
+            .fail(() => {
+                alert('Ошибка при загрузке детализации заказа!');
+            });
+    });
+
     $(document).on('click', '.get-realization-shops', function (event) {
         event.preventDefault();
 

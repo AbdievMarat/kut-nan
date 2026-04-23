@@ -244,6 +244,25 @@ class OrderController extends Controller
      * @return JsonResponse
      * @throws Throwable
      */
+    public function getOrderItems(Request $request): JsonResponse
+    {
+        $date = $request->input('date');
+        $busId = $request->input('bus_id');
+
+        $items = OrderItem::query()
+            ->select('order_items.amount', 'order_items.price', 'products.name')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->whereDate('orders.date', $date)
+            ->where('orders.bus_id', $busId)
+            ->whereNotNull('order_items.amount')
+            ->where('order_items.amount', '>', 0)
+            ->orderBy('products.name')
+            ->get();
+
+        return response()->json(['items' => $items]);
+    }
+
     public function getMarkdownItems(Request $request): JsonResponse
     {
         $date = $request->input('date');

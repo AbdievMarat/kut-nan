@@ -232,7 +232,11 @@
                                 >
                             </td>
                         @endforeach
-                        <td class="no-print">{{ $bus['current_order_sum'] ?: '' }}</td>
+                        <td class="no-print">
+                            @if($bus['current_order_sum'])
+                                <a href="#" class="get-order-breakdown" data-bus_id="{{ $bus['id'] }}">{{ $bus['current_order_sum'] }}</a>
+                            @endif
+                        </td>
                         <td class="no-print">
                             @if($bus['total_markdown_sum'])
                                 <a href="#" class="get-markdown-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_markdown_sum'] }}</a>
