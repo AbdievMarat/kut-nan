@@ -22,6 +22,7 @@
                                 <input
                                         class="form-control"
                                         type="number"
+                                        step="any"
                                         name="product_prices[{{ $product->id }}]"
                                         id="product_{{ $product->id }}"
                                         value="{{ $prices->has($product->id) ? $prices[$product->id]->price : old('product_prices.'.$product->id) }}"

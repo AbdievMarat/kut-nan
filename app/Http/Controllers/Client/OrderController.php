@@ -194,7 +194,7 @@ class OrderController extends Controller
             ->whereNotNull('invoice_return_shops.amount')
             ->value('total');
 
-        $remainderSum = (int) RemainderItem::query()
+        $remainderSum = (float) RemainderItem::query()
             ->selectRaw('COALESCE(SUM(remainder_items.amount * remainder_items.price), 0) as total')
             ->join('remainders', 'remainder_items.remainder_id', '=', 'remainders.id')
             ->whereDate('remainders.date', $date)
@@ -202,7 +202,7 @@ class OrderController extends Controller
             ->whereNotNull('remainder_items.amount')
             ->value('total');
 
-        $prevRemainderSum = (int) RemainderItem::query()
+        $prevRemainderSum = (float) RemainderItem::query()
             ->selectRaw('COALESCE(SUM(remainder_items.amount * remainder_items.price), 0) as total')
             ->join('remainders', 'remainder_items.remainder_id', '=', 'remainders.id')
             ->whereDate('remainders.date', $prevDate)

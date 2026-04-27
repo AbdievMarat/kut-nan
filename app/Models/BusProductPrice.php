@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $bus_id
  * @property int $product_id
- * @property integer $price
+ * @property float $price
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
