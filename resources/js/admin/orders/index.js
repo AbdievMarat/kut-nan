@@ -186,9 +186,9 @@ $(() => {
         event.preventDefault();
 
         const d = $(this).data();
-        const fmt = (n) => Number(n) !== 0 ? Number(n).toLocaleString('ru-RU') : '0';
+        const fmt = (n) => { const v = parseFloat(Number(n).toFixed(2)); return v !== 0 ? v.toLocaleString('ru-RU') : '0'; };
         const sign = (n) => Number(n) >= 0 ? '+' : '−';
-        const abs = (n) => Math.abs(Number(n)).toLocaleString('ru-RU');
+        const abs = (n) => parseFloat(Math.abs(Number(n)).toFixed(2)).toLocaleString('ru-RU');
 
         const rows = [
             { label: `Сумма заказа за ${d.date}`,   sign: '+', value: d.orderSum },

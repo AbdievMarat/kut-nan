@@ -259,7 +259,7 @@
                         </td>
                         <td>
                             @if($bus['total_remainder_sum'])
-                                <a href="#" class="get-remainder-items" data-bus_id="{{ $bus['id'] }}">{{ $bus['total_remainder_sum'] }}</a>
+                                <a href="#" class="get-remainder-items" data-bus_id="{{ $bus['id'] }}">{{ (int) $bus['total_remainder_sum'] }}</a>
                             @endif
                         </td>
                         <td>
