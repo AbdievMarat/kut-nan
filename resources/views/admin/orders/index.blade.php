@@ -234,7 +234,7 @@
                         @endforeach
                         <td class="no-print">
                             @if($bus['current_order_sum'])
-                                <a href="#" class="get-order-breakdown" data-bus_id="{{ $bus['id'] }}">{{ $bus['current_order_sum'] }}</a>
+                                <a href="#" class="get-order-breakdown" data-bus_id="{{ $bus['id'] }}">{{ (int) $bus['current_order_sum'] }}</a>
                             @endif
                         </td>
                         <td class="no-print">
