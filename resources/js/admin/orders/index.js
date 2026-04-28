@@ -232,7 +232,7 @@ $(() => {
                 res.items.forEach(({ name, amount, price }) => {
                     const subtotal = amount * price;
                     total += subtotal;
-                    html += `<tr><td>${name}</td><td class="text-end text-nowrap">${amount} шт × ${price.toLocaleString('ru-RU')} = ${subtotal.toLocaleString('ru-RU')}</td></tr>`;
+                    html += `<tr><td>${name}</td><td class="text-end text-nowrap">${amount} шт. × ${price.toLocaleString('ru-RU')} = ${subtotal.toLocaleString('ru-RU')}</td></tr>`;
                 });
                 html += `<tr class="fw-bold table-active"><td>Итого</td><td class="text-end">${total.toLocaleString('ru-RU')}</td></tr>`;
                 html += '</table>';
