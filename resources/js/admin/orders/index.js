@@ -182,6 +182,9 @@ $(() => {
         }
     });
 
+    function fmt(n) { return Number(n).toLocaleString('ru-RU'); }
+    function abs(n) { return Math.abs(Number(n)).toLocaleString('ru-RU'); }
+
     $(document).on('click', '.get-cashbox-breakdown', function (event) {
         event.preventDefault();
 
