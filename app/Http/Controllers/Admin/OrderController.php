@@ -64,9 +64,9 @@ class OrderController extends Controller
 
         $prevDate = date('Y-m-d', strtotime($date . ' -1 day'));
 
-        $prevPrevDate = date('Y-m-d', strtotime($date . ' -2 day'));
+        $prevPrevDate = date('Y-m-d', strtotime($date . ' -1 day'));
         if (date('N', strtotime($prevPrevDate)) === '7') {
-            $prevPrevDate = date('Y-m-d', strtotime($prevPrevDate . ' -1 day'));
+            $prevPrevDate = date('Y-m-d', strtotime($prevPrevDate));
         }
 
         $prevSumRemainders = $this->getSumRemainders($prevDate);
